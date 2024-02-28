@@ -1,12 +1,18 @@
 const { reportRepository } = require("../repository/report.repository");
 const {
   NoDataError,
-  // RequiredIdError,
-  // InvalidIdError,
   ReportAlreadyExists,
   ReportDoesntExist,
   formErorr,
 } = require("../errors/errors");
+
+const exist = async (id) => {
+  const reports = await reportRepository.find();
+  const reportExists = reports.find((report) => report.id == id);
+  if (!reportExists) {
+    throw new ReportDoesntExist(id);
+  }
+};
 
 exports.reportController = {
   async getAllReports(req, res) {
@@ -74,51 +80,51 @@ exports.reportController = {
       res.status(error?.status || 500).json(error.message);
     }
   },
-  async updateReport() {
-    // try {
-    //   const {
-    //     body: plan,
-    //     params: { id },
-    //   } = req;
-    //   if (isNaN(id) || id <= 0) {
-    //     throw new InvalidIdError(id);
-    //   }
-    //   const plans = await reportRepository.find();
-    //   const planExists = plans.find((plan) => plan.id == Number(id));
-    //   if (!planExists) {
-    //     throw new ReportDoesntExist(id);
-    //   }
-    //   const result = {
-    //     status: 200,
-    //     message: "updeated successfully plan with id: " + id + ".",
-    //     data: await reportRepository.update(id, plan),
-    //   };
-    //   res.status(result.status);
-    //   res.json(result.message);
-    // } catch (error) {
-    //   res.status(error?.status || 500).json(error.message);
-    // }
+  async updateReport(req, res) {
+    try {
+      const {
+        body: report,
+        params: { id },
+      } = req;
+      // const reports = await reportRepository.find();
+      // const reportExists = reports.find((report) => report.id == id);
+      // if (!reportExists) {
+      //   throw new ReportDoesntExist(id);
+      // }
+      await exist(id);
+      const result = {
+        status: 200,
+        message: "updeated successfully report with id: " + id + ".",
+        data: await reportRepository.update(id, report),
+      };
+      res.status(result.status);
+      res.json(result.message);
+    } catch (error) {
+      res.status(error?.status || 500).json(error.message);
+    }
   },
-  async deleteReport() {
-    //   try {
-    //     const { id } = req.params;
-    //     if (isNaN(id) || id <= 0) {
-    //       throw new InvalidIdError(id);
-    //     }
-    //     const plans = await reportRepository.find();
-    //     const planExists = plans.find((plan) => plan.id == Number(id));
-    //     if (!planExists) {
-    //       throw new ReportDoesntExist(id);
-    //     }
-    //     const result = {
-    //       status: 200,
-    //       message: "deleted successfully plan with id: " + id + ".",
-    //       data: await reportRepository.delete(id),
-    //     };
-    //     res.status(result.status);
-    //     res.json(result.message);
-    //   } catch (error) {
-    //     res.status(error?.status || 500).json(error.message);
-    //   }
+  async deleteReport(req, res) {
+    try {
+      const { id } = req.params;
+
+      // const reports = await reportRepository.find();
+      // const reportExists = reports.find((report) => report.id == id);
+      // if (!reportExists) {
+      //   throw new ReportDoesntExist(id);
+      // }
+      await exist(id);
+      const result = {
+        status: 200,
+        message: "report with id: " + id + " deleted successfully.",
+        data: await reportRepository.delete(id),
+      };
+      if (result.data === null) {
+        throw new ReportDoesntExist(id);
+      }
+      res.status(result.status);
+      res.json(result.message);
+    } catch (error) {
+      res.status(error?.status || 500).json(error.message);
+    }
   },
 };

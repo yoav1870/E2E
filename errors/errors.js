@@ -28,20 +28,6 @@ class formErorr extends Error {
     this.name = "formErorr";
   }
 }
-// class NotFoundErrorId extends Error {
-//   constructor(id) {
-//     super("report with id: " + id + " not found");
-//     this.status = 404;
-//     this.name = "NotFoundError";
-//   }
-// }
-// class InvalidIdError extends Error {
-//   constructor(id) {
-//     super("Invalid id, received id: " + id + " .");
-//     this.status = 400;
-//     this.name = "InvalidIdError";
-//   }
-// }
 class RequiredIdError extends Error {
   constructor(action) {
     super("required id to " + action + " the report.");
@@ -76,8 +62,6 @@ module.exports = {
   ServerError,
   NotFoundUrlError,
   NotFoundCRUD,
-  // NotFoundErrorId,
-  // InvalidIdError,
   RequiredIdError,
   ReportAlreadyExists,
   ReportDoesntExist,

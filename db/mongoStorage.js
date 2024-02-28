@@ -35,9 +35,16 @@ module.exports = class MongoStorage {
     return report;
   }
   delete(id) {
-    return this.Model.deleteOne({ id });
+    if (!isValidObjectId(id)) {
+      return null;
+    }
+    return this.Model.deleteOne({ _id: id });
   }
   update(id, data) {
-    return this.Model.updateOne({ id }, data);
+    const { _id, ...updateData } = data;
+    return this.Model.findByIdAndUpdate(id, updateData, {
+      new: true,
+      runValidators: true,
+    });
   }
 };
