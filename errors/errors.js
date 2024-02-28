@@ -21,39 +21,48 @@ class NotFoundCRUD extends Error {
     this.name = "NotFoundCRUD";
   }
 }
-class NotFoundErrorId extends Error {
-  constructor(id) {
-    super("plan with id: " + id + " not found");
-    this.status = 404;
-    this.name = "NotFoundError";
-  }
-}
-class InvalidIdError extends Error {
-  constructor(id) {
-    super("Invalid id, received id: " + id + " .");
+class formErorr extends Error {
+  constructor() {
+    super("Invalid form data");
     this.status = 400;
-    this.name = "InvalidIdError";
+    this.name = "formErorr";
   }
 }
+// class NotFoundErrorId extends Error {
+//   constructor(id) {
+//     super("report with id: " + id + " not found");
+//     this.status = 404;
+//     this.name = "NotFoundError";
+//   }
+// }
+// class InvalidIdError extends Error {
+//   constructor(id) {
+//     super("Invalid id, received id: " + id + " .");
+//     this.status = 400;
+//     this.name = "InvalidIdError";
+//   }
+// }
 class RequiredIdError extends Error {
   constructor(action) {
-    super("required id to " + action + " the plan.");
+    super("required id to " + action + " the report.");
     this.status = 404;
     this.name = "RequiredIdError";
   }
 }
-class PlanAlreadyExistsError extends Error {
-  constructor(id) {
-    super("Plan with id : " + id + " already exists");
+class ReportAlreadyExists extends Error {
+  constructor(location, description) {
+    super(
+      "Report of " + description + " in " + location + " already in the list"
+    );
     this.status = 409;
-    this.name = "PlanExistsError";
+    this.name = "ReportExistsError";
   }
 }
-class PlanDoesNotExistError extends Error {
+class ReportDoesntExist extends Error {
   constructor(id) {
-    super("Plan with id: " + id + " does not exist");
+    super("Report with id: " + id + " does not exist");
     this.status = 404;
-    this.name = "PlanDoesNotExistError";
+    this.name = "ReportDoesntExist";
   }
 }
 class NoDataError extends Error {
@@ -67,10 +76,11 @@ module.exports = {
   ServerError,
   NotFoundUrlError,
   NotFoundCRUD,
-  NotFoundErrorId,
-  InvalidIdError,
+  // NotFoundErrorId,
+  // InvalidIdError,
   RequiredIdError,
-  PlanAlreadyExistsError,
-  PlanDoesNotExistError,
+  ReportAlreadyExists,
+  ReportDoesntExist,
   NoDataError,
+  formErorr,
 };

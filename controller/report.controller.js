@@ -1,10 +1,11 @@
 const { reportRepository } = require("../repository/report.repository");
 const {
   NoDataError,
-  InvalidIdError,
-  PlanDoesNotExistError,
-  RequiredIdError,
-  PlanAlreadyExistsError,
+  // RequiredIdError,
+  // InvalidIdError,
+  ReportAlreadyExists,
+  ReportDoesntExist,
+  formErorr,
 } = require("../errors/errors");
 
 exports.reportController = {
@@ -26,15 +27,12 @@ exports.reportController = {
   async getReport(req, res) {
     try {
       const { id } = req.params;
-      if (isNaN(id) || id <= 0) {
-        throw new InvalidIdError(id);
-      }
       const result = {
         status: 200,
         data: await reportRepository.retrieve(id),
       };
-      if (result.data.length === 0) {
-        throw new PlanDoesNotExistError(id);
+      if (result.data === null) {
+        throw new ReportDoesntExist(id);
       }
       res.status(result.status);
       res.json(result.data);
@@ -42,76 +40,85 @@ exports.reportController = {
       res.status(error?.status || 500).json(error.message);
     }
   },
+
   async createReport(req, res) {
     try {
       const { body } = req;
-      if (!body.id) {
-        throw new RequiredIdError("create");
+      if (
+        !body.location ||
+        !body.description ||
+        !body.severity ||
+        !body.status ||
+        !body.timestamp ||
+        !body.submittedBy ||
+        !body.assignedTo
+      ) {
+        throw new formErorr();
       }
-      if (isNaN(body.id) || body.id <= 0) {
-        throw new InvalidIdError(body.id);
-      }
-      const plans = await reportRepository.find();
-      const planExists = plans.find((plan) => plan.id == body.id);
-      if (planExists) {
-        throw new PlanAlreadyExistsError(body.id);
+      const reports = await reportRepository.find();
+      const reportExists = reports.find(
+        (report) =>
+          report.location === body.location &&
+          report.description === body.description
+      );
+      if (reportExists) {
+        throw new ReportAlreadyExists(body.location, body.description);
       }
       const result = {
         status: 201,
-        message: "created",
         data: await reportRepository.create(body),
       };
       res.status(result.status);
-      res.json(result.message);
+      res.json(result.data);
     } catch (error) {
       res.status(error?.status || 500).json(error.message);
     }
   },
-  async updateReport(req, res) {
-    try {
-      const {
-        body: plan,
-        params: { id },
-      } = req;
-      if (isNaN(id) || id <= 0) {
-        throw new InvalidIdError(id);
-      }
-      const plans = await reportRepository.find();
-      const planExists = plans.find((plan) => plan.id == Number(id));
-      if (!planExists) {
-        throw new PlanDoesNotExistError(id);
-      }
-      const result = {
-        status: 200,
-        message: "updeated successfully plan with id: " + id + ".",
-        data: await reportRepository.update(id, plan),
-      };
-      res.status(result.status);
-      res.json(result.message);
-    } catch (error) {
-      res.status(error?.status || 500).json(error.message);
-    }
+  async updateReport() {
+    // try {
+    //   const {
+    //     body: plan,
+    //     params: { id },
+    //   } = req;
+    //   if (isNaN(id) || id <= 0) {
+    //     throw new InvalidIdError(id);
+    //   }
+    //   const plans = await reportRepository.find();
+    //   const planExists = plans.find((plan) => plan.id == Number(id));
+    //   if (!planExists) {
+    //     throw new ReportDoesntExist(id);
+    //   }
+    //   const result = {
+    //     status: 200,
+    //     message: "updeated successfully plan with id: " + id + ".",
+    //     data: await reportRepository.update(id, plan),
+    //   };
+    //   res.status(result.status);
+    //   res.json(result.message);
+    // } catch (error) {
+    //   res.status(error?.status || 500).json(error.message);
+    // }
   },
-  async deleteReport(req, res) {
-    try {
-      const { id } = req.params;
-      if (isNaN(id) || id <= 0) {
-        throw new InvalidIdError(id);
-      }
-      const plans = await reportRepository.find();
-      const planExists = plans.find((plan) => plan.id == Number(id));
-      if (!planExists) {
-        throw new PlanDoesNotExistError(id);
-      }
-      const result = {
-        status: 200,
-        message: "deleted successfully plan with id: " + id + ".",
-        data: await reportRepository.delete(id),
-      };
-      res.status(result.status);
-      res.json(result.message);
-    } catch (error) {
-      res.status(error?.status || 500).json(error.message);
-    }
+  async deleteReport() {
+    //   try {
+    //     const { id } = req.params;
+    //     if (isNaN(id) || id <= 0) {
+    //       throw new InvalidIdError(id);
+    //     }
+    //     const plans = await reportRepository.find();
+    //     const planExists = plans.find((plan) => plan.id == Number(id));
+    //     if (!planExists) {
+    //       throw new ReportDoesntExist(id);
+    //     }
+    //     const result = {
+    //       status: 200,
+    //       message: "deleted successfully plan with id: " + id + ".",
+    //       data: await reportRepository.delete(id),
+    //     };
+    //     res.status(result.status);
+    //     res.json(result.message);
+    //   } catch (error) {
+    //     res.status(error?.status || 500).json(error.message);
+    //   }
   },
 };

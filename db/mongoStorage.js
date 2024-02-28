@@ -1,6 +1,8 @@
 const mongoose = require("mongoose");
 const Path = require("path");
 
+const isValidObjectId = (id) => mongoose.Types.ObjectId.isValid(id);
+
 module.exports = class MongoStorage {
   constructor(report) {
     this.Model = require(Path.resolve(
@@ -11,7 +13,6 @@ module.exports = class MongoStorage {
   }
   connect() {
     const connectionUrl = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@${process.env.DB_HOST}`;
-    console.log(connectionUrl);
     mongoose
       .connect(connectionUrl)
       .then(() => {
@@ -23,11 +24,15 @@ module.exports = class MongoStorage {
     return this.Model.find();
   }
   retrieve(id) {
-    return this.Model.find({ id });
+    if (!isValidObjectId(id)) {
+      return null;
+    }
+    return this.Model.findById(id);
   }
   create(data) {
-    const plan = new this.Model(data);
-    plan.save();
+    const report = new this.Model(data);
+    report.save();
+    return report;
   }
   delete(id) {
     return this.Model.deleteOne({ id });
