@@ -27,7 +27,6 @@ reportRouter.use((err, req, res, next) => {
   if (err instanceof RequiredIdError || err instanceof NotFoundCRUD) {
     res.status(err?.status || 500).json(err.message);
   }
-  next();
 });
 
 module.exports = { reportRouter };

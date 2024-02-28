@@ -16,7 +16,9 @@ module.exports = class MongoStorage {
     mongoose
       .connect(connectionUrl)
       .then(() => {
-        console.log("Database connected");
+        if (process.env.NODE_ENV !== "test") {
+          console.log("Database connected");
+        }
       })
       .catch((err) => console.log(`connection error: ${err}`));
   }
