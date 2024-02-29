@@ -86,7 +86,7 @@ const Menu = () => {
               ...linkStyle,
               color: hoveredButton === "contact" ? "#4267B2" : "white",
             }}
-            onMouseEnter={() => handleMouseEnter("contact")}
+            onMouseEnter={() => handleMouseEnter("old-reports")}
             onMouseLeave={handleMouseLeave}
           >
             <FaRegTrashCan />
