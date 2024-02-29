@@ -40,8 +40,8 @@ const Menu = () => {
     margin: "20px 0px",
   };
 
-  const handleMouseEnter = (buttonId) => {
-    setHoveredButton(buttonId);
+  const handleMouseEnter = (linkId) => {
+    setHoveredButton(linkId);
   };
 
   const handleMouseLeave = () => {
@@ -81,12 +81,12 @@ const Menu = () => {
         </li>
         <li style={liStyle}>
           <Link
-            to="/contact"
+            to="/oldreports"
             style={{
               ...linkStyle,
-              color: hoveredButton === "contact" ? "#4267B2" : "white",
+              color: hoveredButton === "oldreports" ? "#4267B2" : "white",
             }}
-            onMouseEnter={() => handleMouseEnter("old-reports")}
+            onMouseEnter={() => handleMouseEnter("oldreports")}
             onMouseLeave={handleMouseLeave}
           >
             <FaRegTrashCan />
