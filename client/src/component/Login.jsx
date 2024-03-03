@@ -1,8 +1,7 @@
-// src/components/Login.js
-
 import { useState } from "react";
+import PropTypes from "prop-types";
 
-const Login = (authenticate) => {
+const Login = ({ authenticate }) => {
   const [credentials, setCredentials] = useState({ email: "", password: "" });
   const [error, setError] = useState(null);
 
@@ -20,6 +19,7 @@ const Login = (authenticate) => {
       setError("Invalid email or password");
     }
   };
+
   const loginStyle = {
     display: "flex",
     flexDirection: "column",
@@ -37,6 +37,7 @@ const Login = (authenticate) => {
     height: "100vh",
     color: "white",
   };
+
   const leftStyle = {
     display: "flex",
     flexDirection: "column",
@@ -45,6 +46,7 @@ const Login = (authenticate) => {
     width: "30vw",
     color: "#4267B2",
   };
+
   const inputStyle = {
     margin: "10px",
     padding: "10px",
@@ -53,6 +55,7 @@ const Login = (authenticate) => {
     backgroundColor: "transparent",
     color: "#4267B2",
   };
+
   const buttonStyle = {
     margin: "10px",
     padding: "10px",
@@ -67,7 +70,7 @@ const Login = (authenticate) => {
     <div style={pageStyle}>
       <div style={leftStyle}>
         <h1>Our app</h1>
-        welcome to our app please verify your email and password
+        Welcome to our app. Please verify your email and password.
       </div>
       <form onSubmit={handleSubmit} style={loginStyle}>
         <input
@@ -95,6 +98,10 @@ const Login = (authenticate) => {
       </form>
     </div>
   );
+};
+
+Login.propTypes = {
+  authenticate: PropTypes.func.isRequired,
 };
 
 export default Login;

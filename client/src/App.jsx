@@ -9,7 +9,7 @@ import Login from "./component/Login";
 const App = () => {
   const [authenticated, setAuthenticated] = useState(false);
 
-  const authenticate = (isAuthenticated) => {
+  const handleAuthentication = (isAuthenticated) => {
     setAuthenticated(isAuthenticated);
   };
 
@@ -27,7 +27,7 @@ const App = () => {
           </ContainerRow>
         </>
       ) : (
-        <Login authenticate={authenticate} />
+        <Login authenticate={handleAuthentication} />
       )}
     </Router>
   );
