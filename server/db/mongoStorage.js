@@ -4,8 +4,8 @@ const Path = require("path");
 const isValidObjectId = (id) => mongoose.Types.ObjectId.isValid(id);
 
 module.exports = class MongoStorage {
-  constructor(user) {
-    this.user = user;
+  constructor(entity) {
+    this.entity = entity;
     this.connect();
     this.loadModel();
   }
@@ -13,7 +13,7 @@ module.exports = class MongoStorage {
   connect() {
     const connectionUrl = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@${process.env.DB_HOST}`;
     mongoose
-      .connect(connectionUrl)
+      .connect(connectionUrl, { autoIndex: true })
       .then(() => console.log("Database connected"))
       .catch((err) => console.error("Connection error:", err));
   }
@@ -21,7 +21,7 @@ module.exports = class MongoStorage {
   loadModel() {
     const modelPath = Path.resolve(
       __dirname,
-      `../models/${this.user}.model.js`
+      `../models/${this.entity}.model.js`
     );
     const modelModule = require(modelPath);
     this.Model = modelModule;
@@ -47,8 +47,17 @@ module.exports = class MongoStorage {
     }
     return this.Model.deleteOne({ _id: id });
   }
-  findByRoleAndProfession(role, profession) {
-    return this.Model.find({ role: role, profession: profession });
+  findNearbyAndByProfession(location, profession) {
+    return this.Model.find({
+      location: {
+        $nearSphere: {
+          $geometry: location,
+          $maxDistance: 20000,
+        },
+      },
+      profession,
+      role: "service_provider",
+    });
   }
   updateReports(id, reports) {
     if (!isValidObjectId(id)) {

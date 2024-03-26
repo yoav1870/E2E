@@ -25,30 +25,31 @@ const damageReportSchema = new mongoose.Schema(
     },
     urgency: {
       type: Number,
-      required: [true, "A fault must have a urgency"],
+      required: [true, "A report must have a urgency"],
     },
     reportByUser: {
       type: Schema.Types.ObjectId,
       ref: "user.model",
-      required: [true, "A fault must have a reporter"],
+      required: [true, "A report must have a reporter"],
     },
-    assignedToUser: {
-      type: [Schema.Types.ObjectId],
-      ref: "user.model",
-    },
+    assignedUser: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+
     profession: {
       type: String,
-      required: [true, "A fault must have a profession"],
+      required: [true, "A report must have a profession"],
     },
     createdAt: {
       type: Date,
       default: Date.now,
     },
+    dateOfResolve: {
+      type: Date,
+      required: [true, "A report must have a date of resolve"],
+    },
     resolved: {
       type: Boolean,
       default: false,
     },
-    assignedUser: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
   },
   { collection: "damage_reports", timestamps: true }
 );

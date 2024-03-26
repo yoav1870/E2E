@@ -58,22 +58,51 @@ exports.reportController = {
         body.status &&
         body.urgency &&
         body.reportByUser &&
-        body.profession
+        body.profession &&
+        body.dateOfResolve
       ) {
-        const serviceProviders = await UserRepository.findByRoleAndProfession(
-          "service_provider",
+        //find the nearest service provider by profession and by location up to 20km
+        const serviceProviders = await UserRepository.findNearbyAndByProfession(
+          body.location,
           body.profession
         );
-        serviceProviders.sort((a, b) => b.ranking - a.ranking);
-
-        const assignedServiceProvider =
-          serviceProviders.length > 0 ? serviceProviders[0] : null;
-
-        if (!assignedServiceProvider) {
+        if (!serviceProviders) {
           throw {
             status: 400,
             message: "No service provider available",
           };
+        }
+        // sort the service providers by ranking in the 20km radius
+        serviceProviders.sort((a, b) => b.ranking - a.ranking);
+
+        // get the service provider with the highest ranking in the 20km radius
+        // const assignedServiceProvider =
+        //   serviceProviders.length > 0 ? serviceProviders[0] : null;
+
+        // check if the service provider has a report on the same date
+        // not workinggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggg
+        let assignedServiceProvider = null;
+        const newReportDate = new Date(body.dateOfResolve);
+
+        for (const provider of serviceProviders) {
+          let isAvailable = true;
+          for (const report of provider.reports) {
+            let reportDate = new Date(report.dateOfResolve);
+
+            if (
+              reportDate.getFullYear() === newReportDate.getFullYear() &&
+              reportDate.getMonth() === newReportDate.getMonth() &&
+              reportDate.getDate() === newReportDate.getDate()
+            ) {
+              isAvailable = false;
+              break;
+            }
+          }
+
+          if (isAvailable) {
+            assignedServiceProvider = provider;
+            break;
+          }
         }
 
         const newReport = {
@@ -83,6 +112,7 @@ exports.reportController = {
           photo: body.photo,
           urgency: body.urgency,
           reportByUser: body.reportByUser,
+          dateOfResolve: body.dateOfResolve,
           assignedUser: assignedServiceProvider,
           profession: body.profession,
         };
