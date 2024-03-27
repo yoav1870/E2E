@@ -1,4 +1,12 @@
 const { UserRepository } = require("../repositories/user.repository");
+const {
+  NoDataError,
+  DataNotExistsError,
+  FormError,
+  DataAlreadyExistsError,
+  FailedCRUD,
+} = require("../errors/general.error");
+const { InvalidRoleError } = require("../errors/user.error");
 
 exports.userController = {
   async getAllUsers(req, res) {
@@ -8,10 +16,7 @@ exports.userController = {
         data: await UserRepository.find(),
       };
       if (result.data.length === 0) {
-        throw {
-          status: 404,
-          message: "No users found",
-        };
+        throw new NoDataError("getAllUsers");
       }
       res.status(result.status).json(result.data);
     } catch (error) {
@@ -25,10 +30,7 @@ exports.userController = {
         data: await UserRepository.retrieve(req.params.id),
       };
       if (!result.data) {
-        throw {
-          status: 404,
-          message: "User not found",
-        };
+        throw new DataNotExistsError("getUser", req.params.id);
       }
       res.status(result.status).json(result.data);
     } catch (error) {
@@ -53,18 +55,14 @@ exports.userController = {
               user.username === body.username &&
               user.password === body.password
             ) {
-              throw {
-                status: 400,
-                message: "User with this username already exists",
-              };
+              throw new DataAlreadyExistsError(
+                "User with this username already exists"
+              );
             }
           });
           const createdUser = await UserRepository.create(body);
           if (!createdUser) {
-            throw {
-              status: 400,
-              message: "Failed to create user",
-            };
+            throw new FailedCRUD("Failed to create a user");
           }
           const result = {
             status: 201,
@@ -72,10 +70,9 @@ exports.userController = {
           };
           res.status(result.status).json(result.data);
         } else {
-          throw {
-            status: 400,
-            message: "Please provide all required fields",
-          };
+          throw new FormError(
+            "Please provide all required fields at createUser"
+          );
         }
       } else {
         if (body.role === "service_request") {
@@ -111,10 +108,7 @@ exports.userController = {
             };
           }
         } else {
-          throw {
-            status: 400,
-            message: "Invalid role",
-          };
+          throw new InvalidRoleError(body.role);
         }
       }
     } catch (error) {

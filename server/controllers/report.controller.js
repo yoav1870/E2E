@@ -1,5 +1,12 @@
 const { reportRepository } = require("../repositories/report.repository");
 const { UserRepository } = require("../repositories/user.repository");
+const {
+  NoDataError,
+  DataNotExistsError,
+  FormError,
+  DataAlreadyExistsError, // צריך להחליט עפי איזה נתונים טופס הוא אותו טופס
+  FailedCRUD,
+} = require("../errors/general.error");
 
 exports.reportController = {
   async getAllReports(req, res) {
@@ -9,10 +16,7 @@ exports.reportController = {
         data: await reportRepository.find(),
       };
       if (result.data.length === 0) {
-        throw {
-          status: 404,
-          message: "No reports found",
-        };
+        throw new NoDataError("getAllReports");
       }
       res.status(result.status).json(result.data);
     } catch (error) {
@@ -26,10 +30,7 @@ exports.reportController = {
         data: await reportRepository.retrieve(req.params.id),
       };
       if (!result.data) {
-        throw {
-          status: 404,
-          message: "Report not found",
-        };
+        throw new DataNotExistsError("getReport", req.params.id);
       }
       res.status(result.status).json(result.data);
     } catch (error) {
@@ -41,16 +42,12 @@ exports.reportController = {
       const body = req.body;
       userSubmit = await UserRepository.retrieve(body.reportByUser);
       if (!userSubmit) {
-        throw {
-          status: 400,
-          message: "User that submited the report not found",
-        };
+        throw new DataNotExistsError("createReport", body.reportByUser);
       }
       if (userSubmit.role !== "service_request") {
-        throw {
-          status: 400,
-          message: "User that submited the report is not a service request",
-        };
+        throw new FormError(
+          "User that submited the report is not a service request"
+        );
       }
       if (
         body.location &&
@@ -67,35 +64,26 @@ exports.reportController = {
           body.profession
         );
         if (!serviceProviders) {
-          throw {
-            status: 400,
-            message: "No service provider available",
-          };
+          throw new NoDataError("createReport. No service provider available");
         }
         // sort the service providers by ranking in the 20km radius
         serviceProviders.sort((a, b) => b.ranking - a.ranking);
-
-        // get the service provider with the highest ranking in the 20km radius
-        // const assignedServiceProvider =
-        //   serviceProviders.length > 0 ? serviceProviders[0] : null;
-
         // check if the service provider has a report on the same date
-        // not workinggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggg
         let assignedServiceProvider = null;
         const newReportDate = new Date(body.dateOfResolve);
-
         for (const provider of serviceProviders) {
           let isAvailable = true;
-          for (const report of provider.reports) {
-            let reportDate = new Date(report.dateOfResolve);
 
-            if (
-              reportDate.getFullYear() === newReportDate.getFullYear() &&
-              reportDate.getMonth() === newReportDate.getMonth() &&
-              reportDate.getDate() === newReportDate.getDate()
-            ) {
-              isAvailable = false;
-              break;
+          for (const reportId of provider.reports) {
+            if (!reportId) continue;
+            const report = await reportRepository.retrieve(reportId);
+            if (report) {
+              const reportDate = report.dateOfResolve;
+
+              if (reportDate.getTime() === newReportDate.getTime()) {
+                isAvailable = false;
+                break;
+              }
             }
           }
 
@@ -121,22 +109,21 @@ exports.reportController = {
           data: await reportRepository.create(newReport),
         };
         if (!result.data) {
-          throw {
-            status: 400,
-            message: "Report not created",
-          };
+          throw new FailedCRUD("Failed to create a report");
         }
         assignedServiceProvider.reports.push(result.data._id);
         await UserRepository.updateReports(
           assignedServiceProvider._id,
           assignedServiceProvider.reports
         );
+        if (!result.data) {
+          throw new FailedCRUD("Failed to update the service provider");
+        }
         res.status(result.status).json("Report created");
       } else {
-        throw {
-          status: 400,
-          message: "Please provide all required fields",
-        };
+        throw new FormError(
+          "Please provide all required fields at createReport"
+        );
       }
     } catch (error) {
       res.status(error?.status || 500).json(error.message);
