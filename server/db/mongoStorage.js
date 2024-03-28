@@ -69,4 +69,24 @@ module.exports = class MongoStorage {
       { new: true, runValidators: true }
     );
   }
+  updateDateOfResolve(id, date) {
+    if (!isValidObjectId(id)) {
+      return null;
+    }
+    return this.Model.findByIdAndUpdate(
+      id,
+      { dateOfResolve: date },
+      { new: true, runValidators: true }
+    );
+  }
+  updateAssignedTo(id, assignedTo) {
+    if (!isValidObjectId(id)) {
+      return null;
+    }
+    return this.Model.findByIdAndUpdate(
+      id,
+      { assignedUser: assignedTo },
+      { new: true, runValidators: true }
+    );
+  }
 };

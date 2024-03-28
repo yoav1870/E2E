@@ -6,8 +6,14 @@ const reportRouter = new Router();
 reportRouter.get("/", reportController.getAllReports);
 reportRouter.get("/:id", reportController.getReport);
 reportRouter.post("/", reportController.createReport);
-// reportRouter.delete("/:id", reportController.deleteReport);
-// reportController.put("/:id", reportController.updateReport);
+reportRouter.put("/:id", reportController.updateDateOfResolve);
+reportRouter.put("/", (req, res, next) => {
+  next(new RequiredIdError("put", "report"));
+});
+reportRouter.delete("/:id", reportController.deleteReport);
+reportRouter.delete("/", (req, res, next) => {
+  next(new RequiredIdError("delete", "report"));
+});
 reportRouter.all("*", (req, res, next) => {
   next(new NotFoundCRUD());
 });

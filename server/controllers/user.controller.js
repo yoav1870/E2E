@@ -43,6 +43,7 @@ exports.userController = {
       if (body.role === "service_provider") {
         if (
           body.username &&
+          body.email &&
           body.password &&
           body.location &&
           body.profession &&
@@ -56,7 +57,7 @@ exports.userController = {
               user.password === body.password
             ) {
               throw new DataAlreadyExistsError(
-                "User with this username already exists"
+                "User with this username or password already exists"
               );
             }
           });

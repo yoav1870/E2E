@@ -11,4 +11,13 @@ exports.reportRepository = {
   create(report) {
     return mongo.create(report);
   },
+  updateDateOfResolve(id, data) {
+    return mongo.updateDateOfResolve(id, data);
+  },
+  delete(id) {
+    return mongo.delete(id);
+  },
+  updateAssignedTo(id, data) {
+    return mongo.updateAssignedTo(id, data);
+  },
 };
