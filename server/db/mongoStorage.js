@@ -36,11 +36,17 @@ module.exports = class MongoStorage {
     }
     return this.Model.findById(id);
   }
-  create(data) {
+  async create(data) {
     const entity = new this.Model(data);
-    entity.save();
-    return entity;
+    try {
+      await entity.save();
+      return entity;
+    } catch (error) {
+      console.error("Error creating entity:", error);
+      return null;
+    }
   }
+
   delete(id) {
     if (!isValidObjectId(id)) {
       return null;

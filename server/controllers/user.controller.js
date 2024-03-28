@@ -7,6 +7,9 @@ const {
   FailedCRUD,
 } = require("../errors/general.error");
 const { InvalidRoleError } = require("../errors/user.error");
+const {
+  sendReportNotificationForCreateNewUser,
+} = require("../middlewares/mailerConfig");
 
 exports.userController = {
   async getAllUsers(req, res) {
@@ -54,21 +57,27 @@ exports.userController = {
           existingUser.forEach((user) => {
             if (
               user.username === body.username &&
-              user.password === body.password
+              user.password === body.password &&
+              user.email === body.email
             ) {
               throw new DataAlreadyExistsError(
-                "User with this username or password already exists"
+                "User with this username or password or email already exists"
               );
             }
           });
-          const createdUser = await UserRepository.create(body);
-          if (!createdUser) {
-            throw new FailedCRUD("Failed to create a user");
-          }
           const result = {
             status: 201,
-            data: createdUser,
+            data: await UserRepository.create(body),
           };
+          if (result.data === null) {
+            throw new FailedCRUD("Failed to create a user");
+          }
+          const emailResult = await sendReportNotificationForCreateNewUser(
+            result.data.email
+          );
+          if (emailResult === null) {
+            console.error("Failed to send email");
+          }
           res.status(result.status).json(result.data);
         } else {
           throw new FormError(
@@ -77,36 +86,37 @@ exports.userController = {
         }
       } else {
         if (body.role === "service_request") {
-          if (body.username && body.password && body.location) {
+          if (body.username && body.password && body.location && body.email) {
             const existingUser = await UserRepository.find();
             existingUser.forEach((user) => {
               if (
                 user.username === body.username &&
-                user.password === body.password
+                user.password === body.password &&
+                user.email === body.email
               ) {
-                throw {
-                  status: 400,
-                  message: "User with this username already exists",
-                };
+                throw new DataAlreadyExistsError(
+                  "User with this username or password or email already exists"
+                );
               }
             });
-            const createdUser = await UserRepository.create(body);
-            if (!createdUser) {
-              throw {
-                status: 400,
-                message: "Failed to create user",
-              };
-            }
             const result = {
               status: 201,
-              data: createdUser,
+              data: await UserRepository.create(body),
             };
+            if (result.data === null) {
+              throw new FailedCRUD("Failed to create a user");
+            }
+            const emailResult = await sendReportNotificationForCreateNewUser(
+              result.data.email
+            );
+            if (emailResult === null) {
+              console.error("Failed to send email");
+            }
             res.status(result.status).json(result.data);
           } else {
-            throw {
-              status: 400,
-              message: "Please provide all required fields",
-            };
+            throw new FormError(
+              "Please provide all required fields at createUser"
+            );
           }
         } else {
           throw new InvalidRoleError(body.role);

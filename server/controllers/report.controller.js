@@ -6,7 +6,11 @@ const {
   FormError,
   DataAlreadyExistsError, // צריך להחליט עפי איזה נתונים טופס הוא אותו טופס
   FailedCRUD,
+  NoProviderAvailableError,
 } = require("../errors/general.error");
+const {
+  sendReportNotificationForCreateNewReport,
+} = require("../middlewares/mailerConfig");
 
 exports.reportController = {
   async getAllReports(req, res) {
@@ -69,6 +73,7 @@ exports.reportController = {
         // sort the service providers by ranking in the 20km radius
         serviceProviders.sort((a, b) => b.ranking - a.ranking);
         // check if the service provider has a report on the same date
+
         let assignedServiceProvider = null;
         const newReportDate = new Date(body.dateOfResolve);
         if (newReportDate < new Date()) {
@@ -76,7 +81,6 @@ exports.reportController = {
         }
         for (const provider of serviceProviders) {
           let isAvailable = true;
-
           for (const reportId of provider.reports) {
             if (!reportId) continue;
             const report = await reportRepository.retrieve(reportId);
@@ -95,7 +99,11 @@ exports.reportController = {
             break;
           }
         }
-
+        if (!assignedServiceProvider) {
+          throw new NoProviderAvailableError(
+            "No service provider available for this report plz try again later"
+          );
+        }
         const newReport = {
           location: body.location,
           description: body.description,
@@ -129,6 +137,15 @@ exports.reportController = {
         );
         if (!updateResultUser) {
           throw new FailedCRUD("Failed to update the user");
+        }
+        const emailResult = await sendReportNotificationForCreateNewReport(
+          assignedServiceProvider.email,
+          assignedServiceProvider.username,
+          userSubmit.email,
+          userSubmit.username
+        );
+        if (emailResult === null) {
+          console.error("Failed to send email");
         }
         res.status(result.status).json("Report created");
       } else {

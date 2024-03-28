@@ -54,6 +54,13 @@ class FailedCRUD extends Error {
     this.name = "FailedCRUD";
   }
 }
+class NoProviderAvailableError extends Error {
+  constructor(msg) {
+    super(msg);
+    this.status = 400;
+    this.name = "NoProviderAvailableError";
+  }
+}
 module.exports = {
   NotFoundUrlError,
   RequiredIdError,
@@ -63,4 +70,5 @@ module.exports = {
   FormError,
   DataAlreadyExistsError,
   FailedCRUD,
+  NoProviderAvailableError,
 };
