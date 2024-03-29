@@ -198,10 +198,30 @@ const deleteReportAndNotify = async (
   }
 };
 
+const deleteUserAndNotify = async (email, username) => {
+  const transporter = createTransporter();
+  const mailOptions = {
+    from: process.env.GMAIL_USER,
+    to: email,
+    subject: "Account Deletion Notice",
+    text: `Hello ${username},\n\nYour account has been successfully deleted. We hope to see you again soon!`,
+    html: `<b>Hello ${username},</b><br>Your account has been successfully deleted.<br>We hope to see you again soon!`,
+  };
+
+  try {
+    await transporter.sendMail(mailOptions);
+    return true;
+  } catch (error) {
+    console.error("Error sending email:", error);
+    return false;
+  }
+};
+
 module.exports = {
   createTransporter,
   sendReportNotificationForCreateNewUser,
   sendReportNotificationForCreateNewReport,
   sendUpdateDateOfResolveNotification,
   deleteReportAndNotify,
+  deleteUserAndNotify,
 };

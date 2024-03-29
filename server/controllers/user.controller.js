@@ -1,5 +1,6 @@
 const { UserRepository } = require("../repositories/user.repository");
 const { reportController } = require("./report.controller");
+const { deleteUserAndNotify } = require("../middlewares/mailerConfig");
 const {
   NoDataError,
   DataNotExistsError,
@@ -169,6 +170,13 @@ exports.userController = {
         };
         if (result.data === null) {
           throw new FailedCRUD("Failed to delete a user");
+        }
+        const emailResult = await deleteUserAndNotify(
+          user.email,
+          user.username
+        );
+        if (emailResult === null) {
+          console.error("Failed to send email");
         }
         res.status(result.status).json("User has been deleted");
       }
