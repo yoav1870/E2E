@@ -7,7 +7,10 @@ UserRouter.get("/", userController.getAllUsers);
 UserRouter.get("/:id", userController.getUser);
 UserRouter.post("/", userController.createUser);
 // UserRouter.put("/:id", userController.updateUser); // still not working
-UserRouter.delete("/:id", userController.deleteUser); // still not working
+UserRouter.delete("/:id", userController.deleteUser);
+UserRouter.delete("/", (req, res, next) => {
+  next(new RequiredIdError("delete", "user"));
+});
 UserRouter.all("*", (req, res, next) => {
   next(new NotFoundCRUD());
 });
