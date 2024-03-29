@@ -1,4 +1,5 @@
 const { UserRepository } = require("../repositories/user.repository");
+const { reportController } = require("./report.controller");
 const {
   NoDataError,
   DataNotExistsError,
@@ -121,6 +122,55 @@ exports.userController = {
         } else {
           throw new InvalidRoleError(body.role);
         }
+      }
+    } catch (error) {
+      res.status(error?.status || 500).json(error.message);
+    }
+  },
+  async deleteUser(req, res) {
+    try {
+      const id = req.params.id;
+      const user = await UserRepository.retrieve(id);
+      if (!user) {
+        throw new DataNotExistsError("deleteUser", id);
+      }
+      if (user.reports.length <= 0) {
+        const result = {
+          status: 200,
+          data: await UserRepository.delete(id),
+        };
+        if (result.data === null) {
+          throw new FailedCRUD("Failed to delete a user");
+        }
+        res.status(result.status).json("User has been deleted");
+      } else {
+        const tempRes = {
+          status: (statusCode) => {
+            tempRes.statusCode = statusCode;
+            return tempRes;
+          },
+          json: (data) => {
+            tempRes.data = data;
+            return tempRes;
+          },
+        };
+        for (let i = 0; i < user.reports.length; i++) {
+          const tempReq = {
+            body: {
+              _id: user.reports[i],
+              whoDelete: user.role,
+            },
+          };
+          await reportController.deleteReport(tempReq, tempRes);
+        }
+        const result = {
+          status: 200,
+          data: await UserRepository.delete(id),
+        };
+        if (result.data === null) {
+          throw new FailedCRUD("Failed to delete a user");
+        }
+        res.status(result.status).json("User has been deleted");
       }
     } catch (error) {
       res.status(error?.status || 500).json(error.message);

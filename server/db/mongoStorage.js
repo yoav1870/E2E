@@ -53,6 +53,7 @@ module.exports = class MongoStorage {
     }
     return this.Model.deleteOne({ _id: id });
   }
+
   findNearbyAndByProfession(location, profession) {
     return this.Model.find({
       location: {

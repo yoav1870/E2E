@@ -212,14 +212,14 @@ exports.reportController = {
     // נקרא לו whodelete
     try {
       const body = req.body;
-      if (!body.whoDelete) {
+      if (!body.whoDelete || !body._id) {
         throw new FormError("Please provide the user that delete the report");
       }
-      const report = await reportRepository.retrieve(req.params.id);
+      const report = await reportRepository.retrieve(body._id);
       if (!report) {
         throw new DataNotExistsError(
           "deleteReport, fetch the report to delete",
-          req.params.id
+          body._id
         );
       }
       const userSubmit = await UserRepository.retrieve(report.reportByUser);
@@ -238,7 +238,7 @@ exports.reportController = {
       }
       if (body.whoDelete === "service_request") {
         const result = await deleteReportAndUpdate(
-          req.params.id,
+          body._id,
           userSubmit,
           userAssigned
         );
@@ -262,7 +262,7 @@ exports.reportController = {
         // no replacement for the service provider
         if (!serviceProviders) {
           const result = await deleteReportAndUpdate(
-            req.params.id,
+            body._id,
             userSubmit,
             userAssigned
           );
@@ -304,9 +304,9 @@ exports.reportController = {
           }
         }
         // only replacement is the same service provider
-        if (!assignedServiceProvider) {
+        if (assignedServiceProvider === null) {
           const result = await deleteReportAndUpdate(
-            req.params.id,
+            body._id,
             userSubmit,
             userAssigned
           );
@@ -332,11 +332,11 @@ exports.reportController = {
           if (!updateProviderReports) {
             throw new FailedCRUD("Failed to update the service provider");
           }
-          await removeReportFromUser(userAssigned._id, req.params.id);
+          await removeReportFromUser(userAssigned._id, body._id);
           const result = {
             status: 200,
             data: await reportRepository.updateAssignedTo(
-              req.params.id,
+              body._id,
               assignedServiceProvider._id
             ),
           };
@@ -368,6 +368,36 @@ exports.reportController = {
 };
 
 // FUNCS:
+
+const removeReportFromUser = async (userId, reportId) => {
+  const user = await UserRepository.retrieve(userId);
+  const indexReport = user.reports.indexOf(reportId);
+  if (indexReport > -1) {
+    user.reports.splice(indexReport, 1);
+    const updateResult = await UserRepository.updateReports(
+      user._id,
+      user.reports
+    );
+    if (!updateResult) {
+      throw new FailedCRUD("Failed to update the user");
+    }
+  }
+};
+
+const deleteReportAndUpdate = async (reportId, userSubmit, userAssigned) => {
+  const result = {
+    status: 200,
+    data: await reportRepository.delete(reportId),
+  };
+  if (!result.data) {
+    throw new FailedCRUD("Failed to delete the report");
+  }
+  await removeReportFromUser(userSubmit._id, reportId);
+  await removeReportFromUser(userAssigned._id, reportId);
+
+  return result;
+};
+
 const findAvailableServiceProvider = async (serviceProviders, body) => {
   let assignedServiceProvider = null;
   const newReportDate = new Date(body.dateOfResolve);
@@ -398,34 +428,4 @@ const findAvailableServiceProvider = async (serviceProviders, body) => {
   }
 
   return assignedServiceProvider;
-};
-
-const removeReportFromUser = async (userId, reportId) => {
-  const user = await UserRepository.retrieve(userId);
-  const indexReport = user.reports.indexOf(reportId);
-  if (indexReport > -1) {
-    user.reports.splice(indexReport, 1);
-    const updateResult = await UserRepository.updateReports(
-      user._id,
-      user.reports
-    );
-    if (!updateResult) {
-      throw new FailedCRUD("Failed to update the user");
-    }
-  }
-};
-
-const deleteReportAndUpdate = async (reportId, userSubmit, userAssigned) => {
-  const result = {
-    status: 200,
-    data: await reportRepository.delete(reportId),
-  };
-  if (!result.data) {
-    throw new FailedCRUD("Failed to delete the report");
-  }
-
-  await removeReportFromUser(userSubmit._id, reportId);
-  await removeReportFromUser(userAssigned._id, reportId);
-
-  return result;
 };
