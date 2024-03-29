@@ -10,6 +10,8 @@ const {
 } = require("../errors/general.error");
 const {
   sendReportNotificationForCreateNewReport,
+  sendUpdateDateOfResolveNotification,
+  deleteReportAndNotify,
 } = require("../middlewares/mailerConfig");
 
 exports.reportController = {
@@ -74,31 +76,10 @@ exports.reportController = {
         serviceProviders.sort((a, b) => b.ranking - a.ranking);
         // check if the service provider has a report on the same date
 
-        let assignedServiceProvider = null;
-        const newReportDate = new Date(body.dateOfResolve);
-        if (newReportDate < new Date()) {
-          throw new FormError("The date must be in the future");
-        }
-        for (const provider of serviceProviders) {
-          let isAvailable = true;
-          for (const reportId of provider.reports) {
-            if (!reportId) continue;
-            const report = await reportRepository.retrieve(reportId);
-            if (report) {
-              const reportDate = report.dateOfResolve;
-
-              if (reportDate.getTime() === newReportDate.getTime()) {
-                isAvailable = false;
-                break;
-              }
-            }
-          }
-
-          if (isAvailable) {
-            assignedServiceProvider = provider;
-            break;
-          }
-        }
+        const assignedServiceProvider = await findAvailableServiceProvider(
+          serviceProviders,
+          body
+        );
         if (!assignedServiceProvider) {
           throw new NoProviderAvailableError(
             "No service provider available for this report plz try again later"
@@ -139,10 +120,10 @@ exports.reportController = {
           throw new FailedCRUD("Failed to update the user");
         }
         const emailResult = await sendReportNotificationForCreateNewReport(
-          assignedServiceProvider.email,
-          assignedServiceProvider.username,
           userSubmit.email,
-          userSubmit.username
+          userSubmit.username,
+          assignedServiceProvider.email,
+          assignedServiceProvider.username
         );
         if (emailResult === null) {
           console.error("Failed to send email");
@@ -173,19 +154,19 @@ exports.reportController = {
       if (body.whoDelete !== "service_request") {
         throw new FormError("Only service request can update the date");
       }
-      const report = await reportRepository.retrieve(req.params.id);
       const newReportDate = new Date(body.newDateOfResolve);
       if (newReportDate < new Date()) {
         throw new FormError("The date must be in the future");
       }
+      const report = await reportRepository.retrieve(req.params.id);
       if (newReportDate === report.dateOfResolve) {
         throw new FormError("The new date must be different from the old date");
       }
-
       const userAssigned = await UserRepository.retrieve(report.assignedUser);
       if (!userAssigned) {
         throw new DataNotExistsError("updateReportDate", report.assignedUser);
       }
+
       for (const reportId of userAssigned.reports) {
         if (!reportId) continue;
         const tempReport = await reportRepository.retrieve(reportId);
@@ -209,6 +190,18 @@ exports.reportController = {
       if (!result.data) {
         throw new FailedCRUD("Failed to update the report");
       }
+
+      const emailResult = await sendUpdateDateOfResolveNotification(
+        userAssigned.email,
+        userAssigned.username,
+        report.dateOfResolve,
+        report.description,
+        body.newDateOfResolve
+      );
+      if (emailResult === null) {
+        console.error("Failed to send email");
+      }
+
       res.status(result.status).json("Report updated");
     } catch (error) {
       res.status(error?.status || 500).json(error.message);
@@ -244,34 +237,21 @@ exports.reportController = {
         );
       }
       if (body.whoDelete === "service_request") {
-        const result = {
-          status: 200,
-          data: await reportRepository.delete(req.params.id),
-        };
-        if (!result.data) {
-          throw new FailedCRUD("Failed to delete the report");
-        }
-        const indexProvider = userAssigned.reports.indexOf(req.params.id);
-        if (indexProvider > -1) {
-          userAssigned.reports.splice(indexProvider, 1);
-        }
-        const updateAssignedReports = await UserRepository.updateReports(
-          userAssigned,
-          userAssigned.reports
-        );
-        if (!updateAssignedReports) {
-          throw new FailedCRUD("Failed to update the service provider");
-        }
-        const indexRequest = userSubmit.reports.indexOf(req.params.id);
-        if (indexRequest > -1) {
-          userSubmit.reports.splice(indexRequest, 1);
-        }
-        const updateSubmitReports = await UserRepository.updateReports(
+        const result = await deleteReportAndUpdate(
+          req.params.id,
           userSubmit,
-          userSubmit.reports
+          userAssigned
         );
-        if (!updateSubmitReports) {
-          throw new FailedCRUD("Failed to update the user");
+        const emailResult = await deleteReportAndNotify(
+          userSubmit.email,
+          userSubmit.username,
+          userAssigned.email,
+          userAssigned.username,
+          report.description,
+          "request_delete"
+        );
+        if (emailResult === null) {
+          console.error("Failed to send email");
         }
         res.status(result.status).json("Report deleted");
       } else if (body.whoDelete === "service_provider") {
@@ -279,9 +259,27 @@ exports.reportController = {
           report.location,
           report.profession
         );
+        // no replacement for the service provider
         if (!serviceProviders) {
-          // need to delete the report and send mail to the user that the report was deleted
+          const result = await deleteReportAndUpdate(
+            req.params.id,
+            userSubmit,
+            userAssigned
+          );
+          const emailResult = await deleteReportAndNotify(
+            userSubmit.email,
+            userSubmit.username,
+            userAssigned.email,
+            userAssigned.username,
+            report.description,
+            "provider_delete_but_no_provider_available"
+          );
+          if (emailResult === null) {
+            console.error("Failed to send email");
+          }
+          res.status(result.status).json("Report deleted");
         }
+
         serviceProviders.sort((a, b) => b.ranking - a.ranking);
 
         let assignedServiceProvider = null;
@@ -305,17 +303,27 @@ exports.reportController = {
             }
           }
         }
+        // only replacement is the same service provider
         if (!assignedServiceProvider) {
-          // need to delete the report and send mail to the user that the report was deleted
-          // const result = {
-          //   status: 200,
-          //   data: await reportRepository.delete(req.params.id),
-          // };
-          // if (!result.data) {
-          //   throw new FailedCRUD("Failed to delete the report");
-          // }
-          // res.status(result.status).json("Report deleted");
+          const result = await deleteReportAndUpdate(
+            req.params.id,
+            userSubmit,
+            userAssigned
+          );
+          const emailResult = await deleteReportAndNotify(
+            userSubmit.email,
+            userSubmit.username,
+            userAssigned.email,
+            userAssigned.username,
+            report.description,
+            "provider_delete_but_no_provider_available"
+          );
+          if (emailResult === null) {
+            console.error("Failed to send email");
+          }
+          res.status(result.status).json("Report deleted");
         } else {
+          // there is a replacement for the service provider
           assignedServiceProvider.reports.push(report._id);
           const updateProviderReports = await UserRepository.updateReports(
             assignedServiceProvider._id,
@@ -324,17 +332,7 @@ exports.reportController = {
           if (!updateProviderReports) {
             throw new FailedCRUD("Failed to update the service provider");
           }
-          const indexProvider = userAssigned.reports.indexOf(req.params.id);
-          if (indexProvider > -1) {
-            userAssigned.reports.splice(indexProvider, 1);
-          }
-          const updateAssignedReports = await UserRepository.updateReports(
-            userAssigned,
-            userAssigned.reports
-          );
-          if (!updateAssignedReports) {
-            throw new FailedCRUD("Failed to update the service provider");
-          }
+          await removeReportFromUser(userAssigned._id, req.params.id);
           const result = {
             status: 200,
             data: await reportRepository.updateAssignedTo(
@@ -344,6 +342,17 @@ exports.reportController = {
           };
           if (!result.data) {
             throw new FailedCRUD("Failed to update the report");
+          }
+          const emailResult = await deleteReportAndNotify(
+            userSubmit.email,
+            userSubmit.username,
+            userAssigned.email,
+            userAssigned.username,
+            report.description,
+            "report_transfered_to_another_service_provider"
+          );
+          if (emailResult === null) {
+            console.error("Failed to send email");
           }
           res
             .status(result.status)
@@ -356,4 +365,67 @@ exports.reportController = {
       res.status(error?.status || 500).json(error.message);
     }
   },
+};
+
+// FUNCS:
+const findAvailableServiceProvider = async (serviceProviders, body) => {
+  let assignedServiceProvider = null;
+  const newReportDate = new Date(body.dateOfResolve);
+
+  if (newReportDate < new Date()) {
+    throw new FormError("The date must be in the future");
+  }
+
+  for (const provider of serviceProviders) {
+    let isAvailable = true;
+    for (const reportId of provider.reports) {
+      if (!reportId) continue;
+      const report = await reportRepository.retrieve(reportId);
+      if (report) {
+        const reportDate = new Date(report.dateOfResolve);
+
+        if (reportDate.getTime() === newReportDate.getTime()) {
+          isAvailable = false;
+          break;
+        }
+      }
+    }
+
+    if (isAvailable) {
+      assignedServiceProvider = provider;
+      break;
+    }
+  }
+
+  return assignedServiceProvider;
+};
+
+const removeReportFromUser = async (userId, reportId) => {
+  const user = await UserRepository.retrieve(userId);
+  const indexReport = user.reports.indexOf(reportId);
+  if (indexReport > -1) {
+    user.reports.splice(indexReport, 1);
+    const updateResult = await UserRepository.updateReports(
+      user._id,
+      user.reports
+    );
+    if (!updateResult) {
+      throw new FailedCRUD("Failed to update the user");
+    }
+  }
+};
+
+const deleteReportAndUpdate = async (reportId, userSubmit, userAssigned) => {
+  const result = {
+    status: 200,
+    data: await reportRepository.delete(reportId),
+  };
+  if (!result.data) {
+    throw new FailedCRUD("Failed to delete the report");
+  }
+
+  await removeReportFromUser(userSubmit._id, reportId);
+  await removeReportFromUser(userAssigned._id, reportId);
+
+  return result;
 };
