@@ -11,6 +11,7 @@ const {
 const { InvalidRoleError } = require("../errors/user.error");
 const {
   sendReportNotificationForCreateNewUser,
+  changePasswordAndNotify,
 } = require("../middlewares/mailerConfig");
 
 exports.userController = {
@@ -163,6 +164,9 @@ exports.userController = {
             },
           };
           await reportController.deleteReport(tempReq, tempRes);
+          // if (tempRes.statusCode !== 200) {    // neeed to check this when errors occur!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+          //   throw new FailedCRUD(tempRes.json);
+          // }
         }
         const result = {
           status: 200,
@@ -180,6 +184,40 @@ exports.userController = {
         }
         res.status(result.status).json("User has been deleted");
       }
+    } catch (error) {
+      res.status(error?.status || 500).json(error.message);
+    }
+  },
+  async updateUserPassword(req, res) {
+    try {
+      const body = req.body;
+      const id = req.params.id;
+
+      if (!body.password || !id) {
+        throw new FormError("Please provide all required fields at updateUser");
+      }
+      const user = await UserRepository.retrieve(id);
+      if (!user) {
+        throw new DataNotExistsError("updateUser", id);
+      }
+      if (body.password === user.password) {
+        throw new FormError("New password must be different from the old one");
+      }
+      const result = {
+        status: 200,
+        data: await UserRepository.updatePassword(body.password, user._id),
+      };
+      if (result.data === null) {
+        throw new FailedCRUD("Failed to update a user");
+      }
+      const emailResult = await changePasswordAndNotify(
+        user.email,
+        user.username
+      );
+      if (emailResult === false) {
+        console.error("Failed to send email");
+      }
+      res.status(result.status).json("Password has been updated");
     } catch (error) {
       res.status(error?.status || 500).json(error.message);
     }

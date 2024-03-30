@@ -20,4 +20,7 @@ exports.UserRepository = {
   updateReports(id, data) {
     return mongo.updateReports(id, data);
   },
+  updatePassword(newPassword, id) {
+    return mongo.updatePassword(newPassword, id);
+  },
 };

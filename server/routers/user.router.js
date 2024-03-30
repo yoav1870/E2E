@@ -6,7 +6,10 @@ const UserRouter = new Router();
 UserRouter.get("/", userController.getAllUsers);
 UserRouter.get("/:id", userController.getUser);
 UserRouter.post("/", userController.createUser);
-// UserRouter.put("/:id", userController.updateUser); // still not working
+UserRouter.put("/:id", userController.updateUserPassword);
+UserRouter.put("/", (req, res, next) => {
+  next(new RequiredIdError("put", "user"));
+});
 UserRouter.delete("/:id", userController.deleteUser);
 UserRouter.delete("/", (req, res, next) => {
   next(new RequiredIdError("delete", "user"));

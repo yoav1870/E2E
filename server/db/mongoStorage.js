@@ -76,6 +76,18 @@ module.exports = class MongoStorage {
       { new: true, runValidators: true }
     );
   }
+
+  updatePassword(newPassword, id) {
+    if (!isValidObjectId(id)) {
+      return null;
+    }
+    return this.Model.findByIdAndUpdate(
+      id,
+      { password: newPassword },
+      { new: true, runValidators: true }
+    );
+  }
+
   updateDateOfResolve(id, date) {
     if (!isValidObjectId(id)) {
       return null;
@@ -86,6 +98,7 @@ module.exports = class MongoStorage {
       { new: true, runValidators: true }
     );
   }
+
   updateAssignedTo(id, assignedTo) {
     if (!isValidObjectId(id)) {
       return null;

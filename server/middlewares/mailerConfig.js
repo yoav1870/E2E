@@ -217,6 +217,25 @@ const deleteUserAndNotify = async (email, username) => {
   }
 };
 
+const changePasswordAndNotify = async (email, username) => {
+  const transporter = createTransporter();
+  const mailOptions = {
+    from: process.env.GMAIL_USER,
+    to: email,
+    subject: "Password Change Notification",
+    text: `Hello ${username},\n\nYour password has been successfully changed. If this was not you, please contact us immediately.`,
+    html: `<b>Hello ${username},</b><br>Your password has been successfully changed.<br>If this was not you, please contact us immediately.`,
+  };
+
+  try {
+    await transporter.sendMail(mailOptions);
+    return true;
+  } catch (error) {
+    console.error("Error sending email:", error);
+    return false;
+  }
+};
+
 module.exports = {
   createTransporter,
   sendReportNotificationForCreateNewUser,
@@ -224,4 +243,5 @@ module.exports = {
   sendUpdateDateOfResolveNotification,
   deleteReportAndNotify,
   deleteUserAndNotify,
+  changePasswordAndNotify,
 };
