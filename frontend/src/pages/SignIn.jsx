@@ -20,18 +20,19 @@ const SignIn = () => {
       flexDirection: 'column', 
       alignItems: 'center', 
       justifyContent: 'center', 
-      height: '100vh', // This ensures that the container takes up the full viewport height
+      height: '100vh', 
+     gap: 5,
     }}>
-      {/* Logo at the top of the form */}
+      <Typography component="h1" variant="h5" fontWeight="bold" fontSize="30px">
+      Welcome to the our System 
+      </Typography>
       <Box 
         component="img"
         src={logo}
         alt="Logo"
-        sx={{ width: 100, height: 100, marginBottom: 2 }} // Adjust size as needed
+        sx={{ width: 200, height: 'auto', marginBottom: 2 }} // Adjust size as needed
       />
-      <Typography component="h1" variant="h5">
-        Sign In
-      </Typography>
+     
       <form onSubmit={handleSubmit} noValidate sx={{ mt: 1, width: '100%' }}> {/* Ensure form takes up container width */}
         <TextField
           margin="normal"

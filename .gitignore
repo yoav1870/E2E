@@ -1,4 +1,4 @@
 server/node_modules/
 server/.env
 server/package-lock.json
-frontend/package-lock.json
+frontend/package-lock.json 
