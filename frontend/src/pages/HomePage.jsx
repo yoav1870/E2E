@@ -1,7 +1,7 @@
 import React from 'react'
 import Header from '../component/Header'
 
-export default function HomePage() {
+const HomePage =() =>{
   return (
    
     <div>
@@ -10,3 +10,5 @@ export default function HomePage() {
     </div>
   )
 }
+
+export default HomePage;
