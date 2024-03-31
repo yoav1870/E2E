@@ -1,6 +1,7 @@
 // server.js
 const express = require("express");
 const cors = require("cors");
+const morgan = require("morgan");
 const userRouter = require("./routers/user.router");
 const damageReportRouter = require("./routers/report.router");
 const { NotFoundUrlError } = require("./errors/general.error");
@@ -11,7 +12,7 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
+app.use(morgan("dev"));
 app.use("/api/users", userRouter);
 app.use("/api/reports", damageReportRouter);
 
@@ -24,5 +25,9 @@ app.use((err, req, res, next) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+  if (process.env.NODE_ENV !== "test") {
+    console.log(`Server is running on port ${PORT}`);
+  }
 });
+
+module.exports = app;

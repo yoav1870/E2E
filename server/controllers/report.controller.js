@@ -7,6 +7,7 @@ const {
   DataAlreadyExistsError, // צריך להחליט עפי איזה נתונים טופס הוא אותו טופס
   FailedCRUD,
   NoProviderAvailableError,
+  ServerError,
 } = require("../errors/general.error");
 const {
   sendReportNotificationForCreateNewReport,
@@ -26,7 +27,14 @@ exports.reportController = {
       }
       res.status(result.status).json(result.data);
     } catch (error) {
-      res.status(error?.status || 500).json(error.message);
+      switch (error.name) {
+        case "NoDataError":
+          res.status(error.status).json(error.message);
+          break;
+        default:
+          const serverError = new ServerError();
+          res.status(serverError.status).json(serverError.message);
+      }
     }
   },
   async getReport(req, res) {
@@ -40,7 +48,14 @@ exports.reportController = {
       }
       res.status(result.status).json(result.data);
     } catch (error) {
-      res.status(error?.status || 500).json(error.message);
+      switch (error.name) {
+        case "DataNotExistsError":
+          res.status(error.status).json(error.message);
+          break;
+        default:
+          const serverError = new ServerError();
+          res.status(serverError.status).json(serverError.message);
+      }
     }
   },
   async createReport(req, res) {
@@ -119,15 +134,18 @@ exports.reportController = {
         if (!updateResultUser) {
           throw new FailedCRUD("Failed to update the user");
         }
-        const emailResult = await sendReportNotificationForCreateNewReport(
-          userSubmit.email,
-          userSubmit.username,
-          assignedServiceProvider.email,
-          assignedServiceProvider.username
-        );
-        if (emailResult === null) {
-          console.error("Failed to send email");
+        if (process.env.NODE_ENV !== "test") {
+          const emailResult = await sendReportNotificationForCreateNewReport(
+            userSubmit.email,
+            userSubmit.username,
+            assignedServiceProvider.email,
+            assignedServiceProvider.username
+          );
+          if (emailResult === null) {
+            console.error("Failed to send email");
+          }
         }
+
         res.status(result.status).json("Report created");
       } else {
         throw new FormError(
