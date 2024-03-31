@@ -85,7 +85,9 @@ exports.reportController = {
           body.profession
         );
         if (!serviceProviders) {
-          throw new NoDataError("createReport. No service provider available");
+          throw new NoProviderAvailableError(
+            "No service provider available for this report plz try again later"
+          );
         }
         // sort the service providers by ranking in the 20km radius
         serviceProviders.sort((a, b) => b.ranking - a.ranking);
@@ -95,6 +97,11 @@ exports.reportController = {
           serviceProviders,
           body
         );
+        if (assignedServiceProvider === false) {
+          throw new FormError(
+            "Date of resolve must be later than current date"
+          );
+        }
         if (!assignedServiceProvider) {
           throw new NoProviderAvailableError(
             "No service provider available for this report plz try again later"
@@ -153,7 +160,23 @@ exports.reportController = {
         );
       }
     } catch (error) {
-      res.status(error?.status || 500).json(error.message);
+      switch (error.name) {
+        case "DataNotExistsError":
+          res.status(error.status).json(error.message);
+          break;
+        case "FormError":
+          res.status(error.status).json(error.message);
+          break;
+        case "NoProviderAvailableError":
+          res.status(error.status).json(error.message);
+          break;
+        case "FailedCRUD":
+          res.status(error.status).json(error.message);
+          break;
+        default:
+          const serverError = new ServerError();
+          res.status(serverError.status).json(serverError.message);
+      }
     }
   },
   async updateDateOfResolve(req, res) {
@@ -208,16 +231,17 @@ exports.reportController = {
       if (!result.data) {
         throw new FailedCRUD("Failed to update the report");
       }
-
-      const emailResult = await sendUpdateDateOfResolveNotification(
-        userAssigned.email,
-        userAssigned.username,
-        report.dateOfResolve,
-        report.description,
-        body.newDateOfResolve
-      );
-      if (emailResult === null) {
-        console.error("Failed to send email");
+      if (process.env.NODE_ENV !== "test") {
+        const emailResult = await sendUpdateDateOfResolveNotification(
+          userAssigned.email,
+          userAssigned.username,
+          report.dateOfResolve,
+          report.description,
+          body.newDateOfResolve
+        );
+        if (emailResult === null) {
+          console.error("Failed to send email");
+        }
       }
 
       res.status(result.status).json("Report updated");
@@ -421,7 +445,7 @@ const findAvailableServiceProvider = async (serviceProviders, body) => {
   const newReportDate = new Date(body.dateOfResolve);
 
   if (newReportDate < new Date()) {
-    throw new FormError("The date must be in the future");
+    return false;
   }
 
   for (const provider of serviceProviders) {
