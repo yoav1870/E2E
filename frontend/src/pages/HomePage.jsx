@@ -1,9 +1,14 @@
 import React from 'react'
+import Header from '../component/Header'
 
-export default function HomePage() {
+const HomePage =() =>{
   return (
+   
     <div>
+      <Header />
       Home
     </div>
   )
 }
+
+export default HomePage;
