@@ -1,39 +1,51 @@
-import React from 'react';
-import { Container, Typography, TextField, Button, Link, Box } from '@mui/material';
-import logo from '../assets/images/logo.png';
+import {
+  Container,
+  Typography,
+  TextField,
+  Button,
+  Link,
+  Box,
+} from "@mui/material";
+import logo from "../assets/logo.png";
 
 const SignIn = () => {
   const handleSubmit = (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
     console.log({
-      username: data.get('username'),
-      password: data.get('password'),
-      email: data.get('email'),
+      username: data.get("username"),
+      password: data.get("password"),
+      email: data.get("email"),
     });
     // Add your sign-in logic here
   };
 
   return (
-    <Container component="main" maxWidth="xs" sx={{
-      display: 'flex', 
-      flexDirection: 'column', 
-      alignItems: 'center', 
-      justifyContent: 'center', 
-      height: '100vh', 
-     gap: 5,
-    }}>
+    <Container
+      component="main"
+      maxWidth="xs"
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        height: "100vh",
+        gap: 5,
+      }}
+    >
       <Typography component="h1" variant="h5" fontWeight="bold" fontSize="30px">
-      Welcome to the our System 
+        Welcome to the our System
       </Typography>
-      <Box 
+      <Box
         component="img"
         src={logo}
         alt="Logo"
-        sx={{ width: 200, height: 'auto', marginBottom: 2 }} // Adjust size as needed
+        sx={{ width: 200, height: "auto", marginBottom: 2 }} // Adjust size as needed
       />
-     
-      <form onSubmit={handleSubmit} noValidate sx={{ mt: 1, width: '100%' }}> {/* Ensure form takes up container width */}
+
+      <form onSubmit={handleSubmit}>
+        {" "}
+        {/* Ensure form takes up container width */}
         <TextField
           margin="normal"
           required
@@ -73,7 +85,7 @@ const SignIn = () => {
           Sign In
         </Button>
         <Typography textAlign="center" sx={{ mt: 2 }}>
-          Not registered yet?{' '}
+          Not registered yet?{" "}
           <Link href="/sign-up" variant="body2">
             Create an account now!
           </Link>
