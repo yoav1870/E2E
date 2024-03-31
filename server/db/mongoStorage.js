@@ -6,8 +6,10 @@ const isValidObjectId = (id) => mongoose.Types.ObjectId.isValid(id);
 module.exports = class MongoStorage {
   constructor(entity) {
     this.entity = entity;
-    this.connect();
-    this.loadModel();
+    if (process.env.NODE_ENV !== "test") {
+      this.connect();
+      this.loadModel();
+    }
   }
 
   connect() {

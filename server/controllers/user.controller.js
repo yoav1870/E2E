@@ -164,9 +164,9 @@ exports.userController = {
             },
           };
           await reportController.deleteReport(tempReq, tempRes);
-          // if (tempRes.statusCode !== 200) {    // neeed to check this when errors occur!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-          //   throw new FailedCRUD(tempRes.json);
-          // }
+          if (tempRes.statusCode !== 200) {
+            res.status(tempRes.statusCode).json(tempRes.data);
+          }
         }
         const result = {
           status: 200,

@@ -21,14 +21,14 @@ class NotFoundCRUD extends Error {
 }
 class NoDataError extends Error {
   constructor(msg) {
-    super("No data found at " + msg + ".");
+    super("No data found at " + msg + " .");
     this.status = 404;
     this.name = "NoDataError";
   }
 }
 class DataNotExistsError extends Error {
   constructor(msg, id) {
-    super("No data found at " + msg + " with id " + id + ".");
+    super("No data found at " + msg + " with id " + id + " .");
     this.status = 404;
     this.name = "DataNotExistsError";
   }
@@ -61,6 +61,15 @@ class NoProviderAvailableError extends Error {
     this.name = "NoProviderAvailableError";
   }
 }
+class ServerError extends Error {
+  constructor() {
+    super(
+      "server encountered an unexpected condition that prevented it from fulfilling the request."
+    );
+    this.status = 500;
+    this.name = "ServerError";
+  }
+}
 module.exports = {
   NotFoundUrlError,
   RequiredIdError,
@@ -71,4 +80,5 @@ module.exports = {
   DataAlreadyExistsError,
   FailedCRUD,
   NoProviderAvailableError,
+  ServerError,
 };
