@@ -1,7 +1,6 @@
 const { Router } = require("express");
 const { reportController } = require("../controllers/report.controller");
 const { NotFoundCRUD, RequiredIdError } = require("../errors/general.error");
-const { report } = require("superagent");
 const reportRouter = new Router();
 
 reportRouter.get("/", reportController.getAllReports);

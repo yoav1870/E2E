@@ -1,6 +1,7 @@
 const { UserRepository } = require("../repositories/user.repository");
 const { reportController } = require("./report.controller");
 const { deleteUserAndNotify } = require("../middlewares/mailerConfig");
+const jwt = require("jsonwebtoken");
 const {
   NoDataError,
   DataNotExistsError,
@@ -269,19 +270,20 @@ exports.userController = {
   },
   async signInUser(req, res) {
     try {
-      const body = req.body;
-      if (!body.username || !body.password || !body.email) {
+      const { username, password, email } = req.body;
+      if (!username || !password || !email) {
         throw new FormError("Please provide all required fields at signInUser");
       }
-      const user = await UserRepository.signIn(
-        body.username,
-        body.password,
-        body.email
-      );
+      const user = await UserRepository.signIn(username, password, email);
       if (!user) {
         throw new DataNotExistsError("signInUser");
       }
-      res.status(200).json(user);
+      const token = jwt.sign(
+        { userId: user._id, role: user.role },
+        process.env.JWT_SECRET,
+        { expiresIn: "24h" }
+      );
+      res.status(200).json({ token });
     } catch (error) {
       switch (error.name) {
         case "DataNotExistsError":
