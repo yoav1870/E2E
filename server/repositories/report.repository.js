@@ -20,4 +20,7 @@ exports.reportRepository = {
   updateAssignedTo(id, data) {
     return mongo.updateAssignedTo(id, data);
   },
+  findReportsOfUser(user) {
+    return mongo.findReportsOfUser(user);
+  },
 };

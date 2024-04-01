@@ -4,7 +4,6 @@ const {
   NoDataError,
   DataNotExistsError,
   FormError,
-  DataAlreadyExistsError, // צריך להחליט עפי איזה נתונים טופס הוא אותו טופס
   FailedCRUD,
   NoProviderAvailableError,
   ServerError,
@@ -58,6 +57,41 @@ exports.reportController = {
       }
     }
   },
+  async getAllReportsOfUser(req, res) {
+    try {
+      const userId = req.body.id;
+      if (!userId) {
+        throw new FormError("Please provide the user id");
+      }
+      const user = await UserRepository.retrieve(userId);
+      if (!user) {
+        throw new DataNotExistsError("getAllReportsOfUser", userId);
+      }
+      const result = {
+        status: 200,
+        data: await reportRepository.findReportsOfUser(user),
+      };
+      if (result.data.length === 0) {
+        throw new NoDataError("getAllReportsOfUser");
+      }
+      res.status(result.status).json(result.data);
+    } catch (error) {
+      switch (error.name) {
+        case "DataNotExistsError":
+          res.status(error.status).json(error.message);
+          break;
+        case "NoDataError":
+          res.status(error.status).json(error.message);
+          break;
+        case "FormError":
+          res.status(error.status).json(error.message);
+          break;
+        default:
+          const serverError = new ServerError();
+          res.status(serverError.status).json(serverError.message);
+      }
+    }
+  },
   async createReport(req, res) {
     try {
       const body = req.body;
@@ -73,16 +107,16 @@ exports.reportController = {
       if (
         body.location &&
         body.description &&
-        body.status &&
         body.urgency &&
         body.reportByUser &&
         body.profession &&
-        body.dateOfResolve
+        body.dateOfResolve &&
+        body.range
       ) {
-        //find the nearest service provider by profession and by location up to 20km
         const serviceProviders = await UserRepository.findNearbyAndByProfession(
           body.location,
-          body.profession
+          body.profession,
+          body.range
         );
         if (!serviceProviders) {
           throw new NoProviderAvailableError(
@@ -126,9 +160,13 @@ exports.reportController = {
           throw new FailedCRUD("Failed to create a report");
         }
         assignedServiceProvider.reports.push(result.data._id);
+        if (assignedServiceProvider.ranking < 5) {
+          assignedServiceProvider.ranking += 1;
+        }
         const updateResult = await UserRepository.updateReports(
           assignedServiceProvider._id,
-          assignedServiceProvider.reports
+          assignedServiceProvider.reports,
+          assignedServiceProvider.ranking
         );
         if (!updateResult) {
           throw new FailedCRUD("Failed to update the service provider");
@@ -136,7 +174,8 @@ exports.reportController = {
         userSubmit.reports.push(result.data._id);
         const updateResultUser = await UserRepository.updateReports(
           userSubmit._id,
-          userSubmit.reports
+          userSubmit.reports,
+          1
         );
         if (!updateResultUser) {
           throw new FailedCRUD("Failed to update the user");
@@ -367,9 +406,13 @@ exports.reportController = {
         } else {
           // there is a replacement for the service provider
           assignedServiceProvider.reports.push(report._id);
+          if (assignedServiceProvider.ranking < 5) {
+            assignedServiceProvider.ranking += 1;
+          }
           const updateProviderReports = await UserRepository.updateReports(
             assignedServiceProvider._id,
-            assignedServiceProvider.reports
+            assignedServiceProvider.reports,
+            assignedServiceProvider.ranking
           );
           if (!updateProviderReports) {
             throw new FailedCRUD("Failed to update the service provider");
@@ -416,9 +459,13 @@ const removeReportFromUser = async (userId, reportId) => {
   const indexReport = user.reports.indexOf(reportId);
   if (indexReport > -1) {
     user.reports.splice(indexReport, 1);
+    if ((user.role = "service_provider")) {
+      if (user.ranking > 1) user.ranking -= 1;
+    }
     const updateResult = await UserRepository.updateReports(
       user._id,
-      user.reports
+      user.reports,
+      user.ranking
     );
     if (!updateResult) {
       throw new FailedCRUD("Failed to update the user");

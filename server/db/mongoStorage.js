@@ -32,11 +32,32 @@ module.exports = class MongoStorage {
   find() {
     return this.Model.find();
   }
-  retrieve(id) {
+  async retrieve(id) {
     if (!isValidObjectId(id)) {
       return null;
     }
-    return this.Model.findById(id);
+    const entity = await this.Model.findById(id);
+    if (
+      this.entity === "user" &&
+      entity &&
+      entity.role === "service_provider"
+    ) {
+      const todayStart = new Date();
+      todayStart.setHours(0, 0, 0, 0);
+      const todayEnd = new Date(todayStart);
+      todayEnd.setDate(todayEnd.getDate() + 1);
+
+      const hasReportDueToday = await mongoose.model("DamageReport").findOne({
+        assignedUser: id,
+        dateOfResolve: {
+          $gte: todayStart,
+          $lt: todayEnd,
+        },
+        resolved: false,
+      });
+      entity.availability = !hasReportDueToday;
+    }
+    return entity;
   }
   async create(data) {
     const entity = new this.Model(data);
@@ -56,25 +77,26 @@ module.exports = class MongoStorage {
     return this.Model.deleteOne({ _id: id });
   }
 
-  findNearbyAndByProfession(location, profession) {
+  findNearbyAndByProfession(location, profession, range) {
+    range = range * 1000;
     return this.Model.find({
       location: {
         $nearSphere: {
           $geometry: location,
-          $maxDistance: 20000,
+          $maxDistance: range,
         },
       },
       profession,
       role: "service_provider",
     });
   }
-  updateReports(id, reports) {
+  updateReports(id, reports, ranking) {
     if (!isValidObjectId(id)) {
       return null;
     }
     return this.Model.findByIdAndUpdate(
       id,
-      { reports: reports },
+      { reports: reports, ranking: ranking },
       { new: true, runValidators: true }
     );
   }
@@ -110,5 +132,19 @@ module.exports = class MongoStorage {
       { assignedUser: assignedTo },
       { new: true, runValidators: true }
     );
+  }
+
+  findReportsOfUser(user) {
+    if (!isValidObjectId(user._id)) {
+      return null;
+    }
+    if (user.role === "service_provider") {
+      return this.Model.find({ assignedUser: user._id });
+    }
+    return this.Model.find({ reportByUser: user._id });
+  }
+
+  signIn(username, password, email) {
+    return this.Model.findOne({ username, password, email });
   }
 };

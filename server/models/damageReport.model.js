@@ -17,7 +17,6 @@ const damageReportSchema = new mongoose.Schema(
       type: String,
       enum: ["pending", "in_progress", "completed"],
       default: "pending",
-      required: [true, "A report must have a status"],
     },
     photo: {
       type: String,
@@ -25,6 +24,8 @@ const damageReportSchema = new mongoose.Schema(
     },
     urgency: {
       type: Number,
+      default: 1,
+      enum: [1, 2, 3, 4, 5],
       required: [true, "A report must have a urgency"],
     },
     reportByUser: {
