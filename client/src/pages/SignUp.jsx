@@ -15,12 +15,6 @@ const validationSchema = yup.object({
     profession: yup.string().when('role', (role, schema) =>
         role === 'service_provider' ? schema.required('Profession is required for service providers.') : schema
     ),
-    ranking: yup.number().when('role', (role, schema) =>
-        role === 'service_provider' ? schema.min(1, 'Ranking must be at least 1').max(5, 'Ranking must be at most 5').required('Ranking is required for service providers.') : schema
-    ),
-    availability: yup.boolean().when('role', (role, schema) =>
-        role === 'service_provider' ? schema.required('Availability is required for service providers.') : schema
-    ),
     photo: yup.string().url('Enter a valid URL'),
 });
 
@@ -37,8 +31,6 @@ const SignUp = () => {
             location: '',
             profession: '',
             description: '',
-            ranking: '',
-            availability: false,
             photo: '',
         },
         validationSchema: validationSchema,
@@ -186,34 +178,7 @@ const SignUp = () => {
                             value={formik.values.description}
                             onChange={formik.handleChange}
                         />
-                        <TextField
-                            margin="normal"
-                            required={formik.values.role === 'service_provider'}
-                            fullWidth
-                            id="ranking"
-                            label="Ranking"
-                            name="ranking"
-                            autoComplete="ranking"
-                            type="number"
-                            InputProps={{ inputProps: { min: 1, max: 5 } }}
-                            value={formik.values.ranking}
-                            onChange={formik.handleChange}
-                            error={formik.touched.ranking && Boolean(formik.errors.ranking)}
-                            helperText={formik.touched.ranking && formik.errors.ranking}
-                        />
-                        <FormControl component="fieldset" margin="normal">
-                            <FormControlLabel
-                                control={
-                                    <Checkbox
-                                        checked={formik.values.availability}
-                                        onChange={formik.handleChange}
-                                        name="availability"
-                                        color="primary"
-                                    />
-                                }
-                                label="Available"
-                            />
-                        </FormControl>
+                        
                     </>
                 )}
 
