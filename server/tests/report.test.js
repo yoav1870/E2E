@@ -5,6 +5,7 @@ const request = require("supertest");
 jest.mock("../repositories/report.repository");
 jest.mock("../repositories/user.repository");
 const { ServerError } = require("../errors/general.error");
+const { describe } = require("yargs");
 
 // describe("GET /api/reports", () => {
 //   it("should return all reports with status 200", async () => {

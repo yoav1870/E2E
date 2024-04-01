@@ -4,6 +4,7 @@ const { NotFoundCRUD, RequiredIdError } = require("../errors/general.error");
 const reportRouter = new Router();
 
 reportRouter.get("/", reportController.getAllReports);
+reportRouter.get("/home", reportController.getAllReportsOfUser);
 reportRouter.get("/:id", reportController.getReport);
 reportRouter.post("/", reportController.createReport);
 reportRouter.put("/:id", reportController.updateDateOfResolve);
