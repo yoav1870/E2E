@@ -139,4 +139,8 @@ module.exports = class MongoStorage {
     }
     return this.Model.find({ assignedUser: userId });
   }
+
+  signIn(username, password, email) {
+    return this.Model.findOne({ username, password, email });
+  }
 };

@@ -267,4 +267,33 @@ exports.userController = {
       }
     }
   },
+  async signInUser(req, res) {
+    try {
+      const body = req.body;
+      if (!body.username || !body.password || !body.email) {
+        throw new FormError("Please provide all required fields at signInUser");
+      }
+      const user = await UserRepository.signIn(
+        body.username,
+        body.password,
+        body.email
+      );
+      if (!user) {
+        throw new DataNotExistsError("signInUser");
+      }
+      res.status(200).json(user);
+    } catch (error) {
+      switch (error.name) {
+        case "DataNotExistsError":
+          res.status(error.status).json(error.message);
+          break;
+        case "FormError":
+          res.status(error.status).json(error.message);
+          break;
+        default:
+          const serverError = new ServerError();
+          res.status(serverError.status).json(serverError.message);
+      }
+    }
+  },
 };

@@ -23,4 +23,7 @@ exports.UserRepository = {
   updatePassword(newPassword, id) {
     return mongo.updatePassword(newPassword, id);
   },
+  signIn(username, password, email) {
+    return mongo.signIn(username, password, email);
+  },
 };
