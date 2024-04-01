@@ -77,12 +77,13 @@ module.exports = class MongoStorage {
     return this.Model.deleteOne({ _id: id });
   }
 
-  findNearbyAndByProfession(location, profession) {
+  findNearbyAndByProfession(location, profession, range) {
+    range = range * 1000;
     return this.Model.find({
       location: {
         $nearSphere: {
           $geometry: location,
-          $maxDistance: 20000,
+          $maxDistance: range,
         },
       },
       profession,
@@ -133,11 +134,14 @@ module.exports = class MongoStorage {
     );
   }
 
-  findReportsOfUser(userId) {
-    if (!isValidObjectId(userId)) {
+  findReportsOfUser(user) {
+    if (!isValidObjectId(user._id)) {
       return null;
     }
-    return this.Model.find({ assignedUser: userId });
+    if (user.role === "service_provider") {
+      return this.Model.find({ assignedUser: user._id });
+    }
+    return this.Model.find({ reportByUser: user._id });
   }
 
   signIn(username, password, email) {

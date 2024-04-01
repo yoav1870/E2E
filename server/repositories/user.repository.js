@@ -14,8 +14,8 @@ exports.UserRepository = {
   delete(id) {
     return mongo.delete(id);
   },
-  findNearbyAndByProfession(location, profession) {
-    return mongo.findNearbyAndByProfession(location, profession);
+  findNearbyAndByProfession(location, profession, range) {
+    return mongo.findNearbyAndByProfession(location, profession, range);
   },
   updateReports(id, reports, ranking) {
     return mongo.updateReports(id, reports, ranking);
