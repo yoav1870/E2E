@@ -7,6 +7,7 @@ const {
   FormError,
   DataAlreadyExistsError,
   FailedCRUD,
+  ServerError,
 } = require("../errors/general.error");
 const { InvalidRoleError } = require("../errors/user.error");
 const {
@@ -40,7 +41,14 @@ exports.userController = {
       }
       res.status(result.status).json(result.data);
     } catch (error) {
-      res.status(error?.status || 500).json(error.message);
+      switch (error.name) {
+        case "DataNotExistsError":
+          res.status(error.status).json(error.message);
+          break;
+        default:
+          const serverError = new ServerError();
+          res.status(serverError.status).json(serverError.message);
+      }
     }
   },
   async createUser(req, res) {
@@ -52,9 +60,7 @@ exports.userController = {
           body.email &&
           body.password &&
           body.location &&
-          body.profession &&
-          body.availability &&
-          body.ranking
+          body.profession
         ) {
           const existingUser = await UserRepository.find();
           existingUser.forEach((user) => {
@@ -126,7 +132,23 @@ exports.userController = {
         }
       }
     } catch (error) {
-      res.status(error?.status || 500).json(error.message);
+      switch (error.name) {
+        case "DataAlreadyExistsError":
+          res.status(error.status).json(error.message);
+          break;
+        case "FormError":
+          res.status(error.status).json(error.message);
+          break;
+        case "InvalidRoleError":
+          res.status(error.status).json(error.message);
+          break;
+        case "FailedCRUD":
+          res.status(error.status).json(error.message);
+          break;
+        default:
+          const serverError = new ServerError();
+          res.status(serverError.status).json(serverError.message);
+      }
     }
   },
   async deleteUser(req, res) {
@@ -185,7 +207,17 @@ exports.userController = {
         res.status(result.status).json("User has been deleted");
       }
     } catch (error) {
-      res.status(error?.status || 500).json(error.message);
+      switch (error.name) {
+        case "DataNotExistsError":
+          res.status(error.status).json(error.message);
+          break;
+        case "FailedCRUD":
+          res.status(error.status).json(error.message);
+          break;
+        default:
+          const serverError = new ServerError();
+          res.status(serverError.status).json(serverError.message);
+      }
     }
   },
   async updateUserPassword(req, res) {
@@ -219,7 +251,49 @@ exports.userController = {
       }
       res.status(result.status).json("Password has been updated");
     } catch (error) {
-      res.status(error?.status || 500).json(error.message);
+      switch (error.name) {
+        case "DataNotExistsError":
+          res.status(error.status).json(error.message);
+          break;
+        case "FormError":
+          res.status(error.status).json(error.message);
+          break;
+        case "FailedCRUD":
+          res.status(error.status).json(error.message);
+          break;
+        default:
+          const serverError = new ServerError();
+          res.status(serverError.status).json(serverError.message);
+      }
+    }
+  },
+  async signInUser(req, res) {
+    try {
+      const body = req.body;
+      if (!body.username || !body.password || !body.email) {
+        throw new FormError("Please provide all required fields at signInUser");
+      }
+      const user = await UserRepository.signIn(
+        body.username,
+        body.password,
+        body.email
+      );
+      if (!user) {
+        throw new DataNotExistsError("signInUser");
+      }
+      res.status(200).json(user);
+    } catch (error) {
+      switch (error.name) {
+        case "DataNotExistsError":
+          res.status(error.status).json(error.message);
+          break;
+        case "FormError":
+          res.status(error.status).json(error.message);
+          break;
+        default:
+          const serverError = new ServerError();
+          res.status(serverError.status).json(serverError.message);
+      }
     }
   },
 };
