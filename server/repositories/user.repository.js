@@ -17,8 +17,8 @@ exports.UserRepository = {
   findNearbyAndByProfession(location, profession) {
     return mongo.findNearbyAndByProfession(location, profession);
   },
-  updateReports(id, data) {
-    return mongo.updateReports(id, data);
+  updateReports(id, reports, ranking) {
+    return mongo.updateReports(id, reports, ranking);
   },
   updatePassword(newPassword, id) {
     return mongo.updatePassword(newPassword, id);

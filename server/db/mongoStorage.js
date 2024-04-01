@@ -32,11 +32,32 @@ module.exports = class MongoStorage {
   find() {
     return this.Model.find();
   }
-  retrieve(id) {
+  async retrieve(id) {
     if (!isValidObjectId(id)) {
       return null;
     }
-    return this.Model.findById(id);
+    const entity = await this.Model.findById(id);
+    if (
+      this.entity === "user" &&
+      entity &&
+      entity.role === "service_provider"
+    ) {
+      const todayStart = new Date();
+      todayStart.setHours(0, 0, 0, 0);
+      const todayEnd = new Date(todayStart);
+      todayEnd.setDate(todayEnd.getDate() + 1);
+
+      const hasReportDueToday = await mongoose.model("DamageReport").findOne({
+        assignedUser: id,
+        dateOfResolve: {
+          $gte: todayStart,
+          $lt: todayEnd,
+        },
+        resolved: false,
+      });
+      entity.availability = !hasReportDueToday;
+    }
+    return entity;
   }
   async create(data) {
     const entity = new this.Model(data);
@@ -68,13 +89,13 @@ module.exports = class MongoStorage {
       role: "service_provider",
     });
   }
-  updateReports(id, reports) {
+  updateReports(id, reports, ranking) {
     if (!isValidObjectId(id)) {
       return null;
     }
     return this.Model.findByIdAndUpdate(
       id,
-      { reports: reports },
+      { reports: reports, ranking: ranking },
       { new: true, runValidators: true }
     );
   }
@@ -110,5 +131,12 @@ module.exports = class MongoStorage {
       { assignedUser: assignedTo },
       { new: true, runValidators: true }
     );
+  }
+
+  findReportsOfUser(userId) {
+    if (!isValidObjectId(userId)) {
+      return null;
+    }
+    return this.Model.find({ assignedUser: userId });
   }
 };

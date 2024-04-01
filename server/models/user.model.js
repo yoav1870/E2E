@@ -34,10 +34,12 @@ const userSchema = new Schema(
       type: String,
     },
     availability: {
+      default: true,
       type: Boolean,
     },
     ranking: {
       type: Number,
+      default: 1,
       enum: [1, 2, 3, 4, 5],
     },
     photo: {
@@ -59,14 +61,6 @@ const userSchema = new Schema(
 );
 
 userSchema.path("profession").required(function () {
-  return this.role === "service_provider";
-});
-
-userSchema.path("availability").required(function () {
-  return this.role === "service_provider";
-});
-
-userSchema.path("ranking").required(function () {
   return this.role === "service_provider";
 });
 
