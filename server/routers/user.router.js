@@ -5,7 +5,7 @@ const authenticateToken = require("../middlewares/authenticateToken");
 const UserRouter = new Router();
 
 UserRouter.post("/sign-in", userController.signInUser);
-UserRouter.post("/", userController.createUser);
+UserRouter.post("/sign-up", userController.createUser);
 
 UserRouter.put("/:id", authenticateToken, userController.updateUserPassword);
 
