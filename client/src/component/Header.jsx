@@ -9,22 +9,33 @@ import {
   MenuItem,
   useMediaQuery,
   useTheme,
+  Avatar,
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import logo from "../assets/logo.png";
 
 const Header = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
+  const navigate = useNavigate();
+
   const [mobileMenuAnchorEl, setMobileMenuAnchorEl] = useState(null);
+
   const handleMobileMenuOpen = (event) => {
     setMobileMenuAnchorEl(event.currentTarget);
   };
+
   const handleMobileMenuClose = () => {
     setMobileMenuAnchorEl(null);
   };
+
+  const handleProfileClick = () => {
+    navigate("/profile");
+  };
+
   const mobileMenuId = "primary-search-account-menu-mobile";
+
   const renderMobileMenu = (
     <Menu
       anchorEl={mobileMenuAnchorEl}
@@ -46,6 +57,7 @@ const Header = () => {
       </MenuItem>
     </Menu>
   );
+
   return (
     <AppBar
       position="static"
@@ -59,23 +71,10 @@ const Header = () => {
         justifyContent: "center",
       }}
     >
-      <Toolbar
-        disableGutters
-        sx={{ justifyContent: "space-between", padding: "0 20px" }}
-      >
-        {isMobile && (
-          <IconButton
-            size="large"
-            edge="start"
-            aria-label="menu"
-            aria-controls={mobileMenuId}
-            aria-haspopup="true"
-            onClick={handleMobileMenuOpen}
-            color="inherit"
-          >
-            <MenuIcon />
-          </IconButton>
-        )}
+      <Toolbar disableGutters sx={{ justifyContent: "space-between", padding: "0 20px" }}>
+        <IconButton onClick={handleProfileClick}>
+          <Avatar alt="Profile Picture" src="path/to/profile-picture.jpg" />
+        </IconButton>
         <Typography
           variant="h6"
           sx={{
@@ -87,7 +86,6 @@ const Header = () => {
         >
           <img src={logo} alt="Logo" style={{ height: "50px" }} />
         </Typography>
-
         {!isMobile && (
           <Box sx={{ display: "flex" }}>
             <MenuItem component={Link} to="/reports">
@@ -100,7 +98,19 @@ const Header = () => {
               Create Report
             </MenuItem>
           </Box>
-          
+        )}
+        {isMobile && (
+          <IconButton
+            size="large"
+            edge="end"
+            aria-label="menu"
+            aria-controls={mobileMenuId}
+            aria-haspopup="true"
+            onClick={handleMobileMenuOpen}
+            color="inherit"
+          >
+            <MenuIcon />
+          </IconButton>
         )}
       </Toolbar>
       {renderMobileMenu}
