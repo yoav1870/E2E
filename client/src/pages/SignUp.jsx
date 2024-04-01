@@ -13,7 +13,7 @@ const SignUp = () => {
         location: '',
         profession: '',
         description: '',
-        availability: false,
+        availability: true,
         ranking: '',
         photo: '',
     });
