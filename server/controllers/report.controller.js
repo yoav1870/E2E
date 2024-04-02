@@ -15,51 +15,9 @@ const {
 } = require("../middlewares/mailerConfig");
 
 exports.reportController = {
-  async getAllReports(req, res) {
-    try {
-      const result = {
-        status: 200,
-        data: await reportRepository.find(),
-      };
-      if (result.data.length === 0) {
-        throw new NoDataError("getAllReports");
-      }
-      res.status(result.status).json(result.data);
-    } catch (error) {
-      switch (error.name) {
-        case "NoDataError":
-          res.status(error.status).json(error.message);
-          break;
-        default:
-          const serverError = new ServerError();
-          res.status(serverError.status).json(serverError.message);
-      }
-    }
-  },
-  async getReport(req, res) {
-    try {
-      const result = {
-        status: 200,
-        data: await reportRepository.retrieve(req.params.id),
-      };
-      if (!result.data) {
-        throw new DataNotExistsError("getReport", req.params.id);
-      }
-      res.status(result.status).json(result.data);
-    } catch (error) {
-      switch (error.name) {
-        case "DataNotExistsError":
-          res.status(error.status).json(error.message);
-          break;
-        default:
-          const serverError = new ServerError();
-          res.status(serverError.status).json(serverError.message);
-      }
-    }
-  },
   async getAllReportsOfUser(req, res) {
     try {
-      const userId = req.body.id;
+      const userId = req.user.userId;
       if (!userId) {
         throw new FormError("Please provide the user id");
       }
@@ -78,11 +36,7 @@ exports.reportController = {
     } catch (error) {
       switch (error.name) {
         case "DataNotExistsError":
-          res.status(error.status).json(error.message);
-          break;
         case "NoDataError":
-          res.status(error.status).json(error.message);
-          break;
         case "FormError":
           res.status(error.status).json(error.message);
           break;
@@ -92,6 +46,43 @@ exports.reportController = {
       }
     }
   },
+  async getReport(req, res) {
+    try {
+      const result = {
+        status: 200,
+        data: await reportRepository.retrieve(req.params.id),
+      };
+      if (!result.data) {
+        throw new DataNotExistsError("getReport", req.params.id);
+      }
+
+      if (req.user.role === "service_provider") {
+        if (result.data.assignedUser !== user.userId) {
+          throw new FormError(
+            "You are not assigned to this report, you can't view it"
+          );
+        }
+      } else if (req.user.role === "service_request") {
+        if (result.data.reportByUser !== user.userId) {
+          throw new FormError(
+            "You are not the one who submitted this report, you can't view it"
+          );
+        }
+      }
+
+      res.status(result.status).json(result.data);
+    } catch (error) {
+      switch (error.name) {
+        case "DataNotExistsError":
+          res.status(error.status).json(error.message);
+          break;
+        default:
+          const serverError = new ServerError();
+          res.status(serverError.status).json(serverError.message);
+      }
+    }
+  },
+
   async createReport(req, res) {
     try {
       const body = req.body;
@@ -289,8 +280,6 @@ exports.reportController = {
     }
   },
   async deleteReport(req, res) {
-    // נצטרך לקבל עוד משתנה שמציג מי מהמשתמשים שלנו בחר למחוק את הטופס
-    // נקרא לו whodelete
     try {
       const body = req.body;
       if (!body.whoDelete || !body._id) {
