@@ -22,11 +22,26 @@ const fetchUserData = () => {
 
 const UserProfile = () => {
     const [user, setUser] = useState(null);
-
+  
     useEffect(() => {
-        const userData = fetchUserData();
-        setUser(userData);
+      const fetchUserData = async () => {
+        try {
+          const token = localStorage.getItem('token');
+          const response = await axios.get('https://e2e-y8hj.onrender.com/api/users/profile', {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+          setUser(response.data);
+        } catch (error) {
+          console.error('Failed to fetch user data:', error);
+          // Handle error, display error message, etc.
+        }
+      };
+  
+      fetchUserData();
     }, []);
+  
 
     if (!user) {
         return <Typography>Loading...</Typography>;

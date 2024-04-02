@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Container, Typography, TextField, Button, Box } from '@mui/material';
 import logo from '../assets/logo.png';
@@ -25,14 +26,13 @@ const SignIn = () => {
           'Content-Type': 'application/json',
         },
       });
-      console.log(response.data); 
+      const { token } = response.data;
+      localStorage.setItem('token', token);
       navigate('/home'); 
     } catch (error) {
       if (error.response) {
-   
         console.error("Backend returned an error:", error.response.data);
       } else if (error.request) {
-
         console.error("No response received:", error.request);
       } else {
         console.error('Error:', error.message);

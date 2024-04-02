@@ -11,11 +11,32 @@ const HomePage = () => {
   useEffect(() => {
     const fetchReports = async () => {
       try {
-        const response = await axios.get('https://e2e-y8hj.onrender.com/api/reports/home');
+        const token = localStorage.getItem('token');
+        const response = await axios.get('https://e2e-y8hj.onrender.com/api/reports/home', {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
         setReports(response.data);
         setLoading(false);
       } catch (error) {
-        setError('Failed to fetch reports. Please try again.');
+        console.error('Failed to fetch reports:', error);
+        if (error.response) {
+          // The request was made and the server responded with a status code
+          // that falls out of the range of 2xx
+          console.error('Response data:', error.response.data);
+          console.error('Response status:', error.response.status);
+          console.error('Response headers:', error.response.headers);
+          setError(`Failed to fetch reports. Server responded with status code ${error.response.status}`);
+        } else if (error.request) {
+          // The request was made but no response was received
+          console.error('No response received:', error.request);
+          setError('Failed to fetch reports. No response from the server.');
+        } else {
+          // Something happened in setting up the request that triggered an Error
+          console.error('Error:', error.message);
+          setError('Failed to fetch reports. An error occurred.');
+        }
         setLoading(false);
       }
     };
