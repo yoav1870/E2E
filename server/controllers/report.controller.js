@@ -7,6 +7,7 @@ const {
   FailedCRUD,
   NoProviderAvailableError,
   ServerError,
+  ForbiddenError,
 } = require("../errors/general.error");
 const {
   sendReportNotificationForCreateNewReport,
@@ -57,16 +58,12 @@ exports.reportController = {
       }
 
       if (req.user.role === "service_provider") {
-        if (result.data.assignedUser !== user.userId) {
-          throw new FormError(
-            "You are not assigned to this report, you can't view it"
-          );
+        if (result.data.assignedUser.toString() !== req.user.userId) {
+          throw new ForbiddenError();
         }
       } else if (req.user.role === "service_request") {
-        if (result.data.reportByUser !== user.userId) {
-          throw new FormError(
-            "You are not the one who submitted this report, you can't view it"
-          );
+        if (result.data.reportByUser.toString() !== req.user.userId) {
+          throw new ForbiddenError();
         }
       }
 
@@ -74,6 +71,7 @@ exports.reportController = {
     } catch (error) {
       switch (error.name) {
         case "DataNotExistsError":
+        case "ForbiddenError":
           res.status(error.status).json(error.message);
           break;
         default:
@@ -85,63 +83,63 @@ exports.reportController = {
 
   async createReport(req, res) {
     try {
-      const body = req.body;
-      userSubmit = await UserRepository.retrieve(body.reportByUser);
+      const {
+        location,
+        description,
+        urgency,
+        dateOfResolve,
+        profession,
+        range,
+      } = req.body;
+      const userId = req.user.userId;
+
+      const userSubmit = await UserRepository.retrieve(userId);
       if (!userSubmit) {
-        throw new DataNotExistsError("createReport", body.reportByUser);
+        throw new DataNotExistsError("createReport", userId);
       }
       if (userSubmit.role !== "service_request") {
-        throw new FormError(
-          "User that submited the report is not a service request"
-        );
+        throw new FormError("Only service request users can submit reports.");
       }
+
       if (
-        body.location &&
-        body.description &&
-        body.urgency &&
-        body.reportByUser &&
-        body.profession &&
-        body.dateOfResolve &&
-        body.range
+        location &&
+        description &&
+        urgency &&
+        dateOfResolve &&
+        profession &&
+        range
       ) {
         const serviceProviders = await UserRepository.findNearbyAndByProfession(
-          body.location,
-          body.profession,
-          body.range
+          location,
+          profession,
+          range
         );
-        if (!serviceProviders) {
+        if (!serviceProviders || serviceProviders.length === 0) {
           throw new NoProviderAvailableError(
-            "No service provider available for this report plz try again later"
+            "No service provider available for this report. Please try again later."
           );
         }
-        // sort the service providers by ranking in the 20km radius
+
         serviceProviders.sort((a, b) => b.ranking - a.ranking);
-        // check if the service provider has a report on the same date
 
         const assignedServiceProvider = await findAvailableServiceProvider(
           serviceProviders,
-          body
+          { ...req.body, reportByUser: userId }
         );
-        if (assignedServiceProvider === false) {
-          throw new FormError(
-            "Date of resolve must be later than current date"
-          );
-        }
         if (!assignedServiceProvider) {
           throw new NoProviderAvailableError(
-            "No service provider available for this report plz try again later"
+            "No service provider available for this report. Please try again later."
           );
         }
         const newReport = {
-          location: body.location,
-          description: body.description,
-          status: body.status,
-          photo: body.photo,
-          urgency: body.urgency,
-          reportByUser: body.reportByUser,
-          dateOfResolve: body.dateOfResolve,
-          assignedUser: assignedServiceProvider,
-          profession: body.profession,
+          location,
+          description,
+          photo: req.body.photo,
+          urgency,
+          reportByUser: userId,
+          dateOfResolve,
+          assignedUser: assignedServiceProvider._id,
+          profession,
         };
         const result = {
           status: 201,
@@ -182,7 +180,6 @@ exports.reportController = {
             console.error("Failed to send email");
           }
         }
-
         res.status(result.status).json("Report created");
       } else {
         throw new FormError(
@@ -192,14 +189,8 @@ exports.reportController = {
     } catch (error) {
       switch (error.name) {
         case "DataNotExistsError":
-          res.status(error.status).json(error.message);
-          break;
         case "FormError":
-          res.status(error.status).json(error.message);
-          break;
         case "NoProviderAvailableError":
-          res.status(error.status).json(error.message);
-          break;
         case "FailedCRUD":
           res.status(error.status).json(error.message);
           break;
@@ -209,6 +200,7 @@ exports.reportController = {
       }
     }
   },
+
   async updateDateOfResolve(req, res) {
     // נצטרך לקבל עוד משתנה שמציג מי מהמשתמשים שלנו בחר למחוק את הטופס
     // נקרא לו whodelete
