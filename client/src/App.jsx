@@ -3,6 +3,7 @@ import HomePage from "./pages/HomePage.jsx";
 import SignIn from "./pages/SignIn";
 import SignUp from "./pages/SignUp";
 import Profile from "./pages/Profile.jsx";
+import CreateReport from "./pages/CreateReport";
 
 const App = () => {
   const isAuthenticated = () => {
@@ -24,6 +25,10 @@ const App = () => {
         <Route
           path="/profile"
           element={isAuthenticated() ? <Profile /> : <Navigate to="/sign-in" />}
+        />
+        <Route
+          path="/create-report"
+          element={isAuthenticated() ? <CreateReport /> : <Navigate to="/sign-in" />}
         />
       </Routes>
     </BrowserRouter>

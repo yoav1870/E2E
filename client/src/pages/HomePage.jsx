@@ -12,6 +12,7 @@ const HomePage = () => {
     const fetchReports = async () => {
       try {
         const token = localStorage.getItem('token');
+
         const response = await axios.get('https://e2e-y8hj.onrender.com/api/reports/home', {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -22,18 +23,14 @@ const HomePage = () => {
       } catch (error) {
         console.error('Failed to fetch reports:', error);
         if (error.response) {
-          // The request was made and the server responded with a status code
-          // that falls out of the range of 2xx
           console.error('Response data:', error.response.data);
           console.error('Response status:', error.response.status);
           console.error('Response headers:', error.response.headers);
           setError(`Failed to fetch reports. Server responded with status code ${error.response.status}`);
         } else if (error.request) {
-          // The request was made but no response was received
           console.error('No response received:', error.request);
           setError('Failed to fetch reports. No response from the server.');
         } else {
-          // Something happened in setting up the request that triggered an Error
           console.error('Error:', error.message);
           setError('Failed to fetch reports. An error occurred.');
         }
@@ -59,23 +56,30 @@ const HomePage = () => {
           <Typography variant="body1" align="center" color="error">
             {error}
           </Typography>
+        ) : reports.length === 0 ? (
+          <Typography variant="body1" align="center">
+            No reports found.
+          </Typography>
         ) : (
           <Grid container spacing={3}>
             {reports.map((report) => (
-              <Grid item xs={12} sm={6} md={4} key={report.id}>
+              <Grid item xs={12} sm={6} md={4} key={report._id}>
                 <Card>
-                  <CardMedia
-                    component="img"
-                    height="200"
-                    image={report.photo}
-                    alt={report.title}
-                  />
+                  {report.photo && (
+                    <CardMedia component="img" height="200" image={report.photo} alt={report.description} />
+                  )}
                   <CardContent>
                     <Typography variant="h6" gutterBottom>
-                      {report.title}
+                      {report.description}
                     </Typography>
                     <Typography variant="body2" color="text.secondary">
-                      {report.description}
+                      Status: {report.status}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      Urgency: {report.urgency}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      Date of Resolve: {new Date(report.dateOfResolve).toLocaleDateString()}
                     </Typography>
                   </CardContent>
                 </Card>
