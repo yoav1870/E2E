@@ -7,19 +7,16 @@ const UserRouter = new Router();
 UserRouter.post("/sign-in", userController.signInUser);
 UserRouter.post("/sign-up", userController.createUser);
 
-UserRouter.put("/:id", authenticateToken, userController.updateUserPassword);
+UserRouter.get("/home", authenticateToken, userController.getUser);
 
-UserRouter.delete("/:id", authenticateToken, userController.deleteUser);
+UserRouter.put(
+  "/updatePassword",
+  authenticateToken,
+  userController.updateUserPassword
+);
 
-UserRouter.get("/:id", authenticateToken, userController.getUser);
+UserRouter.delete("/deleteUser", authenticateToken, userController.deleteUser);
 
-// UserRouter.get("/", userController.getAllUsers);
-// UserRouter.put("/", (req, res, next) => {
-//   next(new RequiredIdError("put", "user"));
-// });
-// UserRouter.delete("/", (req, res, next) => {
-//   next(new RequiredIdError("delete", "user"));
-// });
 UserRouter.all("*", (req, res, next) => {
   next(new NotFoundCRUD());
 });

@@ -26,4 +26,7 @@ exports.UserRepository = {
   signIn(username, password, email) {
     return mongo.signIn(username, password, email);
   },
+  findByEmail(email) {
+    return mongo.findByEmail(email);
+  },
 };

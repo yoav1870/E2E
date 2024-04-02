@@ -70,6 +70,14 @@ class ServerError extends Error {
     this.name = "ServerError";
   }
 }
+
+class SignInError extends Error {
+  constructor() {
+    super("Invalid email or password.");
+    this.status = 400;
+    this.name = "SignInError";
+  }
+}
 module.exports = {
   NotFoundUrlError,
   RequiredIdError,
@@ -81,4 +89,5 @@ module.exports = {
   FailedCRUD,
   NoProviderAvailableError,
   ServerError,
+  SignInError,
 };

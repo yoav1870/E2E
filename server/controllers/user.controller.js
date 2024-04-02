@@ -1,44 +1,65 @@
 const { UserRepository } = require("../repositories/user.repository");
 const { reportController } = require("./report.controller");
 const { deleteUserAndNotify } = require("../middlewares/mailerConfig");
+const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const {
-  NoDataError,
   DataNotExistsError,
   FormError,
   DataAlreadyExistsError,
   FailedCRUD,
   ServerError,
+  SignInError,
 } = require("../errors/general.error");
 const { InvalidRoleError } = require("../errors/user.error");
 const {
   sendReportNotificationForCreateNewUser,
   changePasswordAndNotify,
 } = require("../middlewares/mailerConfig");
+const { Sign } = require("crypto");
 
 exports.userController = {
-  async getAllUsers(req, res) {
+  async signInUser(req, res) {
     try {
-      const result = {
-        status: 200,
-        data: await UserRepository.find(),
-      };
-      if (result.data.length === 0) {
-        throw new NoDataError("getAllUsers");
+      const { email, password } = req.body;
+      if (!password || !email) {
+        throw new FormError("Please provide all required fields at signInUser");
       }
-      res.status(result.status).json(result.data);
+      const user = await UserRepository.findByEmail(email);
+      if (!user) {
+        throw new SignInError();
+      }
+      const isMatch = await bcrypt.compare(password, user.password);
+      if (!isMatch) {
+        throw new SignInError();
+      }
+      const token = jwt.sign(
+        { userId: user._id, role: user.role },
+        process.env.JWT_SECRET,
+        { expiresIn: "24h" }
+      );
+      res.status(200).json({ token });
     } catch (error) {
-      res.status(error?.status || 500).json(error.message);
+      switch (error.name) {
+        case "FormError":
+        case "SignInError":
+          res.status(error.status).json(error.message);
+          break;
+        default:
+          const serverError = new ServerError();
+          res.status(serverError.status).json(serverError.message);
+      }
     }
   },
   async getUser(req, res) {
     try {
+      const userId = req.user.userId;
       const result = {
         status: 200,
-        data: await UserRepository.retrieve(req.params.id),
+        data: await UserRepository.retrieve(userId),
       };
       if (!result.data) {
-        throw new DataNotExistsError("getUser", req.params.id);
+        throw new DataNotExistsError("getUser", userId);
       }
       res.status(result.status).json(result.data);
     } catch (error) {
@@ -54,95 +75,153 @@ exports.userController = {
   },
   async createUser(req, res) {
     try {
-      const body = req.body;
-      if (body.role === "service_provider") {
-        if (
-          body.username &&
-          body.email &&
-          body.password &&
-          body.location &&
-          body.profession
-        ) {
-          const existingUser = await UserRepository.find();
-          existingUser.forEach((user) => {
-            if (
-              user.username === body.username &&
-              user.password === body.password &&
-              user.email === body.email
-            ) {
-              throw new DataAlreadyExistsError(
-                "User with this username or password or email already exists"
-              );
-            }
-          });
-          const result = {
-            status: 201,
-            data: await UserRepository.create(body),
-          };
-          if (result.data === null) {
-            throw new FailedCRUD("Failed to create a user");
-          }
-          const emailResult = await sendReportNotificationForCreateNewUser(
-            result.data.email
-          );
-          if (emailResult === null) {
-            console.error("Failed to send email");
-          }
-          res.status(result.status).json(result.data);
-        } else {
-          throw new FormError(
-            "Please provide all required fields at createUser"
+      const { email, password, username, role, location, profession, photo } =
+        req.body;
+      if (!email || !password || !username || !role || !location) {
+        throw new FormError("Please provide all required fields at createUser");
+      }
+      if (role !== "service_provider" && role !== "service_request") {
+        throw new InvalidRoleError(role);
+      }
+      if (role === "service_provider") {
+        if (!profession) {
+          throw new FormError("Please provide profession field at createUser");
+        }
+
+        const existingUser = await UserRepository.findByEmail(email);
+        if (existingUser) {
+          throw new DataAlreadyExistsError(
+            "User with this email already exists."
           );
         }
+
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        const newUser = {
+          email,
+          password: hashedPassword,
+          username,
+          role,
+          location,
+          profession,
+          photo,
+        };
+        const result = {
+          status: 201,
+          data: await UserRepository.create(newUser),
+        };
+        if (result.data === null) {
+          throw new FailedCRUD("Failed to create a user");
+        }
+        const emailResult = await sendReportNotificationForCreateNewUser(
+          result.data.email
+        );
+        if (emailResult === null) {
+          console.error("Failed to send email");
+        }
+        res.status(result.status).json(result.data);
       } else {
-        if (body.role === "service_request") {
-          if (body.username && body.password && body.location && body.email) {
-            const existingUser = await UserRepository.find();
-            existingUser.forEach((user) => {
-              if (
-                user.username === body.username &&
-                user.password === body.password &&
-                user.email === body.email
-              ) {
-                throw new DataAlreadyExistsError(
-                  "User with this username or password or email already exists"
-                );
-              }
-            });
-            const result = {
-              status: 201,
-              data: await UserRepository.create(body),
-            };
-            if (result.data === null) {
-              throw new FailedCRUD("Failed to create a user");
-            }
-            const emailResult = await sendReportNotificationForCreateNewUser(
-              result.data.email
-            );
-            if (emailResult === null) {
-              console.error("Failed to send email");
-            }
-            res.status(result.status).json(result.data);
-          } else {
-            throw new FormError(
-              "Please provide all required fields at createUser"
-            );
-          }
-        } else {
-          throw new InvalidRoleError(body.role);
+        const existingUser = await UserRepository.findByEmail(email);
+        if (existingUser) {
+          throw new DataAlreadyExistsError(
+            "User with this email already exists."
+          );
         }
+
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        const newUser = {
+          email,
+          password: hashedPassword,
+          username,
+          role,
+          location,
+          photo,
+        };
+        const result = {
+          status: 201,
+          data: await UserRepository.create(newUser),
+        };
+
+        if (result.data === null) {
+          throw new FailedCRUD("Failed to create a user");
+        }
+        const emailResult = await sendReportNotificationForCreateNewUser(
+          result.data.email
+        );
+        if (emailResult === null) {
+          console.error("Failed to send email");
+        }
+        res.status(result.status).json(result.data);
       }
     } catch (error) {
       switch (error.name) {
         case "DataAlreadyExistsError":
-          res.status(error.status).json(error.message);
-          break;
         case "FormError":
-          res.status(error.status).json(error.message);
-          break;
         case "InvalidRoleError":
+        case "FailedCRUD":
           res.status(error.status).json(error.message);
           break;
+        default:
+          const serverError = new ServerError();
+          res.status(serverError.status).json(serverError.message);
+      }
+    }
+  },
+  async updateUserPassword(req, res) {
+    try {
+      const userId = req.user.userId;
+      const { oldPassword, newPassword } = req.body;
+
+      if (!oldPassword || !newPassword) {
+        throw new FormError(
+          "Please provide all required fields at updateUserPassword"
+        );
+      }
+      const user = await UserRepository.retrieve(userId);
+      if (!user) {
+        throw new DataNotExistsError("updateUser", userId);
+      }
+
+      const isOldPasswordMatch = await bcrypt.compare(
+        oldPassword,
+        user.password
+      );
+      if (!isOldPasswordMatch) {
+        throw new FormError("Old password does not match.");
+      }
+
+      const isNewPasswordSame = await bcrypt.compare(
+        newPassword,
+        user.password
+      );
+      if (isNewPasswordSame) {
+        throw new FormError("New password must be different from the old one.");
+      }
+
+      const hashedPassword = await bcrypt.hash(newPassword, 10);
+      const result = {
+        status: 200,
+        data: await UserRepository.updatePassword(hashedPassword, userId),
+      };
+
+      if (result.data === null) {
+        throw new FailedCRUD("Failed to update a user");
+      }
+
+      const emailResult = await changePasswordAndNotify(
+        user.email,
+        user.username
+      );
+      if (emailResult === false) {
+        console.error("Failed to send email");
+      }
+
+      res.status(result.status).json("Password has been updated");
+    } catch (error) {
+      switch (error.name) {
+        case "DataNotExistsError":
+        case "FormError":
         case "FailedCRUD":
           res.status(error.status).json(error.message);
           break;
@@ -154,15 +233,17 @@ exports.userController = {
   },
   async deleteUser(req, res) {
     try {
-      const id = req.params.id;
-      const user = await UserRepository.retrieve(id);
+      const userId = req.user.userId;
+
+      const user = await UserRepository.retrieve(userId);
       if (!user) {
-        throw new DataNotExistsError("deleteUser", id);
+        throw new DataNotExistsError("deleteUser", userId);
       }
+
       if (user.reports.length <= 0) {
         const result = {
           status: 200,
-          data: await UserRepository.delete(id),
+          data: await UserRepository.delete(userId),
         };
         if (result.data === null) {
           throw new FailedCRUD("Failed to delete a user");
@@ -193,7 +274,7 @@ exports.userController = {
         }
         const result = {
           status: 200,
-          data: await UserRepository.delete(id),
+          data: await UserRepository.delete(userId),
         };
         if (result.data === null) {
           throw new FailedCRUD("Failed to delete a user");
@@ -210,86 +291,7 @@ exports.userController = {
     } catch (error) {
       switch (error.name) {
         case "DataNotExistsError":
-          res.status(error.status).json(error.message);
-          break;
         case "FailedCRUD":
-          res.status(error.status).json(error.message);
-          break;
-        default:
-          const serverError = new ServerError();
-          res.status(serverError.status).json(serverError.message);
-      }
-    }
-  },
-  async updateUserPassword(req, res) {
-    try {
-      const body = req.body;
-      const id = req.params.id;
-
-      if (!body.password || !id) {
-        throw new FormError("Please provide all required fields at updateUser");
-      }
-      const user = await UserRepository.retrieve(id);
-      if (!user) {
-        throw new DataNotExistsError("updateUser", id);
-      }
-      if (body.password === user.password) {
-        throw new FormError("New password must be different from the old one");
-      }
-      const result = {
-        status: 200,
-        data: await UserRepository.updatePassword(body.password, user._id),
-      };
-      if (result.data === null) {
-        throw new FailedCRUD("Failed to update a user");
-      }
-      const emailResult = await changePasswordAndNotify(
-        user.email,
-        user.username
-      );
-      if (emailResult === false) {
-        console.error("Failed to send email");
-      }
-      res.status(result.status).json("Password has been updated");
-    } catch (error) {
-      switch (error.name) {
-        case "DataNotExistsError":
-          res.status(error.status).json(error.message);
-          break;
-        case "FormError":
-          res.status(error.status).json(error.message);
-          break;
-        case "FailedCRUD":
-          res.status(error.status).json(error.message);
-          break;
-        default:
-          const serverError = new ServerError();
-          res.status(serverError.status).json(serverError.message);
-      }
-    }
-  },
-  async signInUser(req, res) {
-    try {
-      const { username, password, email } = req.body;
-      if (!username || !password || !email) {
-        throw new FormError("Please provide all required fields at signInUser");
-      }
-      const user = await UserRepository.signIn(username, password, email);
-      if (!user) {
-        throw new DataNotExistsError("signInUser");
-      }
-      const token = jwt.sign(
-        { userId: user._id, role: user.role },
-        process.env.JWT_SECRET,
-        { expiresIn: "24h" }
-      );
-      res.status(200).json({ token, user });
-    } catch (error) {
-      switch (error.name) {
-        case "DataNotExistsError":
-          res.status(error.status).json(error.message);
-          break;
-        case "FormError":
           res.status(error.status).json(error.message);
           break;
         default:
