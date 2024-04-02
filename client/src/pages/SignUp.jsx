@@ -44,7 +44,7 @@ const SignUp = () => {
             };
 
             try {
-                await axios.post('https://e2e-y8hj.onrender.com/api/users', dataToSend, {
+                await axios.post('https://e2e-y8hj.onrender.com/api/users/sign-up', dataToSend, {
                     headers: {
                         'Content-Type': 'application/json',
                     },
