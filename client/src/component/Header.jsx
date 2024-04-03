@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   AppBar,
   Toolbar,
@@ -16,15 +16,17 @@ import { Link } from "react-router-dom";
 // import logo from "../assets/logo.png";
 import logo from "../assets/icon_logo.png";
 
-
-// Add <CssBaseline /> at the root of your component tree
-
 const Header = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
 
   const [mobileMenuAnchorEl, setMobileMenuAnchorEl] = useState(null);
   const [profileMenuAnchorEl, setProfileMenuAnchorEl] = useState(null);
+
+
+  const userRole = localStorage.getItem('role');
+  // console.log("Setting role in localStorage:", user.role);
+  localStorage.setItem("role", user.role);
 
   const handleMobileMenuOpen = (event) => {
     setMobileMenuAnchorEl(event.currentTarget);
@@ -72,9 +74,14 @@ const Header = () => {
       <MenuItem component={Link} to="/profile">
         My Profile
       </MenuItem>
+      {/* <MenuItem component={Link} to="/create-report">
+        Create Report
+      </MenuItem> */}
+      {/* {userRole !== "service_provider" && ( */}
       <MenuItem component={Link} to="/create-report">
         Create Report
       </MenuItem>
+      {/* )} */}
     </Menu>
   );
 
@@ -124,22 +131,30 @@ const Header = () => {
             alignItems: "center",
           }}
         >
-              <Box sx={{ flexGrow: 1, display: 'flex', justifyContent: 'center' }}>
-          <Link to="/" style={{ display: 'flex', alignItems: 'center', textDecoration: 'none', color: 'inherit' }}>
-            <img src={logo} alt="Logo" style={{ height: "50px" }} />
-            <Typography
-              variant="body1"
-              color="#170F49"
-              sx={{
-                ml: 1,
-                fontSize: "1.50rem",
-                fontWeight: "bold",
+          <Box sx={{ flexGrow: 1, display: "flex", justifyContent: "center" }}>
+            <Link
+              to="/"
+              style={{
+                display: "flex",
+                alignItems: "center",
+                textDecoration: "none",
+                color: "inherit",
               }}
             >
-              Reports
-            </Typography>
-          </Link>
-        </Box>
+              <img src={logo} alt="Logo" style={{ height: "50px" }} />
+              <Typography
+                variant="body1"
+                color="#170F49"
+                sx={{
+                  ml: 1,
+                  fontSize: "1.50rem",
+                  fontWeight: "bold",
+                }}
+              >
+                Reports
+              </Typography>
+            </Link>
+          </Box>
         </Typography>
         {!isMobile && (
           <Box sx={{ display: "flex" }}>
