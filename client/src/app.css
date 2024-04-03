@@ -8,27 +8,27 @@ html, body, #root {
   #root {
     display: flex;
     flex-direction: column;
-    min-height: 100vh; /* Ensure the root element fills the entire height */
+    min-height: 100vh; 
   }
   
-  /* This is optional if you want to ensure the footer doesn't overlap content when the page content is too short */
+ 
   .content {
-    flex-grow: 1; /* This will make the content grow to occupy available space, pushing the footer down */
-    display: flex; /* Using flex to manage the content layout */
+    flex-grow: 1; 
+    display: flex; 
     flex-direction: column;
-    /* Remove padding-top if your pages already account for header space */
-    padding-top: 64px; /* Adjust if you have a header and it's a different height */
-    padding-bottom: var(--footer-height); /* Reserve space for the footer */
+    
+    padding-top: 64px; 
+    padding-bottom: var(--footer-height); 
   }
   
-  /* Define a CSS variable for the footer height if you know it */
+
   :root {
-    --footer-height: 100px; /* Adjust this to match your footer's height */
+    --footer-height: 100px; 
   }
   
   .footer {
-    /* Footer-specific styles */
-    padding: 20px 0; /* Assuming your footer has this much vertical padding */
+    padding: 20px 0; 
     margin: 0;
   }
+  
   
