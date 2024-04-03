@@ -1,0 +1,34 @@
+html, body, #root {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  #root {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh; 
+  }
+  
+ 
+  .content {
+    flex-grow: 1; 
+    display: flex; 
+    flex-direction: column;
+    
+    padding-top: 64px; 
+    padding-bottom: var(--footer-height); 
+  }
+  
+
+  :root {
+    --footer-height: 100px; 
+  }
+  
+  .footer {
+    padding: 20px 0; 
+    margin: 0;
+  }
+  
+  

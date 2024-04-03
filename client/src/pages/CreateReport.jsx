@@ -6,6 +6,7 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import Header from '../component/Header';
 
+
 const professions = ["Electrician", "plumber", "Carpenter", "Technician"];
 
 const validationSchema = yup.object({
@@ -171,7 +172,9 @@ const CreateReport = () => {
             Submit Report
           </Button>
         </form>
+      
       </Container>
+   
     </>
   );
 };

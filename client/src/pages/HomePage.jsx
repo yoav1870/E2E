@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import axios from 'axios';
 import Header from '../component/Header';
 
+
 const HomePage = () => {
   const [reports, setReports] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -96,7 +97,9 @@ const HomePage = () => {
             ))}
           </Grid>
         )}
+
       </Container>
+      {/* <Footer /> */}
     </>
   );
 };

@@ -13,7 +13,11 @@ import {
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import { Link } from "react-router-dom";
-import logo from "../assets/logo.png";
+// import logo from "../assets/logo.png";
+import logo from "../assets/icon_logo.png";
+
+
+// Add <CssBaseline /> at the root of your component tree
 
 const Header = () => {
   const theme = useTheme();
@@ -62,7 +66,7 @@ const Header = () => {
       open={Boolean(mobileMenuAnchorEl)}
       onClose={handleMobileMenuClose}
     >
-      <MenuItem component={Link} to="/reports">
+      <MenuItem component={Link} to="/home">
         All Reports
       </MenuItem>
       <MenuItem component={Link} to="/profile">
@@ -93,18 +97,21 @@ const Header = () => {
 
   return (
     <AppBar
-      position="static"
+      position="fixed"
       color="default"
       elevation={4}
       sx={{
-        backgroundColor: "#fff",
+        backgroundColor: "#E7E7E7",
         color: "#333",
         boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
-        minHeight: "100px",
         justifyContent: "center",
+        minHeight: "70px",
       }}
     >
-      <Toolbar disableGutters sx={{ justifyContent: "space-between", padding: "0 20px" }}>
+      <Toolbar
+        disableGutters
+        sx={{ justifyContent: "space-between", padding: "0 20px" }}
+      >
         <IconButton onClick={handleProfileMenuOpen}>
           <Avatar alt="Profile Picture" src="path/to/profile-picture.jpg" />
         </IconButton>
@@ -117,11 +124,26 @@ const Header = () => {
             alignItems: "center",
           }}
         >
-          <img src={logo} alt="Logo" style={{ height: "50px" }} />
+              <Box sx={{ flexGrow: 1, display: 'flex', justifyContent: 'center' }}>
+          <Link to="/" style={{ display: 'flex', alignItems: 'center', textDecoration: 'none', color: 'inherit' }}>
+            <img src={logo} alt="Logo" style={{ height: "50px" }} />
+            <Typography
+              variant="body1"
+              color="#170F49"
+              sx={{
+                ml: 1,
+                fontSize: "1.50rem",
+                fontWeight: "bold",
+              }}
+            >
+              Reports
+            </Typography>
+          </Link>
+        </Box>
         </Typography>
         {!isMobile && (
           <Box sx={{ display: "flex" }}>
-            <MenuItem component={Link} to="/reports">
+            <MenuItem component={Link} to="/home">
               All Reports
             </MenuItem>
             <MenuItem component={Link} to="/profile">

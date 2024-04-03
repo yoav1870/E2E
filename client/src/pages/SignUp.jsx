@@ -76,7 +76,7 @@ const SignUp = () => {
     };
 
     return (
-        <Container component="main" maxWidth="xs" sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100vh', gap: 2 }}>
+        <Container component="main"  maxWidth="xs" sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100vh', gap: 2 }}>
             <Box component="img" src={logo} alt="Logo" sx={{ width: 150, height: 'auto', marginBottom: 2 }} />
             <Typography component="h1" variant="h5">Sign Up</Typography>
 
