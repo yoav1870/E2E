@@ -20,24 +20,29 @@ const UserProfile = () => {
         });
 
         const userLocation = userResponse.data.location.coordinates;
-        const googleMapsApiUrl = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${userLocation[1]},${userLocation[0]}&key=AIzaSyB2yu1H1oGeSVPlsxVO6k14GtjUa4KTu54`;
+        const googleMapsApiUrl = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${userLocation[1]},${userLocation[0]}&key=YOUR_GOOGLE_MAPS_API_KEY`;
 
         const cityResponse = await axios.get(googleMapsApiUrl);
-        console.log(cityResponse.data);
+        let locationDescriptor = "Unknown Location"; // Default value
 
+        // Attempt to find a city name from the address components
         const addressComponents = cityResponse.data.results[0]?.address_components;
-        const cityComponent = addressComponents.find(component => component.types.includes('locality') || component.types.includes('administrative_area_level_2'));
-        const cityName = cityComponent ? cityComponent.long_name : 'Unknown Location';
+        const cityComponent = addressComponents?.find(component => component.types.includes('locality'));
+        if (cityComponent) {
+          locationDescriptor = cityComponent.long_name;
+        } else {
+          // Fallback: Use the formatted address for a broader location descriptor
+          locationDescriptor = cityResponse.data.results[0]?.formatted_address;
+        }
 
-        const userDataWithCity = {
+        const userDataWithLocation = {
           ...userResponse.data,
-          location: cityName,
+          location: locationDescriptor,
         };
 
-        setUser(userDataWithCity);
+        setUser(userDataWithLocation);
       } catch (error) {
-        console.error('Failed to fetch user data or city name:', error);
-        // Implement more user-friendly error handling as needed
+        console.error('Failed to fetch user data or location:', error);
       }
     };
 
@@ -50,6 +55,7 @@ const UserProfile = () => {
       }, 3000);
     }
   }, [location.state]);
+
 
   const handleEditProfile = () => {
     navigate('/edit-profile');
