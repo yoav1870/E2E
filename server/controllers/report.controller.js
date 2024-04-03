@@ -202,32 +202,46 @@ exports.reportController = {
   },
 
   async updateDateOfResolve(req, res) {
-    // נצטרך לקבל עוד משתנה שמציג מי מהמשתמשים שלנו בחר למחוק את הטופס
-    // נקרא לו whodelete
     try {
-      const body = req.body;
-      if (req.params.id === undefined) {
-        throw new FormError("Please provide a report id");
+      const userId = req.user.userId;
+      const newDateOfResolve = req.body.newDateOfResolve;
+      const reportId = req.params.id;
+
+      if (!newDateOfResolve || !reportId) {
+        throw new FormError("Please provide a new date and the report id");
       }
-      if (!body.newDateOfResolve || !body.whoDelete) {
-        throw new FormError(
-          "Please provide a new date and the user that delete"
-        );
-      }
-      if (body.whoDelete !== "service_request") {
-        throw new FormError("Only service request can update the date");
-      }
-      const newReportDate = new Date(body.newDateOfResolve);
+      const newReportDate = new Date(newDateOfResolve);
+
       if (newReportDate < new Date()) {
         throw new FormError("The date must be in the future");
       }
-      const report = await reportRepository.retrieve(req.params.id);
-      if (newReportDate === report.dateOfResolve) {
+
+      const user = await UserRepository.retrieve(userId);
+
+      if (!user) {
+        throw new DataNotExistsError("updateDateOfResolve", userId);
+      }
+
+      if (user.role !== "service_request") {
+        throw new ForbiddenError();
+      }
+
+      const report = await reportRepository.retrieve(reportId);
+
+      if (!report) {
+        throw new DataNotExistsError("updateDateOfResolve", reportId);
+      }
+      if (report.dateOfResolve.getTime() === newReportDate.getTime()) {
         throw new FormError("The new date must be different from the old date");
       }
+
       const userAssigned = await UserRepository.retrieve(report.assignedUser);
+
       if (!userAssigned) {
-        throw new DataNotExistsError("updateReportDate", report.assignedUser);
+        throw new DataNotExistsError(
+          "updateDateOfResolve, fetch the user assigned to the report",
+          report.assignedUser
+        );
       }
 
       for (const reportId of userAssigned.reports) {
@@ -246,61 +260,83 @@ exports.reportController = {
       const result = {
         status: 200,
         data: await reportRepository.updateDateOfResolve(
-          req.params.id,
+          reportId,
           newReportDate
         ),
       };
+
       if (!result.data) {
         throw new FailedCRUD("Failed to update the report");
       }
+
       if (process.env.NODE_ENV !== "test") {
         const emailResult = await sendUpdateDateOfResolveNotification(
           userAssigned.email,
           userAssigned.username,
           report.dateOfResolve,
           report.description,
-          body.newDateOfResolve
+          newReportDate
         );
         if (emailResult === null) {
           console.error("Failed to send email");
         }
       }
-
       res.status(result.status).json("Report updated");
     } catch (error) {
-      res.status(error?.status || 500).json(error.message);
+      switch (error.name) {
+        case "DataNotExistsError":
+        case "FormError":
+        case "FailedCRUD":
+        case "ForbiddenError":
+          res.status(error.status).json(error.message);
+          break;
+        default:
+          const serverError = new ServerError();
+          res.status(serverError.status).json(serverError.message);
+      }
     }
   },
   async deleteReport(req, res) {
     try {
-      const body = req.body;
-      if (!body.whoDelete || !body._id) {
-        throw new FormError("Please provide the user that delete the report");
+      const reportId = req.body.id;
+      const userIdWTD = req.user.userId;
+      const roleWTD = req.user.role;
+      if (!reportId) {
+        throw new FormError("Please provide the report id");
       }
-      const report = await reportRepository.retrieve(body._id);
+
+      const report = await reportRepository.retrieve(reportId);
+
       if (!report) {
-        throw new DataNotExistsError(
-          "deleteReport, fetch the report to delete",
-          body._id
-        );
+        throw new DataNotExistsError("deleteReport", reportId);
       }
-      const userSubmit = await UserRepository.retrieve(report.reportByUser);
-      if (!userSubmit) {
-        throw new DataNotExistsError(
-          "deleteReport, fetch the user that submit the report",
-          report.reportByUser
-        );
-      }
-      const userAssigned = await UserRepository.retrieve(report.assignedUser);
-      if (!userAssigned) {
-        throw new DataNotExistsError(
-          "deleteReport , fetch the user assaigned to the report",
-          report.assignedUser
-        );
-      }
-      if (body.whoDelete === "service_request") {
+
+      if (roleWTD === "service_request") {
+        console.log(report.reportByUser.toString(), userIdWTD);
+        if (report.reportByUser.toString() !== userIdWTD) {
+          throw new ForbiddenError();
+        }
+
+        const userAssigned = await UserRepository.retrieve(report.assignedUser);
+
+        if (!userAssigned) {
+          throw new DataNotExistsError(
+            "deleteReport, fetch the user assigned to the report",
+            report.assignedUser
+          );
+        }
+        const userSubmit = await UserRepository.retrieve(report.reportByUser);
+
+        if (!userSubmit) {
+          throw new DataNotExistsError(
+            "deleteReport, fetch the user that submit the report",
+            report.reportByUser
+          );
+        }
+        // reportId, userSubmit, userAssigned;///////////////////////////////////////////////////////////////////////////
+        console.log("reportId, userSubmit, userAssigned");
         const result = await deleteReportAndUpdate(
-          body._id,
+          reportId,
           userSubmit,
           userAssigned
         );
@@ -312,22 +348,46 @@ exports.reportController = {
           report.description,
           "request_delete"
         );
+
         if (emailResult === null) {
           console.error("Failed to send email");
         }
+
         res.status(result.status).json("Report deleted");
-      } else if (body.whoDelete === "service_provider") {
+      } else {
+        if (report.assignedUser.toString() !== userIdWTD) {
+          throw new ForbiddenError();
+        }
+
+        const userSubmit = await UserRepository.retrieve(report.reportByUser);
+
+        if (!userSubmit) {
+          throw new DataNotExistsError(
+            "deleteReport, fetch the user that submit the report",
+            report.reportByUser
+          );
+        }
+        const userAssigned = await UserRepository.retrieve(report.assignedUser);
+
+        if (!userAssigned) {
+          throw new DataNotExistsError(
+            "deleteReport, fetch the user assigned to the report",
+            report.assignedUser
+          );
+        }
         const serviceProviders = await UserRepository.findNearbyAndByProfession(
           report.location,
-          report.profession
+          report.profession,
+          50
         );
-        // no replacement for the service provider
+        // there are no users to replace the service provider
         if (!serviceProviders) {
           const result = await deleteReportAndUpdate(
-            body._id,
+            reportId,
             userSubmit,
             userAssigned
           );
+
           const emailResult = await deleteReportAndNotify(
             userSubmit.email,
             userSubmit.username,
@@ -336,9 +396,11 @@ exports.reportController = {
             report.description,
             "provider_delete_but_no_provider_available"
           );
+
           if (emailResult === null) {
             console.error("Failed to send email");
           }
+
           res.status(result.status).json("Report deleted");
         }
 
@@ -365,50 +427,61 @@ exports.reportController = {
             }
           }
         }
+
         // only replacement is the same service provider
+
         if (assignedServiceProvider === null) {
           const result = await deleteReportAndUpdate(
-            body._id,
+            reportId,
             userSubmit,
             userAssigned
           );
+
           const emailResult = await deleteReportAndNotify(
             userSubmit.email,
             userSubmit.username,
-            userAssigned.email,
-            userAssigned.username,
+            userIdWTD.email,
+            userIdWTD.username,
             report.description,
             "provider_delete_but_no_provider_available"
           );
+
           if (emailResult === null) {
             console.error("Failed to send email");
           }
+
           res.status(result.status).json("Report deleted");
         } else {
-          // there is a replacement for the service provider
           assignedServiceProvider.reports.push(report._id);
+
           if (assignedServiceProvider.ranking < 5) {
             assignedServiceProvider.ranking += 1;
           }
+
           const updateProviderReports = await UserRepository.updateReports(
             assignedServiceProvider._id,
             assignedServiceProvider.reports,
             assignedServiceProvider.ranking
           );
+
           if (!updateProviderReports) {
             throw new FailedCRUD("Failed to update the service provider");
           }
-          await removeReportFromUser(userAssigned._id, body._id);
+
+          await removeReportFromUser(userIdWTD, reportId);
+
           const result = {
             status: 200,
             data: await reportRepository.updateAssignedTo(
-              body._id,
+              reportId,
               assignedServiceProvider._id
             ),
           };
+
           if (!result.data) {
             throw new FailedCRUD("Failed to update the report");
           }
+
           const emailResult = await deleteReportAndNotify(
             userSubmit.email,
             userSubmit.username,
@@ -417,18 +490,29 @@ exports.reportController = {
             report.description,
             "report_transfered_to_another_service_provider"
           );
+
           if (emailResult === null) {
             console.error("Failed to send email");
           }
+
           res
             .status(result.status)
             .json("Report transfered to another service provider");
         }
-      } else {
-        throw new FormError("Please provide the user that delete the report");
       }
     } catch (error) {
-      res.status(error?.status || 500).json(error.message);
+      switch (error.name) {
+        case "DataNotExistsError":
+        case "FormError":
+        case "FailedCRUD":
+        case "ForbiddenError":
+          res.status(error.status).json(error.message);
+          break;
+        default:
+          // const serverError = new ServerError();
+          // res.status(serverError.status).json(serverError.message);
+          res.status(error.status).json(error.message);
+      }
     }
   },
 };
@@ -455,6 +539,7 @@ const removeReportFromUser = async (userId, reportId) => {
 };
 
 const deleteReportAndUpdate = async (reportId, userSubmit, userAssigned) => {
+  // console.log("heyyyyyyyy");
   const result = {
     status: 200,
     data: await reportRepository.delete(reportId),

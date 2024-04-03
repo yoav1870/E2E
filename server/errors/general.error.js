@@ -88,7 +88,7 @@ class NotAuthorizedError extends Error {
 }
 class ForbiddenError extends Error {
   constructor() {
-    super("Access Denied you forbidden to get this report.");
+    super("Access Denied you forbidden for this content.");
     this.status = 403;
     this.name = "ForbiddenError";
   }

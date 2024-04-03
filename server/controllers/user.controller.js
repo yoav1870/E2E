@@ -16,7 +16,6 @@ const {
   sendReportNotificationForCreateNewUser,
   changePasswordAndNotify,
 } = require("../middlewares/mailerConfig");
-const { Sign } = require("crypto");
 
 exports.userController = {
   async signInUser(req, res) {
@@ -51,9 +50,33 @@ exports.userController = {
       }
     }
   },
+  // by token
   async getUser(req, res) {
     try {
       const userId = req.user.userId;
+      const result = {
+        status: 200,
+        data: await UserRepository.retrieve(userId),
+      };
+      if (!result.data) {
+        throw new DataNotExistsError("getUser", userId);
+      }
+      res.status(result.status).json(result.data);
+    } catch (error) {
+      switch (error.name) {
+        case "DataNotExistsError":
+          res.status(error.status).json(error.message);
+          break;
+        default:
+          const serverError = new ServerError();
+          res.status(serverError.status).json(serverError.message);
+      }
+    }
+  },
+  // by id
+  async getUserById(req, res) {
+    try {
+      const userId = req.params.id;
       const result = {
         status: 200,
         data: await UserRepository.retrieve(userId),

@@ -8,6 +8,7 @@ UserRouter.post("/sign-in", userController.signInUser);
 UserRouter.post("/sign-up", userController.createUser);
 
 UserRouter.get("/home", authenticateToken, userController.getUser);
+UserRouter.get("/:id", authenticateToken, userController.getUserById);
 
 UserRouter.put(
   "/updatePassword",

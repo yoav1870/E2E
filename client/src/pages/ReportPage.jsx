@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { Container, Typography, Card, CardContent, CircularProgress } from '@mui/material';
+import { Container, Typography, Card, CardContent, CircularProgress, Box } from '@mui/material';
 import axios from 'axios';
 import Header from '../component/Header';
 
 const ReportPage = () => {
   const { id } = useParams();
   const [report, setReport] = useState(null);
+  const [assignedUser, setAssignedUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -19,6 +20,7 @@ const ReportPage = () => {
             Authorization: `Bearer ${token}`,
           },
         });
+        console.log(response.data);
         setReport(response.data);
         setLoading(false);
       } catch (error) {
@@ -30,6 +32,29 @@ const ReportPage = () => {
 
     fetchReport();
   }, [id]);
+
+  useEffect(() => {
+    const fetchAssignedUser = async () => {
+      if (report && report.assignedUser) {
+        try {
+          const token = localStorage.getItem('token');
+          // Include the assignedUser ID in the URL path as per your backend expectation
+          const response = await axios.get(`https://e2e-y8hj.onrender.com/api/users/${report.assignedUser}`, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+          setAssignedUser(response.data);
+        } catch (error) {
+          console.error('Failed to fetch assigned user:', error);
+        }
+      }
+    };
+  
+    fetchAssignedUser();
+  }, [report]);
+  
+  
 
   if (loading) {
     return (
@@ -99,8 +124,31 @@ const ReportPage = () => {
         <Typography variant="h5" gutterBottom sx={{ mt: 4 }}>
           Assigned Service Provider
         </Typography>
-        {/* Display the assigned service provider details */}
-        {/* You can fetch the service provider data based on the report.assignedUser */}
+        {assignedUser ? (
+          <Card>
+            <CardContent>
+              <Typography variant="h6" gutterBottom>
+                Name: {assignedUser.username}
+              </Typography>
+              <Typography variant="body1" gutterBottom>
+                Email: {assignedUser.email}
+              </Typography>
+              <Typography variant="body1" gutterBottom>
+                Profession: {assignedUser.profession}
+              </Typography>
+              <Typography variant="body1" gutterBottom>
+                Availability: {assignedUser.availability ? 'Available' : 'Not Available'}
+              </Typography>
+              <Typography variant="body1" gutterBottom>
+                Ranking: {assignedUser.ranking}
+              </Typography>
+            </CardContent>
+          </Card>
+        ) : (
+          <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
+            <CircularProgress />
+          </Box>
+        )}
       </Container>
     </>
   );

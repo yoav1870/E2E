@@ -5,6 +5,7 @@ import SignUp from "./pages/SignUp";
 import Profile from "./pages/Profile.jsx";
 import CreateReport from "./pages/CreateReport";
 import ReportPage from "./pages/ReportPage";
+import EditProfile from "./pages/EditProfile";
 import Footer from "./component/Footer";
 import { Box } from "@mui/system";
 import './app.css';
@@ -69,7 +70,8 @@ const App = () => {
             }
           />
           <Route path="/reports/:id" element={<ReportPage />} />
-        </Routes>
+          <Route path="/edit-profile" element={<EditProfile />} />
+      </Routes>
         </Box>
         <Footer />
       </Box>
