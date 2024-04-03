@@ -124,21 +124,6 @@ const Header = () => {
             alignItems: "center",
           }}
         >
-            {/* <Link to="/" style={{ display: 'flex', alignItems: 'center', textDecoration: 'none', color: 'inherit' }}>
-          <img src={logo} alt="Logo" style={{ height: "50px" }} />
-          <Typography
-            variant="body1"
-            component="p"
-            color="#170F49"
-            sx={{
-              ml: 1,
-              fontSize: "1.50rem", 
-              fontWeight: "bold", 
-            }}
-          >
-            Reports
-          </Typography>
-          </Link> */}
               <Box sx={{ flexGrow: 1, display: 'flex', justifyContent: 'center' }}>
           <Link to="/" style={{ display: 'flex', alignItems: 'center', textDecoration: 'none', color: 'inherit' }}>
             <img src={logo} alt="Logo" style={{ height: "50px" }} />
