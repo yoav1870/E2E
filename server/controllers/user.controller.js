@@ -16,7 +16,6 @@ const {
   sendReportNotificationForCreateNewUser,
   changePasswordAndNotify,
 } = require("../middlewares/mailerConfig");
-const { Sign } = require("crypto");
 
 exports.userController = {
   async signInUser(req, res) {
@@ -51,6 +50,7 @@ exports.userController = {
       }
     }
   },
+  // by token
   async getUser(req, res) {
     try {
       const userId = req.user.userId;
@@ -73,9 +73,10 @@ exports.userController = {
       }
     }
   },
+  // by id
   async getUserById(req, res) {
     try {
-      const userId = req.body.id;
+      const userId = req.params.id;
       const result = {
         status: 200,
         data: await UserRepository.retrieve(userId),
