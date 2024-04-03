@@ -13,19 +13,34 @@ import {
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import { Link } from "react-router-dom";
-// import logo from "../assets/logo.png";
 import logo from "../assets/icon_logo.png";
+
+
+// JWT token decoding function (add this outside your component or in a utility file)
+function decodeJWT(token) {
+  if (!token) return null;
+  const base64Url = token.split('.')[1];
+  const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+  const payload = decodeURIComponent(window.atob(base64).split('').map(function(c) {
+    return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+  }).join(''));
+  return JSON.parse(payload);
+}
 
 const Header = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
-
   const [mobileMenuAnchorEl, setMobileMenuAnchorEl] = useState(null);
   const [profileMenuAnchorEl, setProfileMenuAnchorEl] = useState(null);
 
-
-  const userRole = localStorage.getItem('role');
-  
+  const [userRole, setUserRole] = useState("");
+  useEffect(() => {
+    // Decode the JWT token and set the user role
+    const token = localStorage.getItem("token");
+    const decodedToken = decodeJWT(token);
+    const role = decodedToken ? decodedToken.role : "";
+    setUserRole(role);
+  }, []);
 
   const handleMobileMenuOpen = (event) => {
     setMobileMenuAnchorEl(event.currentTarget);
@@ -50,6 +65,8 @@ const Header = () => {
     // Remove any stored user data from local storage
     localStorage.removeItem("user");
 
+    localStorage.removeItem("role");
+
     // Redirect to the sign-in page using window.location.href
     window.location.href = "/sign-in";
   };
@@ -73,14 +90,10 @@ const Header = () => {
       <MenuItem component={Link} to="/profile">
         My Profile
       </MenuItem>
-      {/* <MenuItem component={Link} to="/create-report">
-        Create Report
-      </MenuItem> */}
-      {/* {userRole !== "service_provider" && ( */}
-      <MenuItem component={Link} to="/create-report">
-        Create Report
-      </MenuItem>
-      {/* )} */}
+    
+      {!userRole || userRole !== "service_provider" && (
+        <MenuItem component={Link} to="/create-report">Create Report</MenuItem>
+      )}
     </Menu>
   );
 
@@ -163,9 +176,12 @@ const Header = () => {
             <MenuItem component={Link} to="/profile">
               My Profile
             </MenuItem>
-            <MenuItem component={Link} to="/create-report">
-              Create Report
-            </MenuItem>
+
+            {userRole !== "service_provider" && (
+              <MenuItem component={Link} to="/create-report">
+                Create Report
+              </MenuItem>
+            )}
           </Box>
         )}
         {isMobile && (

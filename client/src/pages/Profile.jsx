@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Container, Typography, Box, Paper, Button } from '@mui/material';
 import { useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
-
+import Header from '../component/Header';
 const UserProfile = () => {
   const [user, setUser] = useState(null);
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
@@ -60,6 +60,8 @@ const UserProfile = () => {
   }
 
   return (
+    <>
+    <Header />
     <Container component="main" maxWidth="sm" sx={{
       display: 'flex', flexDirection: 'column', alignItems: 'center', marginTop: 5,
     }}>
@@ -93,6 +95,7 @@ const UserProfile = () => {
         </Box>
       </Paper>
     </Container>
+    </>
   );
 };
 
