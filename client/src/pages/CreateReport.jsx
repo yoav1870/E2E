@@ -5,7 +5,7 @@ import * as yup from 'yup';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import Header from '../component/Header';
-import Footer from '../component/Footer';
+
 
 const professions = ["Electrician", "plumber", "Carpenter", "Technician"];
 
@@ -174,7 +174,7 @@ const CreateReport = () => {
         </form>
       
       </Container>
-      < Footer />
+   
     </>
   );
 };

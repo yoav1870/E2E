@@ -16,6 +16,9 @@ import { Link } from "react-router-dom";
 // import logo from "../assets/logo.png";
 import logo from "../assets/icon_logo.png";
 
+
+// Add <CssBaseline /> at the root of your component tree
+
 const Header = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
@@ -63,7 +66,7 @@ const Header = () => {
       open={Boolean(mobileMenuAnchorEl)}
       onClose={handleMobileMenuClose}
     >
-      <MenuItem component={Link} to="/reports">
+      <MenuItem component={Link} to="/home">
         All Reports
       </MenuItem>
       <MenuItem component={Link} to="/profile">
@@ -94,15 +97,15 @@ const Header = () => {
 
   return (
     <AppBar
-      position="static"
+      position="fixed"
       color="default"
       elevation={4}
       sx={{
-        backgroundColor: "#fff",
+        backgroundColor: "#E7E7E7",
         color: "#333",
         boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
-        minHeight: "100px",
         justifyContent: "center",
+        minHeight: "70px",
       }}
     >
       <Toolbar
@@ -121,7 +124,7 @@ const Header = () => {
             alignItems: "center",
           }}
         >
-            <Link to="/" style={{ display: 'flex', alignItems: 'center', textDecoration: 'none', color: 'inherit' }}>
+            {/* <Link to="/" style={{ display: 'flex', alignItems: 'center', textDecoration: 'none', color: 'inherit' }}>
           <img src={logo} alt="Logo" style={{ height: "50px" }} />
           <Typography
             variant="body1"
@@ -129,17 +132,33 @@ const Header = () => {
             color="#170F49"
             sx={{
               ml: 1,
-              fontSize: "1.50rem", // Adjust the size as needed
-              fontWeight: "bold", // Makes the font bold
+              fontSize: "1.50rem", 
+              fontWeight: "bold", 
             }}
           >
             Reports
           </Typography>
+          </Link> */}
+              <Box sx={{ flexGrow: 1, display: 'flex', justifyContent: 'center' }}>
+          <Link to="/" style={{ display: 'flex', alignItems: 'center', textDecoration: 'none', color: 'inherit' }}>
+            <img src={logo} alt="Logo" style={{ height: "50px" }} />
+            <Typography
+              variant="body1"
+              color="#170F49"
+              sx={{
+                ml: 1,
+                fontSize: "1.50rem",
+                fontWeight: "bold",
+              }}
+            >
+              Reports
+            </Typography>
           </Link>
+        </Box>
         </Typography>
         {!isMobile && (
           <Box sx={{ display: "flex" }}>
-            <MenuItem component={Link} to="/reports">
+            <MenuItem component={Link} to="/home">
               All Reports
             </MenuItem>
             <MenuItem component={Link} to="/profile">

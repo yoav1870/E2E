@@ -3,7 +3,7 @@ import { Container, Typography, Grid, Card, CardContent, CardMedia, CircularProg
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import Header from '../component/Header';
-import Footer from '../component/Footer';
+
 
 const HomePage = () => {
   const [reports, setReports] = useState([]);
@@ -99,7 +99,7 @@ const HomePage = () => {
         )}
 
       </Container>
-      <Footer />
+      {/* <Footer /> */}
     </>
   );
 };

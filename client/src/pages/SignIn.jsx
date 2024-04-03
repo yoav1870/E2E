@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Container, Typography, TextField, Button } from '@mui/material';
+import { Container, Typography, TextField, Button, Link} from '@mui/material';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
@@ -9,13 +9,13 @@ const SignIn = () => {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    const username = event.currentTarget.username.value;
+    // const username = event.currentTarget.username.value;
     const email = event.currentTarget.email.value;
     const password = event.currentTarget.password.value;
 
     try {
       const response = await axios.post('https://e2e-y8hj.onrender.com/api/users/sign-in', {
-        username,
+        // username,
         email,
         password,
       }, {
@@ -43,7 +43,7 @@ const SignIn = () => {
         Sign In
       </Typography>
       <form onSubmit={handleSubmit}>
-        <TextField
+        {/* <TextField
           margin="normal"
           required
           fullWidth
@@ -51,7 +51,7 @@ const SignIn = () => {
           label="Username"
           name="username"
           autoComplete="username"
-        />
+        /> */}
         <TextField
           margin="normal"
           required
@@ -80,6 +80,12 @@ const SignIn = () => {
         >
           Sign In
         </Button>
+        <Typography textAlign="center" sx={{ mt: 2 }}>
+          Not registered yet?{" "}
+          <Link href="/sign-up" variant="body2">
+            Create an account now!
+          </Link>
+        </Typography>
       </form>
     </Container>
   );
