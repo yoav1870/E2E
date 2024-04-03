@@ -25,8 +25,7 @@ const Header = () => {
 
 
   const userRole = localStorage.getItem('role');
-  // console.log("Setting role in localStorage:", user.role);
-  localStorage.setItem("role", user.role);
+  
 
   const handleMobileMenuOpen = (event) => {
     setMobileMenuAnchorEl(event.currentTarget);

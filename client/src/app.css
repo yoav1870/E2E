@@ -17,7 +17,7 @@ html, body, #root {
     display: flex; 
     flex-direction: column;
     
-    padding-top: 64px; 
+    padding-top: 90px; 
     padding-bottom: var(--footer-height); 
   }
   
