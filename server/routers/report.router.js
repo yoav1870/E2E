@@ -9,6 +9,23 @@ reportRouter.get(
   reportController.getAllReportsOfUser
 );
 
+reportRouter.get(
+  "/search/:profession",
+  authenticateToken,
+  reportController.searchReportsByProfession
+);
+
+reportRouter.get(
+  "/status/:status",
+  authenticateToken,
+  reportController.getReportsByStatus
+);
+
+reportRouter.get(
+  "/past",
+  authenticateToken,
+  reportController.getOldReportsOfUser
+);
 reportRouter.get("/:id", authenticateToken, reportController.getReport);
 
 reportRouter.post("/", authenticateToken, reportController.createReport);
