@@ -14,7 +14,7 @@ reportRouter.get("/:id", authenticateToken, reportController.getReport);
 reportRouter.post("/", authenticateToken, reportController.createReport);
 
 reportRouter.put(
-  "/:id/update",
+  "/updateDate/:id",
   authenticateToken,
   reportController.updateDateOfResolve
 );

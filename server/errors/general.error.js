@@ -78,6 +78,21 @@ class SignInError extends Error {
     this.name = "SignInError";
   }
 }
+
+class NotAuthorizedError extends Error {
+  constructor() {
+    super("Access Denied /Not authorized.");
+    this.status = 401;
+    this.name = "NotAuthorizedError";
+  }
+}
+class ForbiddenError extends Error {
+  constructor() {
+    super("Access Denied you forbidden for this content.");
+    this.status = 403;
+    this.name = "ForbiddenError";
+  }
+}
 module.exports = {
   NotFoundUrlError,
   RequiredIdError,
@@ -90,4 +105,6 @@ module.exports = {
   NoProviderAvailableError,
   ServerError,
   SignInError,
+  NotAuthorizedError,
+  ForbiddenError,
 };

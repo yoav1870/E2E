@@ -73,6 +73,28 @@ exports.userController = {
       }
     }
   },
+  async getUserById(req, res) {
+    try {
+      const userId = req.body.id;
+      const result = {
+        status: 200,
+        data: await UserRepository.retrieve(userId),
+      };
+      if (!result.data) {
+        throw new DataNotExistsError("getUser", userId);
+      }
+      res.status(result.status).json(result.data);
+    } catch (error) {
+      switch (error.name) {
+        case "DataNotExistsError":
+          res.status(error.status).json(error.message);
+          break;
+        default:
+          const serverError = new ServerError();
+          res.status(serverError.status).json(serverError.message);
+      }
+    }
+  },
   async createUser(req, res) {
     try {
       const { email, password, username, role, location, profession, photo } =
