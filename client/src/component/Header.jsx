@@ -13,7 +13,8 @@ import {
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import { Link } from "react-router-dom";
-import logo from "../assets/logo.png";
+// import logo from "../assets/logo.png";
+import logo from "../assets/icon_logo.png";
 
 const Header = () => {
   const theme = useTheme();
@@ -104,7 +105,10 @@ const Header = () => {
         justifyContent: "center",
       }}
     >
-      <Toolbar disableGutters sx={{ justifyContent: "space-between", padding: "0 20px" }}>
+      <Toolbar
+        disableGutters
+        sx={{ justifyContent: "space-between", padding: "0 20px" }}
+      >
         <IconButton onClick={handleProfileMenuOpen}>
           <Avatar alt="Profile Picture" src="path/to/profile-picture.jpg" />
         </IconButton>
@@ -117,7 +121,21 @@ const Header = () => {
             alignItems: "center",
           }}
         >
+            <Link to="/" style={{ display: 'flex', alignItems: 'center', textDecoration: 'none', color: 'inherit' }}>
           <img src={logo} alt="Logo" style={{ height: "50px" }} />
+          <Typography
+            variant="body1"
+            component="p"
+            color="#170F49"
+            sx={{
+              ml: 1,
+              fontSize: "1.50rem", // Adjust the size as needed
+              fontWeight: "bold", // Makes the font bold
+            }}
+          >
+            Reports
+          </Typography>
+          </Link>
         </Typography>
         {!isMobile && (
           <Box sx={{ display: "flex" }}>
