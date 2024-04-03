@@ -25,7 +25,7 @@ const SignIn = () => {
       });
       const { token } = response.data;
       localStorage.setItem('token', token);
-      navigate('/home'); 
+      window.location.href = '/home'; 
     } catch (error) {
       if (error.response) {
         console.error("Backend returned an error:", error.response.data);

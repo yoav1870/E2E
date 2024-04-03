@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Container, Typography, Grid, Card, CardContent, CardMedia, CircularProgress } from '@mui/material';
+import { Link } from 'react-router-dom';
 import axios from 'axios';
 import Header from '../component/Header';
 
@@ -12,7 +13,6 @@ const HomePage = () => {
     const fetchReports = async () => {
       try {
         const token = localStorage.getItem('token');
-
         const response = await axios.get('https://e2e-y8hj.onrender.com/api/reports/home', {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -37,7 +37,6 @@ const HomePage = () => {
         setLoading(false);
       }
     };
-
     fetchReports();
   }, []);
 
@@ -64,25 +63,35 @@ const HomePage = () => {
           <Grid container spacing={3}>
             {reports.map((report) => (
               <Grid item xs={12} sm={6} md={4} key={report._id}>
-                <Card>
-                  {report.photo && (
-                    <CardMedia component="img" height="200" image={report.photo} alt={report.description} />
-                  )}
-                  <CardContent>
-                    <Typography variant="h6" gutterBottom>
-                      {report.description}
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      Status: {report.status}
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      Urgency: {report.urgency}
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      Date of Resolve: {new Date(report.dateOfResolve).toLocaleDateString()}
-                    </Typography>
-                  </CardContent>
-                </Card>
+                <Link
+                  to={`/reports/${report._id}`}
+                  style={{ textDecoration: 'none' }}
+                >
+                  <Card>
+                    {report.photo && (
+                      <CardMedia
+                        component="img"
+                        height="200"
+                        image={report.photo}
+                        alt={report.description}
+                      />
+                    )}
+                    <CardContent>
+                      <Typography variant="h6" gutterBottom>
+                        {report.description}
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        Status: {report.status}
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        Urgency: {report.urgency}
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        Date of Resolve: {new Date(report.dateOfResolve).toLocaleDateString()}
+                      </Typography>
+                    </CardContent>
+                  </Card>
+                </Link>
               </Grid>
             ))}
           </Grid>

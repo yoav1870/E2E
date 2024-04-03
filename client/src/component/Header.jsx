@@ -12,15 +12,15 @@ import {
   Avatar,
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import logo from "../assets/logo.png";
 
 const Header = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
-  const navigate = useNavigate();
 
   const [mobileMenuAnchorEl, setMobileMenuAnchorEl] = useState(null);
+  const [profileMenuAnchorEl, setProfileMenuAnchorEl] = useState(null);
 
   const handleMobileMenuOpen = (event) => {
     setMobileMenuAnchorEl(event.currentTarget);
@@ -30,11 +30,27 @@ const Header = () => {
     setMobileMenuAnchorEl(null);
   };
 
-  const handleProfileClick = () => {
-    navigate("/profile");
+  const handleProfileMenuOpen = (event) => {
+    setProfileMenuAnchorEl(event.currentTarget);
+  };
+
+  const handleProfileMenuClose = () => {
+    setProfileMenuAnchorEl(null);
+  };
+
+  const handleSignOut = () => {
+    // Remove the authentication token from local storage
+    localStorage.removeItem("token");
+
+    // Remove any stored user data from local storage
+    localStorage.removeItem("user");
+
+    // Redirect to the sign-in page using window.location.href
+    window.location.href = "/sign-in";
   };
 
   const mobileMenuId = "primary-search-account-menu-mobile";
+  const profileMenuId = "primary-search-account-menu";
 
   const renderMobileMenu = (
     <Menu
@@ -58,6 +74,23 @@ const Header = () => {
     </Menu>
   );
 
+  const renderProfileMenu = (
+    <Menu
+      anchorEl={profileMenuAnchorEl}
+      anchorOrigin={{ vertical: "top", horizontal: "right" }}
+      id={profileMenuId}
+      keepMounted
+      transformOrigin={{ vertical: "top", horizontal: "right" }}
+      open={Boolean(profileMenuAnchorEl)}
+      onClose={handleProfileMenuClose}
+    >
+      <MenuItem component={Link} to="/profile" onClick={handleProfileMenuClose}>
+        My Profile
+      </MenuItem>
+      <MenuItem onClick={handleSignOut}>Sign Out</MenuItem>
+    </Menu>
+  );
+
   return (
     <AppBar
       position="static"
@@ -72,7 +105,7 @@ const Header = () => {
       }}
     >
       <Toolbar disableGutters sx={{ justifyContent: "space-between", padding: "0 20px" }}>
-        <IconButton onClick={handleProfileClick}>
+        <IconButton onClick={handleProfileMenuOpen}>
           <Avatar alt="Profile Picture" src="path/to/profile-picture.jpg" />
         </IconButton>
         <Typography
@@ -114,6 +147,7 @@ const Header = () => {
         )}
       </Toolbar>
       {renderMobileMenu}
+      {renderProfileMenu}
     </AppBar>
   );
 };

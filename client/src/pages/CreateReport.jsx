@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Container, Typography, TextField, Button, FormControl, InputLabel, Select, MenuItem, Box } from '@mui/material';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
@@ -6,35 +6,65 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import Header from '../component/Header';
 
-const professions = ["Electrician", "Plumber", "Carpenter", "Technician"];
+const professions = ["Electrician", "plumber", "Carpenter", "Technician"];
 
 const validationSchema = yup.object({
   description: yup.string().required('Description is required'),
   profession: yup.string().required('Profession is required'),
   urgency: yup.number().min(1).max(5).required('Urgency is required'),
-  reportByUser: yup.string().required('Report by User is required'),
   dateOfResolve: yup.date().required('Date of Resolve is required'),
-  location: yup.string().required('Location is required'),
   range: yup.number().min(1).max(100).required('Range is required'),
 });
 
 const CreateReport = () => {
   const navigate = useNavigate();
+  const [user, setUser] = useState(null);
+  const [location, setLocation] = useState('');
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        const response = await axios.get('https://e2e-y8hj.onrender.com/api/users/home', {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        setUser(response.data);
+        setLocation(response.data.location.coordinates.join(','));
+      } catch (error) {
+        console.error('Failed to fetch user data:', error);
+      }
+    };
+
+    fetchUserData();
+  }, []);
 
   const formik = useFormik({
     initialValues: {
       description: '',
       profession: '',
       urgency: 4,
-      reportByUser: '',
       dateOfResolve: '',
       range: '',
     },
     validationSchema,
     onSubmit: async (values) => {
       try {
+        // Convert dateOfResolve to ISO 8601 format with time
+        const updatedValues = {
+          ...values,
+          dateOfResolve: new Date(values.dateOfResolve).toISOString(),
+          location: {
+            type: 'Point',
+            coordinates: location.split(',').map(coord => parseFloat(coord.trim())),
+          },
+          reportByUser: user._id,
+        };
+        console.log('Sending report creation request with body:', updatedValues);
+
         const token = localStorage.getItem('token');
-        await axios.post('https://e2e-y8hj.onrender.com/api/reports', values, {
+        await axios.post('https://e2e-y8hj.onrender.com/api/reports', updatedValues, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -45,6 +75,10 @@ const CreateReport = () => {
       }
     },
   });
+
+  if (!user) {
+    return <Typography>Loading...</Typography>;
+  }
 
   return (
     <>
@@ -61,7 +95,7 @@ const CreateReport = () => {
       }}>
         <Typography variant="h4" sx={{ mb: 4 }}>Create Report</Typography>
         <form onSubmit={formik.handleSubmit}>
-          <TextField
+        <TextField
             margin="normal"
             required
             fullWidth

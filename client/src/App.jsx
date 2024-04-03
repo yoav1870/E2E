@@ -4,6 +4,7 @@ import SignIn from "./pages/SignIn";
 import SignUp from "./pages/SignUp";
 import Profile from "./pages/Profile.jsx";
 import CreateReport from "./pages/CreateReport";
+import ReportPage from "./pages/ReportPage";
 
 const App = () => {
   const isAuthenticated = () => {
@@ -14,10 +15,18 @@ const App = () => {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/sign-in" element={<SignIn />} />
-        <Route path="/sign-up" element={<SignUp />} />
-        <Route path="/" element={<Navigate to="/sign-in" />} />
-
+        <Route
+          path="/sign-in"
+          element={isAuthenticated() ? <Navigate to="/home" /> : <SignIn />}
+        />
+        <Route
+          path="/sign-up"
+          element={isAuthenticated() ? <Navigate to="/home" /> : <SignUp />}
+        />
+        <Route
+          path="/"
+          element={isAuthenticated() ? <Navigate to="/home" /> : <Navigate to="/sign-in" />}
+        />
         <Route
           path="/home"
           element={isAuthenticated() ? <HomePage /> : <Navigate to="/sign-in" />}
@@ -30,6 +39,7 @@ const App = () => {
           path="/create-report"
           element={isAuthenticated() ? <CreateReport /> : <Navigate to="/sign-in" />}
         />
+        <Route path="/reports/:id" element={<ReportPage />} />
       </Routes>
     </BrowserRouter>
   );
