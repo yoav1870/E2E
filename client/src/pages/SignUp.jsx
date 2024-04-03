@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Container, Typography, TextField, Button, Link, FormControl, FormControlLabel, Checkbox, InputLabel, Select, MenuItem, Box } from '@mui/material';
+import { Container, Typography, TextField, Button, Link, FormControl, InputLabel, Select, MenuItem, Box } from '@mui/material';
 import axios from 'axios';
 import logo from '../assets/logo.png';
 import { useNavigate } from 'react-router-dom';
@@ -44,13 +44,12 @@ const SignUp = () => {
             };
 
             try {
-                const response = await axios.post('https://e2e-y8hj.onrender.com/api/users', dataToSend, {
+                await axios.post('https://e2e-y8hj.onrender.com/api/users/sign-up', dataToSend, {
                     headers: {
                         'Content-Type': 'application/json',
                     },
                 });
-                console.log('Sign up successful', response.data);
-                navigate('/home');
+                navigate('/sign-in');
             } catch (error) {
                 console.error('Sign up failed', error);
                 const message = error.response && error.response.data ? error.response.data : 'Sign up failed. Please try again.';
@@ -77,7 +76,7 @@ const SignUp = () => {
     };
 
     return (
-        <Container component="main" maxWidth="xs" sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100vh', gap: 2 }}>
+        <Container component="main"  maxWidth="xs" sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100vh', gap: 2 }}>
             <Box component="img" src={logo} alt="Logo" sx={{ width: 150, height: 'auto', marginBottom: 2 }} />
             <Typography component="h1" variant="h5">Sign Up</Typography>
 
@@ -178,7 +177,6 @@ const SignUp = () => {
                             value={formik.values.description}
                             onChange={formik.handleChange}
                         />
-                        
                     </>
                 )}
 

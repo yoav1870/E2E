@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   AppBar,
   Toolbar,
@@ -12,15 +12,21 @@ import {
   Avatar,
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
-import { Link, useNavigate } from "react-router-dom";
-import logo from "../assets/logo.png";
+import { Link } from "react-router-dom";
+// import logo from "../assets/logo.png";
+import logo from "../assets/icon_logo.png";
 
 const Header = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
-  const navigate = useNavigate();
 
   const [mobileMenuAnchorEl, setMobileMenuAnchorEl] = useState(null);
+  const [profileMenuAnchorEl, setProfileMenuAnchorEl] = useState(null);
+
+
+  const userRole = localStorage.getItem('role');
+  // console.log("Setting role in localStorage:", user.role);
+  localStorage.setItem("role", user.role);
 
   const handleMobileMenuOpen = (event) => {
     setMobileMenuAnchorEl(event.currentTarget);
@@ -30,11 +36,27 @@ const Header = () => {
     setMobileMenuAnchorEl(null);
   };
 
-  const handleProfileClick = () => {
-    navigate("/profile");
+  const handleProfileMenuOpen = (event) => {
+    setProfileMenuAnchorEl(event.currentTarget);
+  };
+
+  const handleProfileMenuClose = () => {
+    setProfileMenuAnchorEl(null);
+  };
+
+  const handleSignOut = () => {
+    // Remove the authentication token from local storage
+    localStorage.removeItem("token");
+
+    // Remove any stored user data from local storage
+    localStorage.removeItem("user");
+
+    // Redirect to the sign-in page using window.location.href
+    window.location.href = "/sign-in";
   };
 
   const mobileMenuId = "primary-search-account-menu-mobile";
+  const profileMenuId = "primary-search-account-menu";
 
   const renderMobileMenu = (
     <Menu
@@ -46,33 +68,58 @@ const Header = () => {
       open={Boolean(mobileMenuAnchorEl)}
       onClose={handleMobileMenuClose}
     >
-      <MenuItem component={Link} to="/reports">
+      <MenuItem component={Link} to="/home">
         All Reports
       </MenuItem>
       <MenuItem component={Link} to="/profile">
         My Profile
       </MenuItem>
+      {/* <MenuItem component={Link} to="/create-report">
+        Create Report
+      </MenuItem> */}
+      {/* {userRole !== "service_provider" && ( */}
       <MenuItem component={Link} to="/create-report">
         Create Report
       </MenuItem>
+      {/* )} */}
+    </Menu>
+  );
+
+  const renderProfileMenu = (
+    <Menu
+      anchorEl={profileMenuAnchorEl}
+      anchorOrigin={{ vertical: "top", horizontal: "right" }}
+      id={profileMenuId}
+      keepMounted
+      transformOrigin={{ vertical: "top", horizontal: "right" }}
+      open={Boolean(profileMenuAnchorEl)}
+      onClose={handleProfileMenuClose}
+    >
+      <MenuItem component={Link} to="/profile" onClick={handleProfileMenuClose}>
+        My Profile
+      </MenuItem>
+      <MenuItem onClick={handleSignOut}>Sign Out</MenuItem>
     </Menu>
   );
 
   return (
     <AppBar
-      position="static"
+      position="fixed"
       color="default"
       elevation={4}
       sx={{
-        backgroundColor: "#fff",
+        backgroundColor: "#E7E7E7",
         color: "#333",
         boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
-        minHeight: "100px",
         justifyContent: "center",
+        minHeight: "70px",
       }}
     >
-      <Toolbar disableGutters sx={{ justifyContent: "space-between", padding: "0 20px" }}>
-        <IconButton onClick={handleProfileClick}>
+      <Toolbar
+        disableGutters
+        sx={{ justifyContent: "space-between", padding: "0 20px" }}
+      >
+        <IconButton onClick={handleProfileMenuOpen}>
           <Avatar alt="Profile Picture" src="path/to/profile-picture.jpg" />
         </IconButton>
         <Typography
@@ -84,11 +131,34 @@ const Header = () => {
             alignItems: "center",
           }}
         >
-          <img src={logo} alt="Logo" style={{ height: "50px" }} />
+          <Box sx={{ flexGrow: 1, display: "flex", justifyContent: "center" }}>
+            <Link
+              to="/"
+              style={{
+                display: "flex",
+                alignItems: "center",
+                textDecoration: "none",
+                color: "inherit",
+              }}
+            >
+              <img src={logo} alt="Logo" style={{ height: "50px" }} />
+              <Typography
+                variant="body1"
+                color="#170F49"
+                sx={{
+                  ml: 1,
+                  fontSize: "1.50rem",
+                  fontWeight: "bold",
+                }}
+              >
+                Reports
+              </Typography>
+            </Link>
+          </Box>
         </Typography>
         {!isMobile && (
           <Box sx={{ display: "flex" }}>
-            <MenuItem component={Link} to="/reports">
+            <MenuItem component={Link} to="/home">
               All Reports
             </MenuItem>
             <MenuItem component={Link} to="/profile">
@@ -114,6 +184,7 @@ const Header = () => {
         )}
       </Toolbar>
       {renderMobileMenu}
+      {renderProfileMenu}
     </AppBar>
   );
 };
