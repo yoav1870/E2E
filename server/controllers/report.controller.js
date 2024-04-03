@@ -298,7 +298,7 @@ exports.reportController = {
   },
   async deleteReport(req, res) {
     try {
-      const reportId = req.params.id;
+      const reportId = req.body.id;
       const userIdWTD = req.user.userId;
       const roleWTD = req.user.role;
       if (!reportId) {
@@ -311,167 +311,208 @@ exports.reportController = {
         throw new DataNotExistsError("deleteReport", reportId);
       }
 
-      if (
-        roleWTD === "service_request" &&
-        report.reportByUser.toString() !== userIdWTD
-      ) {
-        throw new ForbiddenError();
-      }
+      if (roleWTD === "service_request") {
+        console.log(report.reportByUser.toString(), userIdWTD);
+        if (report.reportByUser.toString() !== userIdWTD) {
+          throw new ForbiddenError();
+        }
 
-      // const body = req.body;
-      // if (!body.whoDelete || !body._id) {
-      //   throw new FormError("Please provide the user that delete the report");
-      // }
-      // const report = await reportRepository.retrieve(body._id);
-      // if (!report) {
-      //   throw new DataNotExistsError(
-      //     "deleteReport, fetch the report to delete",
-      //     body._id
-      //   );
-      // }
-      // const userSubmit = await UserRepository.retrieve(report.reportByUser);
-      // if (!userSubmit) {
-      //   throw new DataNotExistsError(
-      //     "deleteReport, fetch the user that submit the report",
-      //     report.reportByUser
-      //   );
-      // }
-      // const userAssigned = await UserRepository.retrieve(report.assignedUser);
-      // if (!userAssigned) {
-      //   throw new DataNotExistsError(
-      //     "deleteReport , fetch the user assaigned to the report",
-      //     report.assignedUser
-      //   );
-      // }
-      // if (body.whoDelete === "service_request") {
-      //   const result = await deleteReportAndUpdate(
-      //     body._id,
-      //     userSubmit,
-      //     userAssigned
-      //   );
-      //   const emailResult = await deleteReportAndNotify(
-      //     userSubmit.email,
-      //     userSubmit.username,
-      //     userAssigned.email,
-      //     userAssigned.username,
-      //     report.description,
-      //     "request_delete"
-      //   );
-      //   if (emailResult === null) {
-      //     console.error("Failed to send email");
-      //   }
-      //   res.status(result.status).json("Report deleted");
-      // } else if (body.whoDelete === "service_provider") {
-      //   const serviceProviders = await UserRepository.findNearbyAndByProfession(
-      //     report.location,
-      //     report.profession
-      //   );
-      //   // no replacement for the service provider
-      //   if (!serviceProviders) {
-      //     const result = await deleteReportAndUpdate(
-      //       body._id,
-      //       userSubmit,
-      //       userAssigned
-      //     );
-      //     const emailResult = await deleteReportAndNotify(
-      //       userSubmit.email,
-      //       userSubmit.username,
-      //       userAssigned.email,
-      //       userAssigned.username,
-      //       report.description,
-      //       "provider_delete_but_no_provider_available"
-      //     );
-      //     if (emailResult === null) {
-      //       console.error("Failed to send email");
-      //     }
-      //     res.status(result.status).json("Report deleted");
-      //   }
-      //   serviceProviders.sort((a, b) => b.ranking - a.ranking);
-      //   let assignedServiceProvider = null;
-      //   for (const provider of serviceProviders) {
-      //     let isAvailable = true;
-      //     for (const reportId of provider.reports) {
-      //       if (!reportId) continue;
-      //       const report = await reportRepository.retrieve(reportId);
-      //       if (report) {
-      //         const reportDate = report.dateOfResolve;
-      //         if (reportDate.getTime() === report.dateOfResolve.getTime()) {
-      //           isAvailable = false;
-      //           break;
-      //         }
-      //       }
-      //     }
-      //     if (isAvailable) {
-      //       if (provider._id !== userAssigned) {
-      //         assignedServiceProvider = provider;
-      //         break;
-      //       }
-      //     }
-      //   }
-      //   // only replacement is the same service provider
-      //   if (assignedServiceProvider === null) {
-      //     const result = await deleteReportAndUpdate(
-      //       body._id,
-      //       userSubmit,
-      //       userAssigned
-      //     );
-      //     const emailResult = await deleteReportAndNotify(
-      //       userSubmit.email,
-      //       userSubmit.username,
-      //       userAssigned.email,
-      //       userAssigned.username,
-      //       report.description,
-      //       "provider_delete_but_no_provider_available"
-      //     );
-      //     if (emailResult === null) {
-      //       console.error("Failed to send email");
-      //     }
-      //     res.status(result.status).json("Report deleted");
-      //   } else {
-      //     // there is a replacement for the service provider
-      //     assignedServiceProvider.reports.push(report._id);
-      //     if (assignedServiceProvider.ranking < 5) {
-      //       assignedServiceProvider.ranking += 1;
-      //     }
-      //     const updateProviderReports = await UserRepository.updateReports(
-      //       assignedServiceProvider._id,
-      //       assignedServiceProvider.reports,
-      //       assignedServiceProvider.ranking
-      //     );
-      //     if (!updateProviderReports) {
-      //       throw new FailedCRUD("Failed to update the service provider");
-      //     }
-      //     await removeReportFromUser(userAssigned._id, body._id);
-      //     const result = {
-      //       status: 200,
-      //       data: await reportRepository.updateAssignedTo(
-      //         body._id,
-      //         assignedServiceProvider._id
-      //       ),
-      //     };
-      //     if (!result.data) {
-      //       throw new FailedCRUD("Failed to update the report");
-      //     }
-      //     const emailResult = await deleteReportAndNotify(
-      //       userSubmit.email,
-      //       userSubmit.username,
-      //       userAssigned.email,
-      //       userAssigned.username,
-      //       report.description,
-      //       "report_transfered_to_another_service_provider"
-      //     );
-      //     if (emailResult === null) {
-      //       console.error("Failed to send email");
-      //     }
-      //     res
-      //       .status(result.status)
-      //       .json("Report transfered to another service provider");
-      //   }
-      // } else {
-      //   throw new FormError("Please provide the user that delete the report");
-      // }
+        const userAssigned = await UserRepository.retrieve(report.assignedUser);
+
+        if (!userAssigned) {
+          throw new DataNotExistsError(
+            "deleteReport, fetch the user assigned to the report",
+            report.assignedUser
+          );
+        }
+        const userSubmit = await UserRepository.retrieve(report.reportByUser);
+
+        if (!userSubmit) {
+          throw new DataNotExistsError(
+            "deleteReport, fetch the user that submit the report",
+            report.reportByUser
+          );
+        }
+        // reportId, userSubmit, userAssigned;///////////////////////////////////////////////////////////////////////////
+        console.log("reportId, userSubmit, userAssigned");
+        const result = await deleteReportAndUpdate(
+          reportId,
+          userSubmit,
+          userAssigned
+        );
+        const emailResult = await deleteReportAndNotify(
+          userSubmit.email,
+          userSubmit.username,
+          userAssigned.email,
+          userAssigned.username,
+          report.description,
+          "request_delete"
+        );
+
+        if (emailResult === null) {
+          console.error("Failed to send email");
+        }
+
+        res.status(result.status).json("Report deleted");
+      } else {
+        if (report.assignedUser.toString() !== userIdWTD) {
+          throw new ForbiddenError();
+        }
+
+        const userSubmit = await UserRepository.retrieve(report.reportByUser);
+
+        if (!userSubmit) {
+          throw new DataNotExistsError(
+            "deleteReport, fetch the user that submit the report",
+            report.reportByUser
+          );
+        }
+        const userAssigned = await UserRepository.retrieve(report.assignedUser);
+
+        if (!userAssigned) {
+          throw new DataNotExistsError(
+            "deleteReport, fetch the user assigned to the report",
+            report.assignedUser
+          );
+        }
+        const serviceProviders = await UserRepository.findNearbyAndByProfession(
+          report.location,
+          report.profession,
+          50
+        );
+        // there are no users to replace the service provider
+        if (!serviceProviders) {
+          const result = await deleteReportAndUpdate(
+            reportId,
+            userSubmit,
+            userAssigned
+          );
+
+          const emailResult = await deleteReportAndNotify(
+            userSubmit.email,
+            userSubmit.username,
+            userAssigned.email,
+            userAssigned.username,
+            report.description,
+            "provider_delete_but_no_provider_available"
+          );
+
+          if (emailResult === null) {
+            console.error("Failed to send email");
+          }
+
+          res.status(result.status).json("Report deleted");
+        }
+
+        serviceProviders.sort((a, b) => b.ranking - a.ranking);
+
+        let assignedServiceProvider = null;
+        for (const provider of serviceProviders) {
+          let isAvailable = true;
+          for (const reportId of provider.reports) {
+            if (!reportId) continue;
+            const report = await reportRepository.retrieve(reportId);
+            if (report) {
+              const reportDate = report.dateOfResolve;
+              if (reportDate.getTime() === report.dateOfResolve.getTime()) {
+                isAvailable = false;
+                break;
+              }
+            }
+          }
+          if (isAvailable) {
+            if (provider._id !== userAssigned) {
+              assignedServiceProvider = provider;
+              break;
+            }
+          }
+        }
+
+        // only replacement is the same service provider
+
+        if (assignedServiceProvider === null) {
+          const result = await deleteReportAndUpdate(
+            reportId,
+            userSubmit,
+            userAssigned
+          );
+
+          const emailResult = await deleteReportAndNotify(
+            userSubmit.email,
+            userSubmit.username,
+            userIdWTD.email,
+            userIdWTD.username,
+            report.description,
+            "provider_delete_but_no_provider_available"
+          );
+
+          if (emailResult === null) {
+            console.error("Failed to send email");
+          }
+
+          res.status(result.status).json("Report deleted");
+        } else {
+          assignedServiceProvider.reports.push(report._id);
+
+          if (assignedServiceProvider.ranking < 5) {
+            assignedServiceProvider.ranking += 1;
+          }
+
+          const updateProviderReports = await UserRepository.updateReports(
+            assignedServiceProvider._id,
+            assignedServiceProvider.reports,
+            assignedServiceProvider.ranking
+          );
+
+          if (!updateProviderReports) {
+            throw new FailedCRUD("Failed to update the service provider");
+          }
+
+          await removeReportFromUser(userIdWTD, reportId);
+
+          const result = {
+            status: 200,
+            data: await reportRepository.updateAssignedTo(
+              reportId,
+              assignedServiceProvider._id
+            ),
+          };
+
+          if (!result.data) {
+            throw new FailedCRUD("Failed to update the report");
+          }
+
+          const emailResult = await deleteReportAndNotify(
+            userSubmit.email,
+            userSubmit.username,
+            userAssigned.email,
+            userAssigned.username,
+            report.description,
+            "report_transfered_to_another_service_provider"
+          );
+
+          if (emailResult === null) {
+            console.error("Failed to send email");
+          }
+
+          res
+            .status(result.status)
+            .json("Report transfered to another service provider");
+        }
+      }
     } catch (error) {
-      res.status(error?.status || 500).json(error.message);
+      switch (error.name) {
+        case "DataNotExistsError":
+        case "FormError":
+        case "FailedCRUD":
+        case "ForbiddenError":
+          res.status(error.status).json(error.message);
+          break;
+        default:
+          // const serverError = new ServerError();
+          // res.status(serverError.status).json(serverError.message);
+          res.status(error.status).json(error.message);
+      }
     }
   },
 };
@@ -498,6 +539,7 @@ const removeReportFromUser = async (userId, reportId) => {
 };
 
 const deleteReportAndUpdate = async (reportId, userSubmit, userAssigned) => {
+  // console.log("heyyyyyyyy");
   const result = {
     status: 200,
     data: await reportRepository.delete(reportId),
