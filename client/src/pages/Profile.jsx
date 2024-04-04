@@ -20,7 +20,7 @@ const UserProfile = () => {
         });
 
         const userLocation = userResponse.data.location.coordinates;
-        const googleMapsApiUrl = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${userLocation[1]},${userLocation[0]}&key=AIzaSyBMWrzMd0cEKDbjBnkndFx0WPttLOxbjC8`;
+        const googleMapsApiUrl = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${userLocation[1]},${userLocation[0]}&key=`;
 
         const cityResponse = await axios.get(googleMapsApiUrl);
         const locationDescriptor = extractLocationDescriptor(cityResponse.data);
