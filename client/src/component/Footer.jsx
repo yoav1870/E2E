@@ -61,7 +61,7 @@ const Footer = () => {
             target="_blank"
             style={{ color: "white", textDecoration: "none" }}
           >
-            Yoav Zoker
+            Yoav zucker
           </Link>{" "}
           |
           <Link

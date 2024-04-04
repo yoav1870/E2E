@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Container, Typography, TextField, Button, Box } from '@mui/material';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import Header from '../component/Header';
 
 const EditProfile = () => {
   const [oldPassword, setOldPassword] = useState('');
@@ -32,6 +33,8 @@ const EditProfile = () => {
   };
 
   return (
+    <>
+    < Header />
     <Container maxWidth="sm" sx={{ marginTop: 5 }}>
       <Typography variant="h4" align="center" gutterBottom>
         Edit Profile
@@ -58,6 +61,7 @@ const EditProfile = () => {
         </Button>
       </Box>
     </Container>
+    </>
   );
 };
 

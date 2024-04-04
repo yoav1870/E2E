@@ -10,6 +10,36 @@ const HomePage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  // useEffect(() => {
+  //   const fetchReports = async () => {
+  //     try {
+  //       const token = localStorage.getItem('token');
+  //       const response = await axios.get('https://e2e-y8hj.onrender.com/api/reports/home', {
+  //         headers: {
+  //           Authorization: `Bearer ${token}`,
+  //         },
+  //       });
+  //       setReports(response.data);
+  //       setLoading(false);
+  //     } catch (error) {
+  //       console.error('Failed to fetch reports:', error);
+  //       if (error.response) {
+  //         console.error('Response data:', error.response.data);
+  //         console.error('Response status:', error.response.status);
+  //         console.error('Response headers:', error.response.headers);
+  //         setError(`Failed to fetch reports. Server responded with status code ${error.response.status}`);
+  //       } else if (error.request) {
+  //         console.error('No response received:', error.request);
+  //         setError('Failed to fetch reports. No response from the server.');
+  //       } else {
+  //         console.error('Error:', error.message);
+  //         setError('Failed to fetch reports. An error occurred.');
+  //       }
+  //       setLoading(false);
+  //     }
+  //   };
+  //   fetchReports();
+  // }, []);
   useEffect(() => {
     const fetchReports = async () => {
       try {
@@ -23,7 +53,12 @@ const HomePage = () => {
         setLoading(false);
       } catch (error) {
         console.error('Failed to fetch reports:', error);
-        if (error.response) {
+        setLoading(false);
+  
+        // Check if the error response status code is 404
+        if (error.response && error.response.status === 404) {
+          setError("Sorry, you haven't been placed yet");
+        } else if (error.response) {
           console.error('Response data:', error.response.data);
           console.error('Response status:', error.response.status);
           console.error('Response headers:', error.response.headers);
@@ -35,11 +70,11 @@ const HomePage = () => {
           console.error('Error:', error.message);
           setError('Failed to fetch reports. An error occurred.');
         }
-        setLoading(false);
       }
     };
     fetchReports();
   }, []);
+  
 
   return (
     <>
