@@ -134,14 +134,19 @@ module.exports = class MongoStorage {
     );
   }
 
-  findReportsOfUser(user) {
+  findReportsOfUser(user, fetchOldReports) {
     if (!isValidObjectId(user._id)) {
       return null;
     }
+    const now = new Date();
+    const queryCondition = fetchOldReports
+      ? { dateOfResolve: { $lt: now } }
+      : { dateOfResolve: { $gte: now } };
+
     if (user.role === "service_provider") {
-      return this.Model.find({ assignedUser: user._id });
+      return this.Model.find({ assignedUser: user._id, ...queryCondition });
     }
-    return this.Model.find({ reportByUser: user._id });
+    return this.Model.find({ reportByUser: user._id, ...queryCondition });
   }
 
   signIn(username, password, email) {
