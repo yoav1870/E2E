@@ -20,20 +20,10 @@ const UserProfile = () => {
         });
 
         const userLocation = userResponse.data.location.coordinates;
-        const googleMapsApiUrl = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${userLocation[1]},${userLocation[0]}&key=YOUR_GOOGLE_MAPS_API_KEY`;
+        const googleMapsApiUrl = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${userLocation[1]},${userLocation[0]}&key=AIzaSyBMWrzMd0cEKDbjBnkndFx0WPttLOxbjC8`;
 
         const cityResponse = await axios.get(googleMapsApiUrl);
-        let locationDescriptor = "Unknown Location"; // Default value
-
-        // Attempt to find a city name from the address components
-        const addressComponents = cityResponse.data.results[0]?.address_components;
-        const cityComponent = addressComponents?.find(component => component.types.includes('locality'));
-        if (cityComponent) {
-          locationDescriptor = cityComponent.long_name;
-        } else {
-          // Fallback: Use the formatted address for a broader location descriptor
-          locationDescriptor = cityResponse.data.results[0]?.formatted_address;
-        }
+        const locationDescriptor = extractLocationDescriptor(cityResponse.data);
 
         const userDataWithLocation = {
           ...userResponse.data,
@@ -56,13 +46,31 @@ const UserProfile = () => {
     }
   }, [location.state]);
 
-
   const handleEditProfile = () => {
     navigate('/edit-profile');
   };
 
   if (!user) {
     return <Typography>Loading...</Typography>;
+  }
+
+  function extractLocationDescriptor(apiResponse) {
+    const addressComponents = apiResponse.results[0]?.address_components;
+    if (!addressComponents) return "Unknown Location";
+
+    const preferredTypes = [
+      'locality',
+      'administrative_area_level_2',
+      'administrative_area_level_1',
+      'country'
+    ];
+
+    for (let type of preferredTypes) {
+      const component = addressComponents.find(c => c.types.includes(type));
+      if (component) return component.long_name;
+    }
+
+    return apiResponse.results[0]?.formatted_address || "Unknown Location";
   }
 
   return (
