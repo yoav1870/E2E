@@ -21,7 +21,7 @@ function decodeJWT(token) {
   if (!token) return null;
   const base64Url = token.split('.')[1];
   const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-  const payload = decodeURIComponent(window.atob(base64).split('').map(function(c) {
+  const payload = decodeURIComponent(window.atob(base64).split('').map(function (c) {
     return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
   }).join(''));
   return JSON.parse(payload);
@@ -84,16 +84,17 @@ const Header = () => {
       open={Boolean(mobileMenuAnchorEl)}
       onClose={handleMobileMenuClose}
     >
-      <MenuItem component={Link} to="/home">
-        All Reports
+      <MenuItem component={Link} to="/report-history">
+        Reports History
       </MenuItem>
       <MenuItem component={Link} to="/profile">
         My Profile
       </MenuItem>
-    
-      {!userRole || userRole !== "service_provider" && (
+
+      {(!userRole || userRole !== "service_provider") && (
         <MenuItem component={Link} to="/create-report">Create Report</MenuItem>
       )}
+
     </Menu>
   );
 
@@ -170,8 +171,8 @@ const Header = () => {
         </Typography>
         {!isMobile && (
           <Box sx={{ display: "flex" }}>
-            <MenuItem component={Link} to="/home">
-              All Reports
+            <MenuItem component={Link} to="/report-history">
+              Reports History
             </MenuItem>
             <MenuItem component={Link} to="/profile">
               My Profile

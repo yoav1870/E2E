@@ -7,7 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import Header from '../component/Header';
 
 
-const professions = ["Electrician", "plumber", "Carpenter", "Technician"];
+const professions = ["electrician", "plumber", "Carpenter", "Technician"];
 
 const validationSchema = yup.object({
   description: yup.string().required('Description is required'),
