@@ -7,6 +7,7 @@ import SearchBar from '../component/SearchBar';
 
 const HomePage = () => {
   const [reports, setReports] = useState([]);
+  const [filteredReports, setFilteredReports] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -20,6 +21,7 @@ const HomePage = () => {
           },
         });
         setReports(response.data);
+        setFilteredReports(response.data);
         setLoading(false);
       } catch (error) {
         console.error('Failed to fetch reports:', error);
@@ -46,22 +48,8 @@ const HomePage = () => {
     fetchReports();
   }, []);
 
-  const handleSearch = async (profession) => {
-    try {
-      const token = localStorage.getItem('token');
-      const response = await axios.get(`https://e2e-y8hj.onrender.com/api/reports/search/${profession}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      setReports(response.data);
-      setLoading(false);
-      setError(null);
-    } catch (error) {
-      console.error('Failed to search reports:', error);
-      setLoading(false);
-      setError('Failed to search reports. Please try again.');
-    }
+  const handleFilter = (filtered) => {
+    setFilteredReports(filtered);
   };
 
   return (
@@ -71,7 +59,7 @@ const HomePage = () => {
         <Typography variant="h4" align="center" gutterBottom>
           Welcome to the Homepage
         </Typography>
-        <SearchBar onSearch={handleSearch} />
+        <SearchBar reports={reports} onFilter={handleFilter} />
         {loading ? (
           <Grid container justifyContent="center">
             <CircularProgress />
@@ -80,13 +68,13 @@ const HomePage = () => {
           <Typography variant="body1" align="center" color="error">
             {error}
           </Typography>
-        ) : reports.length === 0 ? (
+        ) : filteredReports.length === 0 ? (
           <Typography variant="body1" align="center">
             No reports found.
           </Typography>
         ) : (
           <Grid container spacing={3}>
-            {reports.map((report) => (
+            {filteredReports.map((report) => (
               <Grid item xs={12} sm={6} md={4} key={report._id}>
                 <Link
                   to={`/reports/${report._id}`}
@@ -121,7 +109,6 @@ const HomePage = () => {
             ))}
           </Grid>
         )}
-
       </Container>
       {/* <Footer /> */}
     </>
