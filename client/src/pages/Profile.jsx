@@ -4,11 +4,41 @@ import { useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
 import Header from "../component/Header";
 import LoadingComponent from "../component/Loading";
+import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material';
+
 const UserProfile = () => {
   const [user, setUser] = useState(null);
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+  const [openDialog, setOpenDialog] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
+
+  const handleClickOpen = () => {
+    setOpenDialog(true);
+  };
+  
+  const handleClose = () => {
+    setOpenDialog(false);
+  };
+
+  const handleDeleteUser = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const userId = user.id; 
+  
+      console.log(userId); 
+      await axios.delete(`https://e2e-y8hj.onrender.com/api/users/${userId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      navigate('/sign-in');
+    } catch (error) {
+      console.error("Failed to delete user:", error);
+    }
+    setOpenDialog(false);
+  };
+  
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -164,7 +194,7 @@ const UserProfile = () => {
           >
             Member since: {new Date(user.createdAt).toLocaleDateString()}
           </Typography>
-          <Box
+          {/* <Box
             sx={{ display: "flex", justifyContent: "center", marginTop: 2 }}
           >
             <Button
@@ -177,7 +207,53 @@ const UserProfile = () => {
             >
               Edit Profile
             </Button>
-          </Box>
+          </Box> */}
+          <Box sx={{ display: "flex", justifyContent: "center", gap: 2, marginTop: 2 }}>
+  <Button
+    variant="contained"
+    onClick={handleEditProfile}
+    sx={{
+      fontFamily: "'Tahoma', sans-serif",
+      textTransform: 'none', 
+    }}
+  >
+    Edit Profile
+  </Button>
+  <Button
+    variant="contained"
+    color="error"
+    onClick={handleClickOpen}
+    sx={{
+      fontFamily: "'Tahoma', sans-serif",
+      textTransform: 'none', 
+    }}
+  >
+    Delete User
+  </Button>
+</Box>
+
+<Dialog
+  open={openDialog}
+  onClose={handleClose}
+  aria-labelledby="alert-dialog-title"
+  aria-describedby="alert-dialog-description"
+>
+  <DialogTitle id="alert-dialog-title">
+    {"Are you sure?"}
+  </DialogTitle>
+  <DialogContent>
+    <DialogContentText id="alert-dialog-description">
+      Deleting your account is irreversible. Do you want to proceed?
+    </DialogContentText>
+  </DialogContent>
+  <DialogActions>
+    <Button onClick={handleClose}>No</Button>
+    <Button onClick={handleDeleteUser} autoFocus>
+      Yes
+    </Button>
+  </DialogActions>
+</Dialog>
+
         </Paper>
       </Container>
     </>

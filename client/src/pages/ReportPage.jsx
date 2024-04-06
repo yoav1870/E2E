@@ -68,7 +68,6 @@
 //       }
 //     };
 
-
 //     fetchAssignedUser();
 //   }, [report]);
 
@@ -139,7 +138,6 @@
 //       </>
 //     );
 //   }
-  
 
 //   if (!report) {
 //     return (
@@ -272,8 +270,8 @@
 
 // export default ReportPage;
 
-import React, { useEffect, useState } from 'react';
-import { useParams, Link as RouterLink, useNavigate } from 'react-router-dom';
+import React, { useEffect, useState } from "react";
+import { useParams, Link as RouterLink, useNavigate } from "react-router-dom";
 import {
   Container,
   Typography,
@@ -285,9 +283,9 @@ import {
   TextField,
   Breadcrumbs,
   Link,
-} from '@mui/material';
-import axios from 'axios';
-import Header from '../component/Header';
+} from "@mui/material";
+import axios from "axios";
+import Header from "../component/Header";
 
 const ReportPage = () => {
   const { id } = useParams();
@@ -296,14 +294,14 @@ const ReportPage = () => {
   const [assignedUser, setAssignedUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [newResolveDate, setNewResolveDate] = useState('');
+  const [newResolveDate, setNewResolveDate] = useState("");
   const [showUpdateField, setShowUpdateField] = useState(false);
 
   useEffect(() => {
     const fetchReport = async () => {
       setLoading(true);
       try {
-        const token = localStorage.getItem('token');
+        const token = localStorage.getItem("token");
         const response = await axios.get(
           `https://e2e-y8hj.onrender.com/api/reports/${id}`,
           {
@@ -314,7 +312,7 @@ const ReportPage = () => {
         );
         setReport(response.data);
       } catch (error) {
-        setError('Failed to fetch the report. Please try again.');
+        setError("Failed to fetch the report. Please try again.");
       } finally {
         setLoading(false);
       }
@@ -327,7 +325,7 @@ const ReportPage = () => {
     const fetchAssignedUser = async () => {
       if (report?.assignedUser) {
         try {
-          const token = localStorage.getItem('token');
+          const token = localStorage.getItem("token");
           const response = await axios.get(
             `https://e2e-y8hj.onrender.com/api/users/${report.assignedUser}`,
             {
@@ -338,7 +336,7 @@ const ReportPage = () => {
           );
           setAssignedUser(response.data);
         } catch (error) {
-          console.error('Failed to fetch assigned user:', error);
+          console.error("Failed to fetch assigned user:", error);
         }
       }
     };
@@ -352,7 +350,7 @@ const ReportPage = () => {
       return;
     }
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem("token");
       await axios.put(
         `https://e2e-y8hj.onrender.com/api/reports/updateDate/${id}`,
         { newDateOfResolve: newResolveDate },
@@ -360,49 +358,104 @@ const ReportPage = () => {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
-      alert('Report updated');
+      alert("Report updated");
       setShowUpdateField(false);
-      navigate('/home');
+      navigate("/home");
     } catch (error) {
-      alert('Failed to update the report.');
+      alert("Failed to update the report.");
     }
   };
 
   const deleteReport = async () => {
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem("token");
       await axios.delete(`https://e2e-y8hj.onrender.com/api/reports/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      alert('Report deleted');
-      navigate('/home');
+      alert("Report deleted");
+      navigate("/home");
     } catch (error) {
-      alert('Failed to delete the report.');
+      alert("Failed to delete the report.");
     }
   };
 
-  if (loading) return <Header><Container maxWidth="lg" sx={{ mt: 4, display: 'flex', justifyContent: 'center' }}><CircularProgress /></Container></Header>;
+  if (loading)
+    return (
+      <Header>
+        <Container
+          maxWidth="lg"
+          sx={{ mt: 4, display: "flex", justifyContent: "center" }}
+        >
+          <CircularProgress />
+        </Container>
+      </Header>
+    );
 
-  if (error) return <Header><Container maxWidth="lg" sx={{ mt: 4 }}><Typography variant="h4" gutterBottom>Error</Typography><Typography variant="body1">{error}</Typography></Container></Header>;
+  if (error)
+    return (
+      <Header>
+        <Container maxWidth="lg" sx={{ mt: 4 }}>
+          <Typography variant="h4" gutterBottom>
+            Error
+          </Typography>
+          <Typography variant="body1">{error}</Typography>
+        </Container>
+      </Header>
+    );
 
-  if (!report) return <Header><Container maxWidth="lg" sx={{ mt: 4 }}><Typography variant="h4" gutterBottom>Report not found</Typography><Typography variant="body1">The requested report could not be found.</Typography></Container></Header>;
+  if (!report)
+    return (
+      <Header>
+        <Container maxWidth="lg" sx={{ mt: 4 }}>
+          <Typography variant="h4" gutterBottom>
+            Report not found
+          </Typography>
+          <Typography variant="body1">
+            The requested report could not be found.
+          </Typography>
+        </Container>
+      </Header>
+    );
 
   return (
     <>
       <Header />
-      <Breadcrumbs aria-label="breadcrumb" style={{ fontFamily: '"Times New Roman", serif', margin: '10px 0' }}>
-        <Link component={RouterLink} color="inherit" to="/" underline="none">Home</Link>
-        <Typography color="text.primary">Report Details</Typography>
+      <Breadcrumbs
+        aria-label="breadcrumb"
+        style={{ fontFamily: '"Times New Roman", serif', marginLeft: "20px" }}
+      >
+        <Link component={RouterLink} color="inherit" to="/" underline="none">
+          Home
+        </Link>
+        <Typography color="text.primary" fontFamily="Georgia, serif">
+          Report Details
+        </Typography>
       </Breadcrumbs>
 
       <Container maxWidth="lg" sx={{ mt: 4 }}>
-        <Typography variant="h4" gutterBottom>Report Details</Typography>
+        <Typography
+          variant="h4"
+          gutterBottom
+          fontFamily="Georgia, serif"
+          textAlign="center"
+        >
+          Report Details
+        </Typography>
         <Card sx={{ mb: 2 }}>
           <CardContent>
-            <Typography variant="h6" gutterBottom>Description: {report.description}</Typography>
-            <Typography variant="body1" gutterBottom>Status: {report.status}</Typography>
-            <Typography variant="body1" gutterBottom>Urgency: {report.urgency}</Typography>
-            <Typography variant="body1" gutterBottom>Date of Resolve: {new Date(report.dateOfResolve).toLocaleDateString()}</Typography>
+            <Typography variant="h6" gutterBottom>
+              Description: {report.description}
+            </Typography>
+            <Typography variant="body1" gutterBottom>
+              Status: {report.status}
+            </Typography>
+            <Typography variant="body1" gutterBottom>
+              Urgency: {report.urgency}
+            </Typography>
+            <Typography variant="body1" gutterBottom>
+              Date of Resolve:{" "}
+              {new Date(report.dateOfResolve).toLocaleDateString()}
+            </Typography>
             {showUpdateField && (
               <TextField
                 label="New Resolve Date"
@@ -414,23 +467,51 @@ const ReportPage = () => {
                 InputLabelProps={{ shrink: true }}
               />
             )}
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>
-              <Button onClick={updateReportDate} variant="contained">{showUpdateField ? 'Submit New Date' : 'Update Resolve Date'}</Button>
-              <Button onClick={deleteReport} variant="contained" color="error">Delete Report</Button>
+            <Box
+              sx={{ display: "flex", justifyContent: "space-between", mt: 2 }}
+            >
+              <Button
+                onClick={updateReportDate}
+                variant="contained"
+                sx={{ textTransform: "none" }}
+              >
+                {showUpdateField ? "Submit New Date" : "Update Resolve Date"}
+              </Button>{" "}
+              <Button
+                onClick={deleteReport}
+                variant="contained"
+                color="error"
+                sx={{ textTransform: "none" }}
+              >
+                Delete Report
+              </Button>{" "}
             </Box>
           </CardContent>
         </Card>
 
         {assignedUser ? (
           <>
-            <Typography variant="h5" gutterBottom>Assigned Service Provider</Typography>
+            <Typography variant="h5" gutterBottom fontFamily="Georgia, serif" textAlign="center">
+              Assigned Service Provider
+            </Typography>
             <Card>
               <CardContent>
-                <Typography variant="h6" gutterBottom>Name: {assignedUser.username}</Typography>
-                <Typography variant="body1" gutterBottom>Email: {assignedUser.email}</Typography>
-                <Typography variant="body1" gutterBottom>Profession: {assignedUser.profession}</Typography>
-                <Typography variant="body1" gutterBottom>Availability: {assignedUser.availability ? 'Available' : 'Not Available'}</Typography>
-                <Typography variant="body1">Ranking: {assignedUser.ranking}</Typography>
+                <Typography variant="h6" gutterBottom>
+                  Name: {assignedUser.username}
+                </Typography>
+                <Typography variant="body1" gutterBottom>
+                  Email: {assignedUser.email}
+                </Typography>
+                <Typography variant="body1" gutterBottom>
+                  Profession: {assignedUser.profession}
+                </Typography>
+                <Typography variant="body1" gutterBottom>
+                  Availability:{" "}
+                  {assignedUser.availability ? "Available" : "Not Available"}
+                </Typography>
+                <Typography variant="body1">
+                  Ranking: {assignedUser.ranking}
+                </Typography>
               </CardContent>
             </Card>
           </>
