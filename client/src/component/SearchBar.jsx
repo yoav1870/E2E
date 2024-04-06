@@ -1,3 +1,4 @@
+// SearchBar.js
 import React, { useState } from 'react';
 import { TextField, Grid, styled } from '@mui/material';
 
@@ -10,12 +11,19 @@ const StyledTextField = styled(TextField)({
   },
 });
 
-const SearchBar = ({ onSearch }) => {
+const SearchBar = ({ reports, onFilter }) => {
   const [searchProfession, setSearchProfession] = useState('');
+
+  const handleFilter = () => {
+    const filteredReports = reports.filter((report) =>
+      report.profession.toLowerCase().includes(searchProfession.toLowerCase())
+    );
+    onFilter(filteredReports);
+  };
 
   const handleKeyPress = (e) => {
     if (e.key === 'Enter') {
-      onSearch(searchProfession);
+      handleFilter();
     }
   };
 

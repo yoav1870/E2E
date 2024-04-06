@@ -135,6 +135,7 @@ dayjs.extend(isSameOrAfter);
 
 const HomePage = () => {
   const [reports, setReports] = useState([]);
+  const [filteredReports, setFilteredReports] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [startDate, setStartDate] = useState(null);
@@ -156,6 +157,7 @@ const HomePage = () => {
           }
         );
         setReports(response.data);
+        setFilteredReports(response.data);
         setLoading(false);
       } catch (error) {
         console.error("Failed to fetch reports:", error);
@@ -167,22 +169,8 @@ const HomePage = () => {
     fetchReports();
   }, []);
 
-  const handleSearch = async (profession) => {
-    try {
-      const token = localStorage.getItem('token');
-      const response = await axios.get(`https://e2e-y8hj.onrender.com/api/reports/search/${profession}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      setReports(response.data);
-      setLoading(false);
-      setError(null);
-    } catch (error) {
-      console.error('Failed to search reports:', error);
-      setLoading(false);
-      setError('Failed to search reports. Please try again.');
-    }
+  const handleFilter = (filtered) => {
+    setFilteredReports(filtered);
   };
 
   // Filter reports based on the selected date range
@@ -198,6 +186,10 @@ const HomePage = () => {
     <>
       <Header />
       <Container maxWidth="lg" sx={{ mt: 4 }}>
+        <Typography variant="h4" align="center" gutterBottom>
+          Welcome to the Homepage
+        </Typography>
+        <SearchBar reports={reports} onFilter={handleFilter} />
         {/* <Grid
           container
           justifyContent="space-between"
@@ -266,11 +258,13 @@ const HomePage = () => {
             {error}
           </Typography>
         ) : filteredReports.length === 0 ? (
+        ) : filteredReports.length === 0 ? (
           <Typography variant="body1" align="center">
             No reports found within the selected date range.
           </Typography>
         ) : (
           <Grid container spacing={3}>
+            {filteredReports.map((report) => (
             {filteredReports.map((report) => (
               <Grid item xs={12} sm={6} md={4} key={report._id}>
                 <Link
