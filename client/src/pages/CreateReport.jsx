@@ -5,9 +5,10 @@ import * as yup from 'yup';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import Header from '../component/Header';
+import LoadingComponent from '../component/Loading';
 
 
-const professions = ["Electrician", "plumber", "Carpenter", "Technician"];
+const professions = ["electrician", "plumber", "Carpenter", "Technician"];
 
 const validationSchema = yup.object({
   description: yup.string().required('Description is required'),
@@ -78,7 +79,7 @@ const CreateReport = () => {
   });
 
   if (!user) {
-    return <Typography>Loading...</Typography>;
+    return <LoadingComponent />;
   }
 
   return (

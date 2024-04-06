@@ -6,7 +6,9 @@ import Profile from "./pages/Profile.jsx";
 import CreateReport from "./pages/CreateReport";
 import ReportPage from "./pages/ReportPage";
 import EditProfile from "./pages/EditProfile";
+import Information from "./pages/Information.jsx";
 import Footer from "./component/Footer";
+import ReportHistory from "./pages/ReportHistory";
 import { Box } from "@mui/system";
 import './app.css';
 
@@ -71,6 +73,11 @@ const App = () => {
           />
           <Route path="/reports/:id" element={<ReportPage />} />
           <Route path="/edit-profile" element={<EditProfile />} />
+          <Route path="/information" element={<Information />} />
+          <Route
+            path="/report-history"
+            element={isAuthenticated() ? <ReportHistory /> : <Navigate to="/sign-in" />}
+          />
       </Routes>
         </Box>
         <Footer />

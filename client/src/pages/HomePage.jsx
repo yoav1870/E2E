@@ -3,7 +3,7 @@
 // import { Link } from 'react-router-dom';
 // import axios from 'axios';
 // import Header from '../component/Header';
-
+import SearchBar from '../component/SearchBar';
 // const HomePage = () => {
 //   const [reports, setReports] = useState([]);
 //   const [loading, setLoading] = useState(true);
@@ -160,11 +160,30 @@ const HomePage = () => {
       } catch (error) {
         console.error("Failed to fetch reports:", error);
         setLoading(false);
-        setError("Failed to fetch reports. Please try again later.");
+      setError("Failed to fetch reports. Please try again later.");
       }
     };
+
     fetchReports();
   }, []);
+
+  const handleSearch = async (profession) => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await axios.get(`https://e2e-y8hj.onrender.com/api/reports/search/${profession}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      setReports(response.data);
+      setLoading(false);
+      setError(null);
+    } catch (error) {
+      console.error('Failed to search reports:', error);
+      setLoading(false);
+      setError('Failed to search reports. Please try again.');
+    }
+  };
 
   // Filter reports based on the selected date range
   const filteredReports = reports.filter((report) => {
@@ -211,8 +230,7 @@ const HomePage = () => {
           <IconButton aria-label="filter" onClick={() => setShowFilters(!showFilters)}>
             <FilterListIcon />
             <Typography variant="body1" color="textSecondary">
-              Filter by date
-            </Typography>
+              Filter by date            </Typography>
           </IconButton>
         </Box>
         {showFilters && (
@@ -238,6 +256,7 @@ const HomePage = () => {
             />
           </Box>
         )}
+        <SearchBar onSearch={handleSearch} />
         {loading ? (
           <Grid container justifyContent="center">
             <CircularProgress />
