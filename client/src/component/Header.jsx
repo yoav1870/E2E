@@ -168,6 +168,8 @@ const Header = () => {
         boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
         justifyContent: 'center',
         minHeight: '70px',
+        fontFamily: '"Times New Roman", serif',
+        fontWeight: 'bold',
       }}
     >
       <Toolbar disableGutters sx={{ justifyContent: 'space-between', padding: '0 20px' }}>
@@ -185,6 +187,7 @@ const Header = () => {
             display: 'flex',
             justifyContent: 'center',
             alignItems: 'center',
+            fontFamily: '"Times New Roman", serif',
           }}
         >
           <Box sx={{ flexGrow: 1, display: 'flex', justifyContent: 'center' }}>
@@ -201,7 +204,7 @@ const Header = () => {
               <Typography
                 variant="body1"
                 color="#170F49"
-                sx={{ ml: 1, fontSize: '1.50rem', fontWeight: 'bold' }}
+                sx={{ ml: 1, fontSize: '1.50rem', fontWeight: 'bold',fontFamily: '"Times New Roman", serif' }}
               >
                 Reports
               </Typography>
@@ -209,8 +212,8 @@ const Header = () => {
           </Box>
         </Typography>
         {!isMobile && (
-          <Box sx={{ display: 'flex' }}>
-            <Tabs value={getTabValue()} indicatorColor="primary">
+          <Box sx={{ display: 'flex' ,fontFamily: '"Times New Roman", serif' }}>
+            <Tabs value={getTabValue()} indicatorColor="primary" sx={{ '.MuiTab-root': { fontFamily: '"Times New Roman", serif' } }}>
               <Tab label="Reports History" component={RouterLink} to="/report-history" />
               <Tab label="My Profile" component={RouterLink} to="/profile" />
               <Tab label="Information" component={RouterLink} to="/information" />
