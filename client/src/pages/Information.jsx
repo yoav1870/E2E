@@ -50,10 +50,11 @@ const Information = () => {
   return (
     <>
       <Header />
-      <Container maxWidth="lg" sx={{ mt: 4 }}>
-        <Typography variant="h4" gutterBottom>
-          Recommended Videos
-        </Typography>
+      <Container maxWidth="lg" sx={{ mt: 4 }} >
+      <Typography variant="h4" gutterBottom fontFamily="Georgia, serif" sx={{ textAlign: 'center' }}>
+  Recommended Videos
+</Typography>
+
         {videos.length === 0 ? (
           <Typography>No videos found.</Typography>
         ) : (

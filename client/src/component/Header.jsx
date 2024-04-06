@@ -127,43 +127,47 @@ const Header = () => {
       open={Boolean(mobileMenuAnchorEl)}
       onClose={handleMobileMenuClose}
     >
-      <MenuItem component={RouterLink} to="/report-history">
+      {/* Apply the sx prop with fontFamily to each MenuItem */}
+      <MenuItem component={RouterLink} to="/report-history" sx={{ fontFamily: "'Tahoma', sans-serif" }}>
         Reports History
       </MenuItem>
-      <MenuItem component={RouterLink} to="/profile">
+      <MenuItem component={RouterLink} to="/profile" sx={{ fontFamily: "'Tahoma', sans-serif" }}>
         My Profile
       </MenuItem>
       {(!userRole || userRole !== "service_provider") && (
-        <MenuItem component={RouterLink} to="/create-report">
+        <MenuItem component={RouterLink} to="/create-report" sx={{ fontFamily: "'Tahoma', sans-serif" }}>
           Create Report
         </MenuItem>
       )}
-      <MenuItem component={RouterLink} to="/information">
+      <MenuItem component={RouterLink} to="/information" sx={{ fontFamily: "'Tahoma', sans-serif" }}>
         Information
       </MenuItem>
     </Menu>
-  );
+);
 
-  const renderProfileMenu = (
-    <Menu
-      anchorEl={profileMenuAnchorEl}
-      anchorOrigin={{ vertical: "top", horizontal: "right" }}
-      id={profileMenuId}
-      keepMounted
-      transformOrigin={{ vertical: "top", horizontal: "right" }}
-      open={Boolean(profileMenuAnchorEl)}
-      onClose={handleProfileMenuClose}
+const renderProfileMenu = (
+  <Menu
+    anchorEl={profileMenuAnchorEl}
+    anchorOrigin={{ vertical: "top", horizontal: "right" }}
+    id={profileMenuId}
+    keepMounted
+    transformOrigin={{ vertical: "top", horizontal: "right" }}
+    open={Boolean(profileMenuAnchorEl)}
+    onClose={handleProfileMenuClose}
+  >
+    <MenuItem
+      component={RouterLink}
+      to="/profile"
+      onClick={handleProfileMenuClose}
+      sx={{ fontFamily: "'Tahoma', sans-serif" }}
     >
-      <MenuItem
-        component={RouterLink}
-        to="/profile"
-        onClick={handleProfileMenuClose}
-      >
-        My Profile
-      </MenuItem>
-      <MenuItem onClick={handleSignOut}>Sign Out</MenuItem>
-    </Menu>
-  );
+      My Profile
+    </MenuItem>
+    <MenuItem onClick={handleSignOut} sx={{ fontFamily: "'Tahoma', sans-serif" }}>
+      Sign Out
+    </MenuItem>
+  </Menu>
+);
 
   return (
     <AppBar
@@ -176,7 +180,7 @@ const Header = () => {
         boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
         justifyContent: "center",
         minHeight: "70px",
-        fontFamily: "sans-serif",
+      
         fontWeight: "bold",
         textTransform: 'none'
       }}
@@ -200,7 +204,7 @@ const Header = () => {
             display: "flex",
             justifyContent: "center",
             alignItems: "center",
-            fontFamily: "sans-serif",
+            fontFamily: "'Segoe UI', sans-serif",
             
           }}
         >
@@ -222,7 +226,7 @@ const Header = () => {
                   ml: 1,
                   fontSize: "1.50rem",
                   fontWeight: "bold",
-                  fontFamily: "sans-serif",
+                  fontFamily:" serif"
                 }}
               >
                 Reports
@@ -231,13 +235,13 @@ const Header = () => {
           </Box>
         </Typography>
         {!isMobile && (
-          <Box sx={{ display: "flex", fontfamily: "serif" }}>
+          <Box sx={{ display: "flex",   fontFamily: "'Segoe UI', sans-serif", }}>
             <Tabs
   value={getTabValue()}
   indicatorColor="primary"
   sx={{
     ".MuiTab-root": { 
-      textTransform: 'none', // Prevents text from being transformed to uppercase for Tabs
+      textTransform: 'none', 
     },
   }}
 >
@@ -250,8 +254,8 @@ const Header = () => {
       component={RouterLink}
       to="/create-report"
       sx={{
-        backgroundColor: "primary.main",
-        color: "white",
+        // backgroundColor: 'rgba(100, 100, 100, 0.2)', 
+        // color: "white",
         "&:hover": {
           backgroundColor: "primary.dark",
         },
@@ -260,7 +264,6 @@ const Header = () => {
     />
   )}
 </Tabs>
-
           </Box>
         )}
         {isMobile && (

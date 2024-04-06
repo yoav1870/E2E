@@ -106,7 +106,7 @@ const UserProfile = () => {
           User Profile
         </Typography>
         <Paper elevation={3} sx={{ width: "100%", padding: 4 }}>
-          {/* <Box
+          <Box
             component="img"
             src={user.photo}
             alt="Profile photo"
@@ -115,8 +115,10 @@ const UserProfile = () => {
               height: 100,
               borderRadius: "50%",
               margin: "auto",
+              display: 'block',
+              objectFit: 'cover',
             }}
-          /> */}
+          />
           <Typography
             variant="h6"
             fontWeight="bold"
@@ -169,7 +171,8 @@ const UserProfile = () => {
               variant="contained"
               onClick={handleEditProfile}
               sx={{
-                fontFamily: "serif",
+                fontFamily: "'Tahoma', sans-serif",
+                textTransform: 'none', 
               }}
             >
               Edit Profile
