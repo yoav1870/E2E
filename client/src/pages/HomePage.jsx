@@ -105,12 +105,14 @@
 //     </>
 //   );
 // };
+// HomePage.js
 import React, { useEffect, useState } from 'react';
 import { Container, Typography, Grid, Card, CardContent, CardMedia, CircularProgress } from '@mui/material';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import Header from '../component/Header';
 import SearchBar from '../component/SearchBar';
+import DateFilter from '../component/Filter';
 
 const HomePage = () => {
   const [reports, setReports] = useState([]);
@@ -155,8 +157,12 @@ const HomePage = () => {
     fetchReports();
   }, []);
 
-  const handleFilter = (filtered) => {
-    setFilteredReports(filtered);
+  const handleSearch = (searchedReports) => {
+    setFilteredReports(searchedReports);
+  };
+
+  const handleFilter = (filteredReports) => {
+    setFilteredReports(filteredReports);
   };
 
   return (
@@ -166,7 +172,8 @@ const HomePage = () => {
         <Typography variant="h4" align="center" gutterBottom  fontFamily="Georgia, serif">
           Welcome to the Homepage
         </Typography>
-        <SearchBar reports={reports} onFilter={handleFilter} />
+        <SearchBar reports={reports} onSearch={handleSearch} />
+        <DateFilter reports={reports} onFilter={handleFilter} />
         {loading ? (
           <Grid container justifyContent="center">
             <CircularProgress />
