@@ -1,28 +1,35 @@
 import React, { useState } from 'react';
-import { TextField, Button, Grid } from '@mui/material';
+import { TextField, Grid, styled } from '@mui/material';
+
+const StyledTextField = styled(TextField)({
+  '& .MuiOutlinedInput-root': {
+    borderRadius: '24px',
+    '&:hover': {
+      boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+    },
+  },
+});
 
 const SearchBar = ({ onSearch }) => {
   const [searchProfession, setSearchProfession] = useState('');
 
-  const handleSearch = () => {
-    onSearch(searchProfession);
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      onSearch(searchProfession);
+    }
   };
 
   return (
-    <Grid container spacing={2} justifyContent="center" alignItems="center" paddingBottom={4}>
+    <Grid container justifyContent="center" alignItems="center" paddingBottom={4}>
       <Grid item xs={12} sm={6}>
-        <TextField
+        <StyledTextField
           label="Search report by Profession"
           variant="outlined"
           fullWidth
           value={searchProfession}
           onChange={(e) => setSearchProfession(e.target.value)}
+          onKeyPress={handleKeyPress}
         />
-      </Grid>
-      <Grid item xs={12} sm={2}>
-        <Button variant="contained" onClick={handleSearch}>
-          Search
-        </Button>
       </Grid>
     </Grid>
   );

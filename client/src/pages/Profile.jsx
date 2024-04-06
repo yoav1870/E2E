@@ -3,6 +3,7 @@ import { Container, Typography, Box, Paper, Button } from '@mui/material';
 import { useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import Header from '../component/Header';
+import LoadingComponent from '../component/Loading';
 const UserProfile = () => {
   const [user, setUser] = useState(null);
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
@@ -51,7 +52,7 @@ const UserProfile = () => {
   };
 
   if (!user) {
-    return <Typography>Loading...</Typography>;
+    return <LoadingComponent />;
   }
 
   function extractLocationDescriptor(apiResponse) {

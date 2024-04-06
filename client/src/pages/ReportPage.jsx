@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Container, Typography, Card, CardContent, CircularProgress, Box, Button, TextField } from '@mui/material';
 import axios from 'axios';
 import Header from '../component/Header';
+import LoadingComponent from '../component/Loading';
 
 const ReportPage = () => {
   const { id } = useParams();
@@ -98,12 +99,7 @@ const ReportPage = () => {
 
   if (loading) {
     return (
-      <>
-        <Header />
-        <Container maxWidth="lg" sx={{ mt: 4, display: 'flex', justifyContent: 'center' }}>
-          <CircularProgress />
-        </Container>
-      </>
+     <LoadingComponent/>
     );
   }
 

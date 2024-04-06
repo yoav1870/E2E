@@ -1,20 +1,10 @@
-import { useState, useEffect } from "react";
-import {
-  AppBar,
-  Toolbar,
-  Typography,
-  IconButton,
-  Box,
-  Menu,
-  MenuItem,
-  useMediaQuery,
-  useTheme,
-  Avatar,
-} from "@mui/material";
-import MenuIcon from "@mui/icons-material/Menu";
-import { Link } from "react-router-dom";
-import logo from "../assets/icon_logo.png";
-
+// Header.jsx
+import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import { AppBar, Toolbar, Typography, IconButton, Box, Menu, MenuItem, useMediaQuery, useTheme, Avatar } from '@mui/material';
+import MenuIcon from '@mui/icons-material/Menu';
+import logo from '../assets/icon_logo.png';
+import axios from 'axios';
 
 // JWT token decoding function (add this outside your component or in a utility file)
 function decodeJWT(token) {
@@ -34,12 +24,32 @@ const Header = () => {
   const [profileMenuAnchorEl, setProfileMenuAnchorEl] = useState(null);
 
   const [userRole, setUserRole] = useState("");
+  const [user, setUser] = useState(null);
+
   useEffect(() => {
     // Decode the JWT token and set the user role
     const token = localStorage.getItem("token");
     const decodedToken = decodeJWT(token);
     const role = decodedToken ? decodedToken.role : "";
     setUserRole(role);
+  }, []);
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        const response = await axios.get('https://e2e-y8hj.onrender.com/api/users/home', {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        setUser(response.data);
+      } catch (error) {
+        console.error('Failed to fetch user data:', error);
+      }
+    };
+
+    fetchUserData();
   }, []);
 
   const handleMobileMenuOpen = (event) => {
@@ -94,7 +104,6 @@ const Header = () => {
       {(!userRole || userRole !== "service_provider") && (
         <MenuItem component={Link} to="/create-report">Create Report</MenuItem>
       )}
-
     </Menu>
   );
 
@@ -116,61 +125,27 @@ const Header = () => {
   );
 
   return (
-    <AppBar
-      position="fixed"
-      color="default"
-      elevation={4}
-      sx={{
-        backgroundColor: "#E7E7E7",
-        color: "#333",
-        boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
-        justifyContent: "center",
-        minHeight: "70px",
-      }}
-    >
-      <Toolbar
-        disableGutters
-        sx={{ justifyContent: "space-between", padding: "0 20px" }}
-      >
+    <AppBar position="fixed" color="default" elevation={4} sx={{ backgroundColor: '#E7E7E7', color: '#333', boxShadow: '0 2px 4px rgba(0,0,0,0.1)', justifyContent: 'center', minHeight: '70px' }}>
+      <Toolbar disableGutters sx={{ justifyContent: 'space-between', padding: '0 20px' }}>
         <IconButton onClick={handleProfileMenuOpen}>
-          <Avatar alt="Profile Picture" src="path/to/profile-picture.jpg" />
+          {user && user.photo ? (
+            <Avatar alt="Profile Picture" src={user.photo} />
+          ) : (
+            <Avatar />
+          )}
         </IconButton>
-        <Typography
-          variant="h6"
-          sx={{
-            flexGrow: 1,
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-          }}
-        >
-          <Box sx={{ flexGrow: 1, display: "flex", justifyContent: "center" }}>
-            <Link
-              to="/"
-              style={{
-                display: "flex",
-                alignItems: "center",
-                textDecoration: "none",
-                color: "inherit",
-              }}
-            >
-              <img src={logo} alt="Logo" style={{ height: "50px" }} />
-              <Typography
-                variant="body1"
-                color="#170F49"
-                sx={{
-                  ml: 1,
-                  fontSize: "1.50rem",
-                  fontWeight: "bold",
-                }}
-              >
+        <Typography variant="h6" sx={{ flexGrow: 1, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+          <Box sx={{ flexGrow: 1, display: 'flex', justifyContent: 'center' }}>
+            <Link to="/" style={{ display: 'flex', alignItems: 'center', textDecoration: 'none', color: 'inherit' }}>
+              <img src={logo} alt="Logo" style={{ height: '50px' }} />
+              <Typography variant="body1" color="#170F49" sx={{ ml: 1, fontSize: '1.50rem', fontWeight: 'bold' }}>
                 Reports
               </Typography>
             </Link>
           </Box>
         </Typography>
         {!isMobile && (
-          <Box sx={{ display: "flex" }}>
+          <Box sx={{ display: 'flex' }}>
             <MenuItem component={Link} to="/report-history">
               Reports History
             </MenuItem>
