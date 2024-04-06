@@ -32,6 +32,7 @@ module.exports = class MongoStorage {
   find() {
     return this.Model.find();
   }
+
   async retrieve(id) {
     if (!isValidObjectId(id)) {
       return null;
@@ -59,13 +60,13 @@ module.exports = class MongoStorage {
     }
     return entity;
   }
+
   async create(data) {
     const entity = new this.Model(data);
     try {
       await entity.save();
       return entity;
     } catch (error) {
-      console.error("Error creating entity:", error);
       return null;
     }
   }
@@ -90,6 +91,7 @@ module.exports = class MongoStorage {
       role: "service_provider",
     });
   }
+
   updateReports(id, reports, ranking) {
     if (!isValidObjectId(id)) {
       return null;
@@ -134,14 +136,29 @@ module.exports = class MongoStorage {
     );
   }
 
-  findReportsOfUser(user) {
+  findReportsOfUser(user, fetchOldReports) {
     if (!isValidObjectId(user._id)) {
       return null;
     }
+    const now = new Date();
+    const queryCondition = fetchOldReports
+      ? { dateOfResolve: { $lt: now } }
+      : { dateOfResolve: { $gte: now } };
+
     if (user.role === "service_provider") {
-      return this.Model.find({ assignedUser: user._id });
+      return this.Model.find({ assignedUser: user._id, ...queryCondition });
     }
-    return this.Model.find({ reportByUser: user._id });
+    return this.Model.find({ reportByUser: user._id, ...queryCondition });
+  }
+  updateStatus(reportId, newStatus) {
+    if (!isValidObjectId(reportId)) {
+      return null;
+    }
+    return this.Model.findByIdAndUpdate(
+      reportId,
+      { status: newStatus },
+      { new: true, runValidators: true }
+    );
   }
 
   signIn(username, password, email) {

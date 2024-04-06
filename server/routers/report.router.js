@@ -9,6 +9,11 @@ reportRouter.get(
   reportController.getAllReportsOfUser
 );
 
+reportRouter.get(
+  "/past",
+  authenticateToken,
+  reportController.getOldReportsOfUser
+);
 reportRouter.get("/:id", authenticateToken, reportController.getReport);
 
 reportRouter.post("/", authenticateToken, reportController.createReport);
@@ -17,6 +22,12 @@ reportRouter.put(
   "/updateDate/:id",
   authenticateToken,
   reportController.updateDateOfResolve
+);
+
+reportRouter.put(
+  "/updateStatus/:id",
+  authenticateToken,
+  reportController.updateStatus
 );
 
 reportRouter.delete("/", authenticateToken, reportController.deleteReport);

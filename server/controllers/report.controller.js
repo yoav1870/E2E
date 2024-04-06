@@ -28,7 +28,7 @@ exports.reportController = {
       }
       const result = {
         status: 200,
-        data: await reportRepository.findReportsOfUser(user),
+        data: await reportRepository.findReportsOfUser(user, false),
       };
       if (result.data.length === 0) {
         throw new NoDataError("getAllReportsOfUser");
@@ -47,6 +47,34 @@ exports.reportController = {
       }
     }
   },
+
+  async getOldReportsOfUser(req, res) {
+    try {
+      const userId = req.user.userId;
+      const user = await UserRepository.retrieve(userId);
+      if (!user) {
+        throw new DataNotExistsError("getOldReportsOfUser", userId);
+      }
+
+      const reports = await reportRepository.findReportsOfUser(user, true);
+      if (!reports || reports.length === 0) {
+        throw new NoDataError("getOldReportsOfUser");
+      }
+
+      res.status(200).json(reports);
+    } catch (error) {
+      switch (error.name) {
+        case "DataNotExistsError":
+        case "NoDataError":
+          res.status(error.status).json(error.message);
+          break;
+        default:
+          const serverError = new ServerError();
+          res.status(serverError.status).json(serverError.message);
+      }
+    }
+  },
+
   async getReport(req, res) {
     try {
       const result = {
@@ -296,6 +324,60 @@ exports.reportController = {
       }
     }
   },
+  async updateStatus(req, res) {
+    try {
+      const userId = req.user.userId;
+      const roleToken = req.user.role;
+      const reportId = req.params.id;
+      const newStatus = req.body.newStatus;
+
+      if (!newStatus || !reportId) {
+        throw new FormError("Please provide the status and the report id");
+      }
+      if (
+        newStatus !== "pending" &&
+        newStatus !== "in_progress" &&
+        newStatus !== "completed"
+      ) {
+        throw new FormError("Invalid status");
+      }
+      if (roleToken !== "service_provider") {
+        throw new ForbiddenError();
+      }
+      const report = await reportRepository.retrieve(reportId);
+      if (!report) {
+        throw new DataNotExistsError("updateStatus", reportId);
+      }
+      if (report.assignedUser.toString() !== userId) {
+        throw new ForbiddenError();
+      }
+      if (report.status === newStatus) {
+        throw new FormError(
+          "The new status must be different from the old status"
+        );
+      }
+      const result = {
+        status: 200,
+        data: await reportRepository.updateStatus(reportId, newStatus),
+      };
+      if (!result.data) {
+        throw new FailedCRUD("Failed to update the report");
+      }
+      res.status(result.status).json("Report status updated");
+    } catch (error) {
+      switch (error.name) {
+        case "DataNotExistsError":
+        case "FormError":
+        case "FailedCRUD":
+        case "ForbiddenError":
+          res.status(error.status).json(error.message);
+          break;
+        default:
+          const serverError = new ServerError();
+          res.status(serverError.status).json(serverError.message);
+      }
+    }
+  },
   async deleteReport(req, res) {
     try {
       const reportId = req.body.id;
@@ -312,7 +394,6 @@ exports.reportController = {
       }
 
       if (roleWTD === "service_request") {
-        console.log(report.reportByUser.toString(), userIdWTD);
         if (report.reportByUser.toString() !== userIdWTD) {
           throw new ForbiddenError();
         }
@@ -333,8 +414,6 @@ exports.reportController = {
             report.reportByUser
           );
         }
-        // reportId, userSubmit, userAssigned;///////////////////////////////////////////////////////////////////////////
-        console.log("reportId, userSubmit, userAssigned");
         const result = await deleteReportAndUpdate(
           reportId,
           userSubmit,
@@ -509,9 +588,8 @@ exports.reportController = {
           res.status(error.status).json(error.message);
           break;
         default:
-          // const serverError = new ServerError();
-          // res.status(serverError.status).json(serverError.message);
-          res.status(error.status).json(error.message);
+          const serverError = new ServerError();
+          res.status(serverError.status).json(serverError.message);
       }
     }
   },
@@ -539,7 +617,6 @@ const removeReportFromUser = async (userId, reportId) => {
 };
 
 const deleteReportAndUpdate = async (reportId, userSubmit, userAssigned) => {
-  // console.log("heyyyyyyyy");
   const result = {
     status: 200,
     data: await reportRepository.delete(reportId),
