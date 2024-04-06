@@ -9,18 +9,6 @@ reportRouter.get(
   reportController.getAllReportsOfUser
 );
 
-// reportRouter.get(
-//   "/search/:profession",
-//   authenticateToken,
-//   reportController.searchReportsByProfession
-// );
-
-// reportRouter.get(
-//   "/status/:status",
-//   authenticateToken,
-//   reportController.getReportsByStatus
-// );
-
 reportRouter.get(
   "/past",
   authenticateToken,
@@ -34,6 +22,12 @@ reportRouter.put(
   "/updateDate/:id",
   authenticateToken,
   reportController.updateDateOfResolve
+);
+
+reportRouter.put(
+  "/updateStatus/:id",
+  authenticateToken,
+  reportController.updateStatus
 );
 
 reportRouter.delete("/", authenticateToken, reportController.deleteReport);

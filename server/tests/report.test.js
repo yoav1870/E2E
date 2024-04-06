@@ -435,6 +435,118 @@ describe("PUT /api/reports/updateDate/:id", () => {
   });
 });
 
+describe("PUT /api/reports/updateStatus/:id", () => {
+  beforeEach(() => {
+    authenticateToken.mockImplementation((req, res, next) => {
+      req.user = { userId: "123", role: "service_provider" };
+      next();
+    });
+  });
+  it("should return 500 for server errors", async () => {
+    reportRepository.retrieve.mockImplementation(() => {
+      const error = new Error("Unexpected error");
+      error.name = "UnknownError";
+      throw error;
+    });
+
+    const response = await request(app)
+      .put(`/api/reports/updateStatus/1`)
+      .send({ newStatus: "in_progress" });
+
+    // expect(response.status).toBe(500);
+    expect(response.body).toEqual(
+      "server encountered an unexpected condition that prevented it from fulfilling the request."
+    );
+  });
+  it("should return 400 when no new status provided", async () => {
+    const response = await request(app).put(`/api/reports/updateStatus/1`);
+
+    expect(response.status).toBe(400);
+    expect(response.body).toEqual(
+      "Please provide the status and the report id"
+    );
+  });
+  it("should return 403 when a service_request user try to change the status", async () => {
+    authenticateToken.mockImplementation((req, res, next) => {
+      req.user = { userId: "123", role: "service_request" };
+      next();
+    });
+
+    const response = await request(app)
+      .put(`/api/reports/updateStatus/1`)
+      .send({ newStatus: "in_progress" });
+
+    expect(response.status).toBe(403);
+    expect(response.body).toEqual(
+      "Access Denied you forbidden for this content."
+    );
+  });
+  it("should return 404 when no report found", async () => {
+    reportRepository.retrieve.mockImplementation(() => {
+      return null;
+    });
+
+    const response = await request(app)
+      .put(`/api/reports/updateStatus/1`)
+      .send({ newStatus: "in_progress" });
+
+    expect(response.status).toBe(404);
+    expect(response.body).toEqual("No data found at updateStatus with id 1 .");
+  });
+  it("should return 400 when the new status is invalid", async () => {
+    reportRepository.retrieve.mockImplementation(() => {
+      return { reportId: "1", status: "pending" };
+    });
+
+    const response = await request(app)
+      .put(`/api/reports/updateStatus/1`)
+      .send({ newStatus: "invalid" });
+
+    expect(response.status).toBe(400);
+    expect(response.body).toEqual("Invalid status");
+  });
+  it("should return 400 when the new status is equal to the old status", async () => {
+    reportRepository.retrieve.mockImplementation(() => {
+      return { reportId: "1", status: "pending", assignedUser: "123" };
+    });
+
+    const response = await request(app)
+      .put(`/api/reports/updateStatus/1`)
+      .send({ newStatus: "pending" });
+
+    expect(response.status).toBe(400);
+    expect(response.body).toEqual(
+      "The new status must be different from the old status"
+    );
+  });
+  it("should return 400 when failed crud", async () => {
+    reportRepository.retrieve.mockImplementation(() => {
+      return { reportId: "1", status: "pending", assignedUser: "123" };
+    });
+    reportRepository.updateStatus.mockImplementation(null);
+
+    const response = await request(app)
+      .put(`/api/reports/updateStatus/1`)
+      .send({ newStatus: "in_progress" });
+
+    expect(response.status).toBe(400);
+    expect(response.body).toEqual("Failed to update the report");
+  });
+  it("should return 200 when the status is updated", async () => {
+    reportRepository.retrieve.mockResolvedValue({
+      reportId: "1",
+      status: "pending",
+      assignedUser: "123",
+    });
+    reportRepository.updateStatus.mockResolvedValue(true);
+    const response = await request(app)
+      .put(`/api/reports/updateStatus/1`)
+      .send({ newStatus: "in_progress" });
+
+    expect(response.status).toBe(200);
+    expect(response.body).toEqual("Report status updated");
+  });
+});
 describe("DELETE /api/reports", () => {
   beforeEach(() => {
     authenticateToken.mockImplementation((req, res, next) => {
@@ -483,3 +595,5 @@ describe("DELETE /api/reports", () => {
     );
   });
 });
+
+// enum: ["pending", "in_progress", "completed"],

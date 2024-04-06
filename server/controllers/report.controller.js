@@ -47,82 +47,7 @@ exports.reportController = {
       }
     }
   },
-  // async searchReportsByProfession(req, res) {
-  //   try {
-  //     const userId = req.user.userId;
-  //     const prof = req.params.profession;
-  //     if (!userId || !prof) {
-  //       throw new FormError("Please provide the user id and the profession");
-  //     }
-  //     const user = await UserRepository.retrieve(userId);
-  //     if (!user) {
-  //       throw new DataNotExistsError("searchReportsByProfession", userId);
-  //     }
-  //     const reports = await reportRepository.findReportsOfUser(user, false);
-  //     if (!reports || reports.length === 0) {
-  //       throw new NoDataError("searchReportsByProfession");
-  //     }
-  //     const result = {
-  //       status: 200,
-  //       data: reports.filter((report) => report.profession === prof),
-  //     };
 
-  //     if (result.data.length === 0) {
-  //       throw new NoDataError("searchReportsByProfession");
-  //     }
-
-  //     res.status(result.status).json(result.data);
-  //   } catch (error) {
-  //     switch (error.name) {
-  //       case "DataNotExistsError":
-  //       case "NoDataError":
-  //       case "FormError":
-  //         res.status(error.status).json(error.message);
-  //         break;
-  //       default:
-  //         const serverError = new ServerError();
-  //         res.status(serverError.status).json(serverError.message);
-  //     }
-  //   }
-  // },
-  // async getReportsByStatus(req, res) {
-  //   try {
-  //     const userId = req.user.userId;
-  //     const status = req.params.status;
-  //     if (!userId || !status) {
-  //       throw new FormError("Please provide the user id and the status");
-  //     }
-  //     const user = await UserRepository.retrieve(userId);
-  //     if (!user) {
-  //       throw new DataNotExistsError("getReportsByStatus", userId);
-  //     }
-  //     const reports = await reportRepository.findReportsOfUser(user, false);
-  //     if (!reports || reports.length === 0) {
-  //       throw new NoDataError("getReportsByStatus");
-  //     }
-  //     const result = {
-  //       status: 200,
-  //       data: reports.filter((report) => report.status === status),
-  //     };
-
-  //     if (result.data.length === 0) {
-  //       throw new NoDataError("getReportsByStatus");
-  //     }
-
-  //     res.status(result.status).json(result.data);
-  //   } catch (error) {
-  //     switch (error.name) {
-  //       case "DataNotExistsError":
-  //       case "NoDataError":
-  //       case "FormError":
-  //         res.status(error.status).json(error.message);
-  //         break;
-  //       default:
-  //         const serverError = new ServerError();
-  //         res.status(serverError.status).json(serverError.message);
-  //     }
-  //   }
-  // },
   async getOldReportsOfUser(req, res) {
     try {
       const userId = req.user.userId;
@@ -385,6 +310,60 @@ exports.reportController = {
         }
       }
       res.status(result.status).json("Report updated");
+    } catch (error) {
+      switch (error.name) {
+        case "DataNotExistsError":
+        case "FormError":
+        case "FailedCRUD":
+        case "ForbiddenError":
+          res.status(error.status).json(error.message);
+          break;
+        default:
+          const serverError = new ServerError();
+          res.status(serverError.status).json(serverError.message);
+      }
+    }
+  },
+  async updateStatus(req, res) {
+    try {
+      const userId = req.user.userId;
+      const roleToken = req.user.role;
+      const reportId = req.params.id;
+      const newStatus = req.body.newStatus;
+
+      if (!newStatus || !reportId) {
+        throw new FormError("Please provide the status and the report id");
+      }
+      if (
+        newStatus !== "pending" &&
+        newStatus !== "in_progress" &&
+        newStatus !== "completed"
+      ) {
+        throw new FormError("Invalid status");
+      }
+      if (roleToken !== "service_provider") {
+        throw new ForbiddenError();
+      }
+      const report = await reportRepository.retrieve(reportId);
+      if (!report) {
+        throw new DataNotExistsError("updateStatus", reportId);
+      }
+      if (report.assignedUser.toString() !== userId) {
+        throw new ForbiddenError();
+      }
+      if (report.status === newStatus) {
+        throw new FormError(
+          "The new status must be different from the old status"
+        );
+      }
+      const result = {
+        status: 200,
+        data: await reportRepository.updateStatus(reportId, newStatus),
+      };
+      if (!result.data) {
+        throw new FailedCRUD("Failed to update the report");
+      }
+      res.status(result.status).json("Report status updated");
     } catch (error) {
       switch (error.name) {
         case "DataNotExistsError":
