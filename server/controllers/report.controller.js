@@ -47,82 +47,82 @@ exports.reportController = {
       }
     }
   },
-  async searchReportsByProfession(req, res) {
-    try {
-      const userId = req.user.userId;
-      const prof = req.params.profession;
-      if (!userId || !prof) {
-        throw new FormError("Please provide the user id and the profession");
-      }
-      const user = await UserRepository.retrieve(userId);
-      if (!user) {
-        throw new DataNotExistsError("searchReportsByProfession", userId);
-      }
-      const reports = await reportRepository.findReportsOfUser(user, false);
-      if (!reports || reports.length === 0) {
-        throw new NoDataError("searchReportsByProfession");
-      }
-      const result = {
-        status: 200,
-        data: reports.filter((report) => report.profession === prof),
-      };
+  // async searchReportsByProfession(req, res) {
+  //   try {
+  //     const userId = req.user.userId;
+  //     const prof = req.params.profession;
+  //     if (!userId || !prof) {
+  //       throw new FormError("Please provide the user id and the profession");
+  //     }
+  //     const user = await UserRepository.retrieve(userId);
+  //     if (!user) {
+  //       throw new DataNotExistsError("searchReportsByProfession", userId);
+  //     }
+  //     const reports = await reportRepository.findReportsOfUser(user, false);
+  //     if (!reports || reports.length === 0) {
+  //       throw new NoDataError("searchReportsByProfession");
+  //     }
+  //     const result = {
+  //       status: 200,
+  //       data: reports.filter((report) => report.profession === prof),
+  //     };
 
-      if (result.data.length === 0) {
-        throw new NoDataError("searchReportsByProfession");
-      }
+  //     if (result.data.length === 0) {
+  //       throw new NoDataError("searchReportsByProfession");
+  //     }
 
-      res.status(result.status).json(result.data);
-    } catch (error) {
-      switch (error.name) {
-        case "DataNotExistsError":
-        case "NoDataError":
-        case "FormError":
-          res.status(error.status).json(error.message);
-          break;
-        default:
-          const serverError = new ServerError();
-          res.status(serverError.status).json(serverError.message);
-      }
-    }
-  },
-  async getReportsByStatus(req, res) {
-    try {
-      const userId = req.user.userId;
-      const status = req.params.status;
-      if (!userId || !status) {
-        throw new FormError("Please provide the user id and the status");
-      }
-      const user = await UserRepository.retrieve(userId);
-      if (!user) {
-        throw new DataNotExistsError("getReportsByStatus", userId);
-      }
-      const reports = await reportRepository.findReportsOfUser(user, false);
-      if (!reports || reports.length === 0) {
-        throw new NoDataError("getReportsByStatus");
-      }
-      const result = {
-        status: 200,
-        data: reports.filter((report) => report.status === status),
-      };
+  //     res.status(result.status).json(result.data);
+  //   } catch (error) {
+  //     switch (error.name) {
+  //       case "DataNotExistsError":
+  //       case "NoDataError":
+  //       case "FormError":
+  //         res.status(error.status).json(error.message);
+  //         break;
+  //       default:
+  //         const serverError = new ServerError();
+  //         res.status(serverError.status).json(serverError.message);
+  //     }
+  //   }
+  // },
+  // async getReportsByStatus(req, res) {
+  //   try {
+  //     const userId = req.user.userId;
+  //     const status = req.params.status;
+  //     if (!userId || !status) {
+  //       throw new FormError("Please provide the user id and the status");
+  //     }
+  //     const user = await UserRepository.retrieve(userId);
+  //     if (!user) {
+  //       throw new DataNotExistsError("getReportsByStatus", userId);
+  //     }
+  //     const reports = await reportRepository.findReportsOfUser(user, false);
+  //     if (!reports || reports.length === 0) {
+  //       throw new NoDataError("getReportsByStatus");
+  //     }
+  //     const result = {
+  //       status: 200,
+  //       data: reports.filter((report) => report.status === status),
+  //     };
 
-      if (result.data.length === 0) {
-        throw new NoDataError("getReportsByStatus");
-      }
+  //     if (result.data.length === 0) {
+  //       throw new NoDataError("getReportsByStatus");
+  //     }
 
-      res.status(result.status).json(result.data);
-    } catch (error) {
-      switch (error.name) {
-        case "DataNotExistsError":
-        case "NoDataError":
-        case "FormError":
-          res.status(error.status).json(error.message);
-          break;
-        default:
-          const serverError = new ServerError();
-          res.status(serverError.status).json(serverError.message);
-      }
-    }
-  },
+  //     res.status(result.status).json(result.data);
+  //   } catch (error) {
+  //     switch (error.name) {
+  //       case "DataNotExistsError":
+  //       case "NoDataError":
+  //       case "FormError":
+  //         res.status(error.status).json(error.message);
+  //         break;
+  //       default:
+  //         const serverError = new ServerError();
+  //         res.status(serverError.status).json(serverError.message);
+  //     }
+  //   }
+  // },
   async getOldReportsOfUser(req, res) {
     try {
       const userId = req.user.userId;
@@ -415,7 +415,6 @@ exports.reportController = {
       }
 
       if (roleWTD === "service_request") {
-        console.log(report.reportByUser.toString(), userIdWTD);
         if (report.reportByUser.toString() !== userIdWTD) {
           throw new ForbiddenError();
         }
@@ -610,9 +609,8 @@ exports.reportController = {
           res.status(error.status).json(error.message);
           break;
         default:
-          // const serverError = new ServerError();
-          // res.status(serverError.status).json(serverError.message);
-          res.status(error.status).json(error.message);
+          const serverError = new ServerError();
+          res.status(serverError.status).json(serverError.message);
       }
     }
   },
