@@ -95,7 +95,7 @@ const CreateReport = () => {
         minHeight: '100vh',
         paddingTop: '64px',
       }}>
-        <Typography variant="h4" sx={{ mb: 4 }}>Create Report</Typography>
+        <Typography variant="h4" sx={{ mb: 4  ,fontFamily:"Georgia, serif"}}>Create Report</Typography>
         <form onSubmit={formik.handleSubmit}>
         <TextField
             margin="normal"
@@ -169,9 +169,15 @@ const CreateReport = () => {
               shrink: true,
             }}
           />
-          <Button type="submit" variant="contained" sx={{ mt: 3, mb: 2 }}>
+          {/* <Button type="submit" variant="contained" sx={{ mt: 3, mb: 2 ,textTransform: "none"}}>
             Submit Report
-          </Button>
+          </Button> */}
+          <Box sx={{ display: 'flex', justifyContent: 'center', width: '100%', mt: 3, mb: 2 }}>
+  <Button type="submit" variant="contained" sx={{ textTransform: "none" }}>
+    Submit Report
+  </Button>
+</Box>
+
         </form>
       
       </Container>
