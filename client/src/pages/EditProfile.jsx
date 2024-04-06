@@ -69,10 +69,10 @@ const EditProfile = () => {
         </Typography>
       </Breadcrumbs>
     <Container maxWidth="sm" sx={{ marginTop: 5 }}>
-      <Typography variant="h4" align="center" gutterBottom>
+      <Typography variant="h4" align="center" fontFamily= '"Times New Roman", serif' gutterBottom>
         Edit Profile
       </Typography>
-      <Box component="form" onSubmit={handleSubmit}>
+      <Box component="form" onSubmit={handleSubmit}sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}>
         <TextField
           type="password"
           label="Old Password"
@@ -89,7 +89,7 @@ const EditProfile = () => {
           fullWidth
           margin="normal"
         />
-        <Button type="submit" variant="contained" sx={{ marginTop: 2 }}>
+        <Button type="submit" variant="contained" sx={{ marginTop: 2 ,justifyContent: "center", fontFamily: '"Times New Roman", serif'}}>
           Update Password
         </Button>
       </Box>
