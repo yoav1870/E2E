@@ -11,14 +11,14 @@ const StyledTextField = styled(TextField)({
   },
 });
 
-const SearchBar = ({ reports, onFilter }) => {
+const SearchBar = ({ reports, onSearch }) => {
   const [searchProfession, setSearchProfession] = useState('');
 
   const handleFilter = () => {
     const filteredReports = reports.filter((report) =>
       report.profession.toLowerCase().includes(searchProfession.toLowerCase())
     );
-    onFilter(filteredReports);
+    onSearch(filteredReports);
   };
 
   const handleKeyPress = (e) => {
