@@ -136,11 +136,13 @@ exports.userController = {
         if (result.data === null) {
           throw new FailedCRUD("Failed to create a user");
         }
-        const emailResult = await sendReportNotificationForCreateNewUser(
-          result.data.email
-        );
-        if (emailResult === null) {
-          console.error("Failed to send email");
+        if (process.env.NODE_ENV !== "test") {
+          const emailResult = await sendReportNotificationForCreateNewUser(
+            result.data.email
+          );
+          if (emailResult === null) {
+            console.error("Failed to send email");
+          }
         }
         res.status(result.status).json(result.data);
       } else {
@@ -232,14 +234,15 @@ exports.userController = {
         throw new FailedCRUD("Failed to update a user");
       }
 
-      const emailResult = await changePasswordAndNotify(
-        user.email,
-        user.username
-      );
-      if (emailResult === false) {
-        console.error("Failed to send email");
+      if (process.env.NODE_ENV !== "test") {
+        const emailResult = await changePasswordAndNotify(
+          user.email,
+          user.username
+        );
+        if (emailResult === false) {
+          console.error("Failed to send email");
+        }
       }
-
       res.status(result.status).json("Password has been updated");
     } catch (error) {
       switch (error.name) {
@@ -302,12 +305,14 @@ exports.userController = {
         if (result.data === null) {
           throw new FailedCRUD("Failed to delete a user");
         }
-        const emailResult = await deleteUserAndNotify(
-          user.email,
-          user.username
-        );
-        if (emailResult === null) {
-          console.error("Failed to send email");
+        if (process.env.NODE_ENV !== "test") {
+          const emailResult = await deleteUserAndNotify(
+            user.email,
+            user.username
+          );
+          if (emailResult === null) {
+            console.error("Failed to send email");
+          }
         }
         res.status(result.status).json("User has been deleted");
       }

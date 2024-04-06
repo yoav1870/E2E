@@ -9,17 +9,17 @@ reportRouter.get(
   reportController.getAllReportsOfUser
 );
 
-reportRouter.get(
-  "/search/:profession",
-  authenticateToken,
-  reportController.searchReportsByProfession
-);
+// reportRouter.get(
+//   "/search/:profession",
+//   authenticateToken,
+//   reportController.searchReportsByProfession
+// );
 
-reportRouter.get(
-  "/status/:status",
-  authenticateToken,
-  reportController.getReportsByStatus
-);
+// reportRouter.get(
+//   "/status/:status",
+//   authenticateToken,
+//   reportController.getReportsByStatus
+// );
 
 reportRouter.get(
   "/past",
