@@ -431,7 +431,7 @@ describe("DELETE /api/users/deleteUser", () => {
     const response = await request(app).delete(`/api/users/deleteUser`);
 
     expect(response.status).toBe(400);
-    expect(response.body).toEqual("Failed to delete a user");
+    expect(response.body).toEqual("failed to delete the user");
   });
 
   it("should return 200 and delete the user when there are no reports associated", async () => {

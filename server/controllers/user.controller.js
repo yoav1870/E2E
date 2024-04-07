@@ -1,6 +1,5 @@
 const { UserRepository } = require("../repositories/user.repository");
-const { reportController } = require("./report.controller");
-const { deleteUserAndNotify } = require("../middlewares/mailerConfig");
+const { deleteUserById } = require("../services/deleteUser");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const {
@@ -257,77 +256,6 @@ exports.userController = {
       }
     }
   },
-  // async deleteUser(req, res) {
-  //   try {
-  //     const userId = req.user.userId;
-
-  //     const user = await UserRepository.retrieve(userId);
-  //     if (!user) {
-  //       throw new DataNotExistsError("deleteUser", userId);
-  //     }
-
-  //     if (user.reports.length <= 0) {
-  //       const result = {
-  //         status: 200,
-  //         data: await UserRepository.delete(userId),
-  //       };
-  //       if (result.data === null) {
-  //         throw new FailedCRUD("Failed to delete a user");
-  //       }
-  //       res.status(result.status).json("User has been deleted");
-  //     } else {
-  //       const tempRes = {
-  //         status: (statusCode) => {
-  //           tempRes.statusCode = statusCode;
-  //           return tempRes;
-  //         },
-  //         json: (data) => {
-  //           tempRes.data = data;
-  //           return tempRes;
-  //         },
-  //       };
-  //       for (let i = 0; i < user.reports.length; i++) {
-  //         const tempReq = {
-  //           body: {
-  //             _id: user.reports[i],
-  //             whoDelete: user.role,
-  //           },
-  //         };
-  //         await reportController.deleteReport(tempReq, tempRes);
-  //         if (tempRes.statusCode !== 200) {
-  //           res.status(tempRes.statusCode).json(tempRes.data);
-  //         }
-  //       }
-  //       const result = {
-  //         status: 200,
-  //         data: await UserRepository.delete(userId),
-  //       };
-  //       if (result.data === null) {
-  //         throw new FailedCRUD("Failed to delete a user");
-  //       }
-  //       if (process.env.NODE_ENV !== "test") {
-  //         const emailResult = await deleteUserAndNotify(
-  //           user.email,
-  //           user.username
-  //         );
-  //         if (emailResult === null) {
-  //           console.error("Failed to send email");
-  //         }
-  //       }
-  //       res.status(result.status).json("User has been deleted");
-  //     }
-  //   } catch (error) {
-  //     switch (error.name) {
-  //       case "DataNotExistsError":
-  //       case "FailedCRUD":
-  //         res.status(error.status).json(error.message);
-  //         break;
-  //       default:
-  //         const serverError = new ServerError();
-  //         res.status(serverError.status).json(serverError.message);
-  //     }
-  //   }
-  // },
   async deleteUser(req, res) {
     try {
       const result = await deleteUserById(req.user.userId);
