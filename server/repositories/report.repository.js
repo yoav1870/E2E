@@ -23,4 +23,7 @@ exports.reportRepository = {
   findReportsOfUser(user, fetchOldReports) {
     return mongo.findReportsOfUser(user, fetchOldReports);
   },
+  updateStatus(reportId, newStatus) {
+    return mongo.updateStatus(reportId, newStatus);
+  },
 };

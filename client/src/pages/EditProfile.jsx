@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { Container, Typography, TextField, Button, Box } from '@mui/material';
+import { Container, Typography, TextField, Button, Box, Breadcrumbs,Link  } from '@mui/material';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import Header from '../component/Header';
-
+import { Link as RouterLink } from 'react-router-dom';
 const EditProfile = () => {
   const [oldPassword, setOldPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
@@ -34,33 +34,66 @@ const EditProfile = () => {
 
   return (
     <>
-      <Header />
-      <Container maxWidth="sm" sx={{ marginTop: 5 }}>
-        <Typography variant="h4" align="center" gutterBottom>
-          Edit Profile
+    < Header />
+    
+    <Breadcrumbs
+        aria-label="breadcrumb"
+        style={{ fontFamily: '"Times New Roman", serif' }}
+      >
+        <Link
+          component={RouterLink}
+          color="inherit"
+          to="/"
+          style={{ fontFamily: '"Times New Roman", serif', marginLeft: "5px" }}
+          underline="none"
+        >
+          Home
+        </Link>
+        <Link
+          component={RouterLink}
+          color="inherit"
+          to="/profile"
+          style={{ fontFamily: '"Times New Roman", serif', marginLeft: "5px" }}
+          underline="none"
+        >
+          profile
+        </Link>
+
+
+        <Typography
+          color="text.primary"
+          style={{ fontFamily: '"Times New Roman", serif' }}
+          to="/profile"
+        >
+         Edit profile
         </Typography>
-        <Box component="form" onSubmit={handleSubmit}>
-          <TextField
-            type="password"
-            label="Old Password"
-            value={oldPassword}
-            onChange={(e) => setOldPassword(e.target.value)}
-            fullWidth
-            margin="normal"
-          />
-          <TextField
-            type="password"
-            label="New Password"
-            value={newPassword}
-            onChange={(e) => setNewPassword(e.target.value)}
-            fullWidth
-            margin="normal"
-          />
-          <Button type="submit" variant="contained" sx={{ marginTop: 2 }}>
-            Update Password
-          </Button>
-        </Box>
-      </Container>
+      </Breadcrumbs>
+    <Container maxWidth="sm" sx={{ marginTop: 5 }}>
+      <Typography variant="h4" align="center" fontFamily= '"Times New Roman", serif' gutterBottom>
+        Edit Profile
+      </Typography>
+      <Box component="form" onSubmit={handleSubmit}sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}>
+        <TextField
+          type="password"
+          label="Old Password"
+          value={oldPassword}
+          onChange={(e) => setOldPassword(e.target.value)}
+          fullWidth
+          margin="normal"
+        />
+        <TextField
+          type="password"
+          label="New Password"
+          value={newPassword}
+          onChange={(e) => setNewPassword(e.target.value)}
+          fullWidth
+          margin="normal"
+        />
+        <Button type="submit" variant="contained" sx={{ marginTop: 2 ,justifyContent: "center", fontFamily: '"Times New Roman", serif'}}>
+          Update Password
+        </Button>
+      </Box>
+    </Container>
     </>
   );
 };

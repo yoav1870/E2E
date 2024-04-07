@@ -1,4 +1,3 @@
-// DateFilter.js
 import React, { useState, useEffect } from 'react';
 import { TextField, Grid, styled, IconButton, Collapse, Button, Divider } from '@mui/material';
 import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
@@ -53,9 +52,9 @@ const DateFilter = ({ reports, onFilter }) => {
             <FilterListIcon />
           </IconButton>
         </Grid>
-        <Grid item xs={12}>
+        <Grid item xs={12}  >
           <Collapse in={showFilter}>
-            <Grid container spacing={2}>
+            <Grid container spacing={2} justifyContent="center">
               <Grid item xs={12}>
                 <Divider sx={{ borderColor: '#1976d2', borderWidth: '1px' }} />
               </Grid>
@@ -75,11 +74,18 @@ const DateFilter = ({ reports, onFilter }) => {
                   slotProps={{ textField: { fullWidth: true } }}
                 />
               </Grid>
-              <Grid item xs={12} sm={3}>
-                <Button variant="outlined" onClick={handleResetFilter}>
-                  Reset Filter
-                </Button>
-              </Grid>
+              <Grid item xs={12} display="flex" justifyContent="center">
+  <Button
+    variant="outlined"
+    onClick={handleResetFilter}
+    sx={{
+      textTransform: 'none', // Prevents the text from being capitalized
+      marginTop: '8px', // Optional, for spacing
+    }}
+  >
+    Reset Filter
+  </Button>
+</Grid>
               <Grid item xs={12}>
                 <Divider sx={{ borderColor: '#1976d2', borderWidth: '1px' }} />
               </Grid>

@@ -30,8 +30,8 @@ const App = () => {
           <Box
           className="content"
           sx={{
-            flex: 1, // This will make sure that the content section grows to fill available space.
-            // Add additional styling for the content container as necessary
+            flex: 1,
+            
           }}
         >
         <Routes>

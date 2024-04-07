@@ -32,7 +32,7 @@ const ReportsHistory = () => {
     <>
       <Header />
       <Container maxWidth="lg" sx={{ mt: 4 }}>
-        <Typography variant="h4" align="center" gutterBottom>
+        <Typography variant="h4" align="center" gutterBottom fontFamily="Georgia, serif">
           Reports History
         </Typography>
         {loading ? (
