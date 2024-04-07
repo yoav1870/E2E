@@ -21,24 +21,55 @@ const UserProfile = () => {
     setOpenDialog(false);
   };
 
+  // const handleDeleteUser = async () => {
+  //   try {
+  //     const token = localStorage.getItem("token");
+  //     const userId = user.id; 
+  
+  //     console.log(userId); 
+  //     await axios.delete(`https://e2e-y8hj.onrender.com/api/users/deleteUser`, {
+  //       headers: {
+  //         Authorization: `Bearer ${token}`,
+  //       },
+  //     });
+  //     console.log('Navigating to sign-in page');
+  //     navigate('/sign-in');
+  //   } catch (error) {
+  //     console.error("Failed to delete user:", error);
+  //   }
+  //   setOpenDialog(false);
+  // };
   const handleDeleteUser = async () => {
     try {
       const token = localStorage.getItem("token");
-      const userId = user.id; 
-  
-      console.log(userId); 
-      await axios.delete(`https://e2e-y8hj.onrender.com/api/users/${userId}`, {
+    
+      console.log("User ID for deletion: ", user?.id); // Assuming 'user' state exists
+    
+      // Perform the deletion operation
+      await axios.delete(`https://e2e-y8hj.onrender.com/api/users/deleteUser`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
-      navigate('/sign-in');
+  
+      console.log('User deleted successfully. Navigating to sign-in page.');
+  
+      // Clear local storage or any state management tokens/user info here
+      localStorage.removeItem("token");
+      
+      // This part is already in your setup - just ensure the user is navigated away
+      // from a protected route to trigger the redirect to '/sign-in'
+      window.location.pathname = '/sign-in';
+  
     } catch (error) {
-      console.error("Failed to delete user:", error);
+      console.error("Failed to delete user: ", error);
+    } finally {
+      // Close any modal or state indicating deletion progress
+      setOpenDialog(false);
     }
-    setOpenDialog(false);
   };
   
+
 
   useEffect(() => {
     const fetchUserData = async () => {
