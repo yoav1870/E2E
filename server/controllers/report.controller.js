@@ -1,5 +1,6 @@
 const { reportRepository } = require("../repositories/report.repository");
 const { UserRepository } = require("../repositories/user.repository");
+const { deleteReportById } = require("../services/deleteReport");
 const {
   NoDataError,
   DataNotExistsError,
@@ -12,7 +13,6 @@ const {
 const {
   sendReportNotificationForCreateNewReport,
   sendUpdateDateOfResolveNotification,
-  deleteReportAndNotify,
 } = require("../middlewares/mailerConfig");
 
 exports.reportController = {
@@ -324,6 +324,7 @@ exports.reportController = {
       }
     }
   },
+
   async updateStatus(req, res) {
     try {
       const userId = req.user.userId;
@@ -378,207 +379,11 @@ exports.reportController = {
       }
     }
   },
+
   async deleteReport(req, res) {
     try {
-      const reportId = req.body.id;
-      const userIdWTD = req.user.userId;
-      const roleWTD = req.user.role;
-      if (!reportId) {
-        throw new FormError("Please provide the report id");
-      }
-
-      const report = await reportRepository.retrieve(reportId);
-
-      if (!report) {
-        throw new DataNotExistsError("deleteReport", reportId);
-      }
-
-      if (roleWTD === "service_request") {
-        if (report.reportByUser.toString() !== userIdWTD) {
-          throw new ForbiddenError();
-        }
-
-        const userAssigned = await UserRepository.retrieve(report.assignedUser);
-
-        if (!userAssigned) {
-          throw new DataNotExistsError(
-            "deleteReport, fetch the user assigned to the report",
-            report.assignedUser
-          );
-        }
-        const userSubmit = await UserRepository.retrieve(report.reportByUser);
-
-        if (!userSubmit) {
-          throw new DataNotExistsError(
-            "deleteReport, fetch the user that submit the report",
-            report.reportByUser
-          );
-        }
-        const result = await deleteReportAndUpdate(
-          reportId,
-          userSubmit,
-          userAssigned
-        );
-        const emailResult = await deleteReportAndNotify(
-          userSubmit.email,
-          userSubmit.username,
-          userAssigned.email,
-          userAssigned.username,
-          report.description,
-          "request_delete"
-        );
-
-        if (emailResult === null) {
-          console.error("Failed to send email");
-        }
-
-        res.status(result.status).json("Report deleted");
-      } else {
-        if (report.assignedUser.toString() !== userIdWTD) {
-          throw new ForbiddenError();
-        }
-
-        const userSubmit = await UserRepository.retrieve(report.reportByUser);
-
-        if (!userSubmit) {
-          throw new DataNotExistsError(
-            "deleteReport, fetch the user that submit the report",
-            report.reportByUser
-          );
-        }
-        const userAssigned = await UserRepository.retrieve(report.assignedUser);
-
-        if (!userAssigned) {
-          throw new DataNotExistsError(
-            "deleteReport, fetch the user assigned to the report",
-            report.assignedUser
-          );
-        }
-        const serviceProviders = await UserRepository.findNearbyAndByProfession(
-          report.location,
-          report.profession,
-          50
-        );
-        // there are no users to replace the service provider
-        if (!serviceProviders) {
-          const result = await deleteReportAndUpdate(
-            reportId,
-            userSubmit,
-            userAssigned
-          );
-
-          const emailResult = await deleteReportAndNotify(
-            userSubmit.email,
-            userSubmit.username,
-            userAssigned.email,
-            userAssigned.username,
-            report.description,
-            "provider_delete_but_no_provider_available"
-          );
-
-          if (emailResult === null) {
-            console.error("Failed to send email");
-          }
-
-          res.status(result.status).json("Report deleted");
-        }
-
-        serviceProviders.sort((a, b) => b.ranking - a.ranking);
-
-        let assignedServiceProvider = null;
-        for (const provider of serviceProviders) {
-          let isAvailable = true;
-          for (const reportId of provider.reports) {
-            if (!reportId) continue;
-            const report = await reportRepository.retrieve(reportId);
-            if (report) {
-              const reportDate = report.dateOfResolve;
-              if (reportDate.getTime() === report.dateOfResolve.getTime()) {
-                isAvailable = false;
-                break;
-              }
-            }
-          }
-          if (isAvailable) {
-            if (provider._id !== userAssigned) {
-              assignedServiceProvider = provider;
-              break;
-            }
-          }
-        }
-
-        // only replacement is the same service provider
-
-        if (assignedServiceProvider === null) {
-          const result = await deleteReportAndUpdate(
-            reportId,
-            userSubmit,
-            userAssigned
-          );
-
-          const emailResult = await deleteReportAndNotify(
-            userSubmit.email,
-            userSubmit.username,
-            userIdWTD.email,
-            userIdWTD.username,
-            report.description,
-            "provider_delete_but_no_provider_available"
-          );
-
-          if (emailResult === null) {
-            console.error("Failed to send email");
-          }
-
-          res.status(result.status).json("Report deleted");
-        } else {
-          assignedServiceProvider.reports.push(report._id);
-
-          if (assignedServiceProvider.ranking < 5) {
-            assignedServiceProvider.ranking += 1;
-          }
-
-          const updateProviderReports = await UserRepository.updateReports(
-            assignedServiceProvider._id,
-            assignedServiceProvider.reports,
-            assignedServiceProvider.ranking
-          );
-
-          if (!updateProviderReports) {
-            throw new FailedCRUD("Failed to update the service provider");
-          }
-
-          await removeReportFromUser(userIdWTD, reportId);
-
-          const result = {
-            status: 200,
-            data: await reportRepository.updateAssignedTo(
-              reportId,
-              assignedServiceProvider._id
-            ),
-          };
-
-          if (!result.data) {
-            throw new FailedCRUD("Failed to update the report");
-          }
-
-          const emailResult = await deleteReportAndNotify(
-            userSubmit.email,
-            userSubmit.username,
-            userAssigned.email,
-            userAssigned.username,
-            report.description,
-            "report_transfered_to_another_service_provider"
-          );
-
-          if (emailResult === null) {
-            console.error("Failed to send email");
-          }
-
-          res
-            .status(result.status)
-            .json("Report transfered to another service provider");
-        }
-      }
+      const result = await deleteReportById(req.body.id, req.user.userId);
+      res.status(result.status).json(result.message);
     } catch (error) {
       switch (error.name) {
         case "DataNotExistsError":
@@ -595,41 +400,7 @@ exports.reportController = {
   },
 };
 
-// FUNCS:
-
-const removeReportFromUser = async (userId, reportId) => {
-  const user = await UserRepository.retrieve(userId);
-  const indexReport = user.reports.indexOf(reportId);
-  if (indexReport > -1) {
-    user.reports.splice(indexReport, 1);
-    if ((user.role = "service_provider")) {
-      if (user.ranking > 1) user.ranking -= 1;
-    }
-    const updateResult = await UserRepository.updateReports(
-      user._id,
-      user.reports,
-      user.ranking
-    );
-    if (!updateResult) {
-      throw new FailedCRUD("Failed to update the user");
-    }
-  }
-};
-
-const deleteReportAndUpdate = async (reportId, userSubmit, userAssigned) => {
-  const result = {
-    status: 200,
-    data: await reportRepository.delete(reportId),
-  };
-  if (!result.data) {
-    throw new FailedCRUD("Failed to delete the report");
-  }
-  await removeReportFromUser(userSubmit._id, reportId);
-  await removeReportFromUser(userAssigned._id, reportId);
-
-  return result;
-};
-
+// Find available service provider
 const findAvailableServiceProvider = async (serviceProviders, body) => {
   let assignedServiceProvider = null;
   const newReportDate = new Date(body.dateOfResolve);
