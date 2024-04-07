@@ -34,33 +34,33 @@ const EditProfile = () => {
 
   return (
     <>
-    < Header />
-    <Container maxWidth="sm" sx={{ marginTop: 5 }}>
-      <Typography variant="h4" align="center" gutterBottom>
-        Edit Profile
-      </Typography>
-      <Box component="form" onSubmit={handleSubmit}>
-        <TextField
-          type="password"
-          label="Old Password"
-          value={oldPassword}
-          onChange={(e) => setOldPassword(e.target.value)}
-          fullWidth
-          margin="normal"
-        />
-        <TextField
-          type="password"
-          label="New Password"
-          value={newPassword}
-          onChange={(e) => setNewPassword(e.target.value)}
-          fullWidth
-          margin="normal"
-        />
-        <Button type="submit" variant="contained" sx={{ marginTop: 2 }}>
-          Update Password
-        </Button>
-      </Box>
-    </Container>
+      <Header />
+      <Container maxWidth="sm" sx={{ marginTop: 5 }}>
+        <Typography variant="h4" align="center" gutterBottom>
+          Edit Profile
+        </Typography>
+        <Box component="form" onSubmit={handleSubmit}>
+          <TextField
+            type="password"
+            label="Old Password"
+            value={oldPassword}
+            onChange={(e) => setOldPassword(e.target.value)}
+            fullWidth
+            margin="normal"
+          />
+          <TextField
+            type="password"
+            label="New Password"
+            value={newPassword}
+            onChange={(e) => setNewPassword(e.target.value)}
+            fullWidth
+            margin="normal"
+          />
+          <Button type="submit" variant="contained" sx={{ marginTop: 2 }}>
+            Update Password
+          </Button>
+        </Box>
+      </Container>
     </>
   );
 };

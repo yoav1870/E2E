@@ -8,8 +8,8 @@ const SignIn = () => {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    const email = event.currentTarget.email.value;
-    const password = event.currentTarget.password.value;
+    const email = event.target.elements.email.value;
+    const password = event.target.elements.password.value;
 
     try {
       const response = await axios.post(
@@ -26,7 +26,7 @@ const SignIn = () => {
       );
       const { token } = response.data;
       localStorage.setItem("token", token);
-    
+
       window.location.href = "/home";
     } catch (error) {
       if (error.response) {
@@ -67,7 +67,7 @@ const SignIn = () => {
       <Typography component="h1" variant="h6" fontSize="1rem">
         Sign In
       </Typography>
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit} data-testid="signin-form">
         <TextField
           margin="normal"
           required

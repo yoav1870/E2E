@@ -28,10 +28,10 @@ const Information = () => {
             },
           });
           const reports = reportsResponse.data;
-          searchQueries = reports.map(report => `${report.profession} ${report.description}`);
+          searchQueries = reports.slice(0, 5).map(report => `${report.profession} ${report.description}`);
         }
 
-        // const youtubeApiKey = "AIzaSyAkUl6glORD9H5Futo0QktijzL2j2mLmbE";
+        const youtubeApiKey = 'AIzaSyAkUl6glORD9H5Futo0QktijzL2j2mLmbE';
         const videoPromises = searchQueries.map(async (query) => {
           const youtubeResponse = await axios.get(`https://www.googleapis.com/youtube/v3/search?part=snippet&q=${query}&type=video&key=${youtubeApiKey}&maxResults=1`);
           return youtubeResponse.data.items[0];
