@@ -1,6 +1,10 @@
 const { UserRepository } = require("../repositories/user.repository");
 const { deleteReportById } = require("../services/deleteReport");
-const { FailedCRUD, DataNotExistsError } = require("../errors/general.error");
+const {
+  FailedCRUD,
+  DataNotExistsError,
+  FormError,
+} = require("../errors/general.error");
 const { deleteUserAndNotify } = require("../middlewares/mailerConfig");
 
 const deleteUserById = async (userId) => {

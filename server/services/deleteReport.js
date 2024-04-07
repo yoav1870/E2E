@@ -113,7 +113,7 @@ const deleteReportById = async (reportId, actingUserId) => {
         }
       }
       if (isAvailable) {
-        if (provider._id !== userAssigned) {
+        if (provider._id !== actingUser) {
           assignedServiceProvider = provider;
           break;
         }

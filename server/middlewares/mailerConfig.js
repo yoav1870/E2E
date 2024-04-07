@@ -185,6 +185,7 @@ const deleteReportAndNotify = async (
       };
       try {
         await transporter.sendMail(mailOptionsTransferred);
+        await transporter.sendMail(mailOptionsTransferredRequestor);
         console.log(`Email sent to new provider: ${emailProvider}`);
         return true;
       } catch (error) {
