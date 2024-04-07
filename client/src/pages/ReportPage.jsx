@@ -422,8 +422,10 @@ const ReportPage = () => {
       <Header />
       <Breadcrumbs
         aria-label="breadcrumb"
-        style={{ fontFamily: '"Times New Roman", serif', marginLeft: "20px" }}
-      >
+        sx={{
+          fontFamily: '"Times New Roman", serif', marginLeft: '10px', 
+          display: { xs: 'none', sm: 'flex' },
+      }}      >      
         <Link component={RouterLink} color="inherit" to="/" underline="none">
           Home
         </Link>

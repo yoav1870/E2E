@@ -38,13 +38,15 @@ const EditProfile = () => {
     
     <Breadcrumbs
         aria-label="breadcrumb"
-        style={{ fontFamily: '"Times New Roman", serif' }}
-      >
+        sx={{
+          fontFamily: '"Times New Roman", serif', marginLeft: '10px',
+          display: { xs: 'none', sm: 'flex' },
+      }}      >
         <Link
           component={RouterLink}
           color="inherit"
           to="/"
-          style={{ fontFamily: '"Times New Roman", serif', marginLeft: "5px" }}
+          style={{ fontFamily: '"Times New Roman", serif' }}
           underline="none"
         >
           Home
@@ -58,8 +60,6 @@ const EditProfile = () => {
         >
           profile
         </Link>
-
-
         <Typography
           color="text.primary"
           style={{ fontFamily: '"Times New Roman", serif' }}
@@ -89,7 +89,8 @@ const EditProfile = () => {
           fullWidth
           margin="normal"
         />
-        <Button type="submit" variant="contained" sx={{ marginTop: 2 ,justifyContent: "center", fontFamily: '"Times New Roman", serif'}}>
+        <Button type="submit" variant="contained" sx={{ marginTop: 2 ,justifyContent: "center",  fontFamily: "'Tahoma', sans-serif",
+      textTransform: 'none', }}>
           Update Password
         </Button>
       </Box>

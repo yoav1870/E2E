@@ -34,7 +34,7 @@ const SignUp = () => {
             photo: '',
         },
         validationSchema: validationSchema,
-        onSubmit: async (values, { setSubmitting }) => {
+        onSubmit: async (values, { setSubmitting }) => {      
             const dataToSend = {
                 ...values,
                 location: {
