@@ -13,7 +13,7 @@ const ReportsHistory = () => {
       setLoading(true);
       try {
         const token = localStorage.getItem('token');
-        const response = await axios.get('http://localhost:3000/api/reports/past', {
+        const response = await axios.get('https://e2e-y8hj.onrender.com/api/reports/past', {
           headers: { Authorization: `Bearer ${token}` },
         });
         setReports(response.data);

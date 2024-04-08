@@ -12,6 +12,9 @@ import {
     Breadcrumbs,
     Link,
     CardMedia,
+    MenuItem,
+    Collapse,
+    Alert,
 } from "@mui/material";
 import axios from "axios";
 import Header from "../component/Header";
@@ -27,12 +30,49 @@ const ReportPage = () => {
     const [showUpdateField, setShowUpdateField] = useState(false);
     const [userDetails, setUserDetails] = useState(null);
     const [userRole, setUserRole] = useState(null);
+    const [selectedStatus, setSelectedStatus] = useState(report?.status || "");
+    const [statusUpdateMessage, setStatusUpdateMessage] = useState("");
+    const [showStatusUpdateMessage, setShowStatusUpdateMessage] = useState(false);
+
+    const handleStatusChange = (event) => {
+        setSelectedStatus(event.target.value);
+    };
+
+    const updateReportStatus = async () => {
+        try {
+            const token = localStorage.getItem('token');
+            await axios.put(
+                `https://e2e-y8hj.onrender.com/api/reports/updateStatus/${id}`,
+                { newStatus: selectedStatus },
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        'Content-Type': 'application/json',
+                    },
+                }
+            );
+            setStatusUpdateMessage("Report status updated successfully.");
+            setShowStatusUpdateMessage(true);
+            setReport({ ...report, status: selectedStatus }); // Update the local report state
+            setTimeout(() => {
+                setShowStatusUpdateMessage(false);
+            }, 2000);
+        } catch (error) {
+            console.error('Failed to update report status:', error);
+            setStatusUpdateMessage("Failed to update the report status.");
+            setShowStatusUpdateMessage(true);
+            setTimeout(() => {
+                setShowStatusUpdateMessage(false);
+            }, 2000);
+        }
+    };
+
 
     useEffect(() => {
         const fetchUserDetailsAndRole = async () => {
             try {
                 const token = localStorage.getItem('token');
-                const userResponse = await axios.get('http://localhost:3000/api/users/home', {
+                const userResponse = await axios.get('https://e2e-y8hj.onrender.com/api/users/home', {
                     headers: {
                         Authorization: `Bearer ${token}`,
                     },
@@ -41,7 +81,7 @@ const ReportPage = () => {
 
                 if (report) {
                     const userId = userResponse.data.role === 'service_provider' ? report.reportByUser : report.assignedUser;
-                    const userDetailsResponse = await axios.get(`http://localhost:3000/api/users/${userId}`, {
+                    const userDetailsResponse = await axios.get(`https://e2e-y8hj.onrender.com/api/users/${userId}`, {
                         headers: {
                             Authorization: `Bearer ${token}`,
                         },
@@ -60,7 +100,7 @@ const ReportPage = () => {
         const fetchReport = async () => {
             try {
                 const token = localStorage.getItem('token');
-                const response = await axios.get(`http://localhost:3000/api/reports/${id}`, {
+                const response = await axios.get(`https://e2e-y8hj.onrender.com/api/reports/${id}`, {
                     headers: {
                         Authorization: `Bearer ${token}`,
                     },
@@ -85,7 +125,7 @@ const ReportPage = () => {
         try {
             const token = localStorage.getItem('token');
             await axios.put(
-                `http://localhost:3000/api/reports/updateDate/${id}`,
+                `https://e2e-y8hj.onrender.com/api/reports/updateDate/${id}`,
                 { newDateOfResolve: newResolveDate },
                 {
                     headers: { Authorization: `Bearer ${token}` },
@@ -104,7 +144,7 @@ const ReportPage = () => {
         try {
             const token = localStorage.getItem('token');
             await axios.delete(
-                `http://localhost:3000/api/reports/`,
+                `https://e2e-y8hj.onrender.com/api/reports/`,
                 {
                     data: { id },
                     headers: { Authorization: `Bearer ${token}` },
@@ -212,6 +252,35 @@ const ReportPage = () => {
                                 InputLabelProps={{ shrink: true }}
                             />
                         )}
+                        {userRole === 'service_provider' && (
+                            <>
+                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mt: 2 }}>
+                                    <TextField
+                                        select
+                                        label="Update Status"
+                                        value={selectedStatus}
+                                        onChange={handleStatusChange}
+                                        fullWidth
+                                    >
+                                        <MenuItem value="pending">Pending</MenuItem>
+                                        <MenuItem value="in_progress">In Progress</MenuItem>
+                                        <MenuItem value="completed">Completed</MenuItem>
+                                    </TextField>
+                                    <Button
+                                        variant="contained"
+                                        onClick={updateReportStatus}
+                                        sx={{ textTransform: 'none' }}
+                                    >
+                                        Update
+                                    </Button>
+                                </Box>
+                            </>
+                        )}
+                        <Collapse in={showStatusUpdateMessage}>
+                            <Alert severity={statusUpdateMessage.includes("successfully") ? "success" : "error"} sx={{ mt: 2 }}>
+                                {statusUpdateMessage}
+                            </Alert>
+                        </Collapse>
                         <Box
                             sx={{ display: "flex", justifyContent: "space-between", mt: 2 }}
                         >
@@ -231,6 +300,8 @@ const ReportPage = () => {
                                 Delete Report
                             </Button>{" "}
                         </Box>
+
+
                     </CardContent>
                 </Card>
 

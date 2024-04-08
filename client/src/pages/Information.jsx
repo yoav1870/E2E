@@ -10,7 +10,7 @@ const Information = () => {
     const fetchVideos = async () => {
       try {
         const token = localStorage.getItem('token');
-        const userResponse = await axios.get('http://localhost:3000/api/users/home', {
+        const userResponse = await axios.get('https://e2e-y8hj.onrender.com/api/users/home', {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -22,7 +22,7 @@ const Information = () => {
         if (user.role === 'service_provider') {
           searchQueries = [user.profession];
         } else {
-          const reportsResponse = await axios.get('http://localhost:3000/api/reports/home', {
+          const reportsResponse = await axios.get('https://e2e-y8hj.onrender.com/api/reports/home', {
             headers: {
               Authorization: `Bearer ${token}`,
             },

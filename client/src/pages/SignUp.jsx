@@ -67,7 +67,7 @@ const SignUp = () => {
                 }
             });
 
-            axios.post('http://localhost:3000/api/users/sign-up', formData, {
+            axios.post('https://e2e-y8hj.onrender.com/api/users/sign-up', formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                 },

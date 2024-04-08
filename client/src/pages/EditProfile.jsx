@@ -15,7 +15,7 @@ const EditProfile = () => {
     try {
       const token = localStorage.getItem('token');
       const response = await axios.put(
-        'http://localhost:3000/api/users/updatePassword',
+        'https://e2e-y8hj.onrender.com/api/users/updatePassword',
         { oldPassword, newPassword },
         {
           headers: {

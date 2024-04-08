@@ -29,7 +29,7 @@ const CreateReport = () => {
     const fetchUserData = async () => {
       try {
         const token = localStorage.getItem('token');
-        const response = await axios.get('http://localhost:3000/api/users/home', {
+        const response = await axios.get('https://e2e-y8hj.onrender.com/api/users/home', {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -82,7 +82,7 @@ const CreateReport = () => {
           formData.append('photo', selectedPhoto);
         }
 
-        await axios.post('http://localhost:3000/api/reports', formData, {
+        await axios.post('https://e2e-y8hj.onrender.com/api/reports', formData, {
           headers: {
             Authorization: `Bearer ${token}`,
             'Content-Type': 'multipart/form-data',
