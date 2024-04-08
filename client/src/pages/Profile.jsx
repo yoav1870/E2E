@@ -10,6 +10,7 @@ import {
   DialogContent,
   DialogContentText,
   DialogTitle,
+  Avatar,
 } from "@mui/material";
 
 const UserProfile = () => {
@@ -88,7 +89,11 @@ const UserProfile = () => {
         );
 
         const userLocation = userResponse.data.location.coordinates;
-        const googleMapsApiUrl = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${userLocation[1]},${userLocation[0]}&key=AIzaSyDDP0CzKiSUWI0tHWsPIZb4BHdE5j8BgQY`;
+        const googleMapsApiUrl = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${
+          userLocation[1]
+        },${userLocation[0]}&key=${
+          import.meta.env.REACT_APP_GOOGLE_MAPS_API_KEY
+        }`;
 
         const cityResponse = await axios.get(googleMapsApiUrl);
         const locationDescriptor = extractLocationDescriptor(cityResponse.data);
@@ -169,9 +174,6 @@ const UserProfile = () => {
         </Typography>
         <Paper elevation={3} sx={{ width: "100%", padding: 4 }}>
           <Box
-            component="img"
-            src={user.photo}
-            alt="Profile photo"
             sx={{
               width: 100,
               height: 100,
@@ -180,7 +182,18 @@ const UserProfile = () => {
               display: "block",
               objectFit: "cover",
             }}
-          />
+          >
+            {user.photo ? (
+              <Avatar
+                alt="Profile Picture"
+                src={user.photo}
+                sx={{ width: 100, height: 100 }}
+              />
+            ) : (
+              <Avatar sx={{ width: 100, height: 100 }}></Avatar>
+            )}
+          </Box>
+
           <Typography
             variant="h6"
             fontWeight="bold"
