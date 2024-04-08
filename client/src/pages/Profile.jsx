@@ -4,7 +4,13 @@ import { useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
 import Header from "../component/Header";
 import LoadingComponent from "../component/Loading";
-import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material';
+import {
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+} from "@mui/material";
 
 const UserProfile = () => {
   const [user, setUser] = useState(null);
@@ -16,7 +22,7 @@ const UserProfile = () => {
   const handleClickOpen = () => {
     setOpenDialog(true);
   };
-  
+
   const handleClose = () => {
     setOpenDialog(false);
   };
@@ -24,10 +30,10 @@ const UserProfile = () => {
   // const handleDeleteUser = async () => {
   //   try {
   //     const token = localStorage.getItem("token");
-  //     const userId = user.id; 
-  
-  //     console.log(userId); 
-  //     await axios.delete(`http://localhost:3000/api/users/deleteUser`, {
+  //     const userId = user.id;
+
+  //     console.log(userId);
+  //     await axios.delete(`https://e2e-y8hj.onrender.com/api/users/deleteUser`, {
   //       headers: {
   //         Authorization: `Bearer ${token}`,
   //       },
@@ -42,25 +48,24 @@ const UserProfile = () => {
   const handleDeleteUser = async () => {
     try {
       const token = localStorage.getItem("token");
-    
+
       console.log("User ID for deletion: ", user?.id); // Assuming 'user' state exists
-    
+
       // Perform the deletion operation
-      await axios.delete(`http://localhost:3000/api/users/deleteUser`, {
+      await axios.delete(`https://e2e-y8hj.onrender.com/api/users/deleteUser`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
-  
-      console.log('User deleted successfully. Navigating to sign-in page.');
-  
+
+      console.log("User deleted successfully. Navigating to sign-in page.");
+
       // Clear local storage or any state management tokens/user info here
       localStorage.removeItem("token");
-      
+
       // This part is already in your setup - just ensure the user is navigated away
       // from a protected route to trigger the redirect to '/sign-in'
-      window.location.pathname = '/sign-in';
-  
+      window.location.pathname = "/sign-in";
     } catch (error) {
       console.error("Failed to delete user: ", error);
     } finally {
@@ -68,15 +73,13 @@ const UserProfile = () => {
       setOpenDialog(false);
     }
   };
-  
-
 
   useEffect(() => {
     const fetchUserData = async () => {
       try {
         const token = localStorage.getItem("token");
         const userResponse = await axios.get(
-          "http://localhost:3000/api/users/home",
+          "https://e2e-y8hj.onrender.com/api/users/home",
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -176,8 +179,8 @@ const UserProfile = () => {
               height: 100,
               borderRadius: "50%",
               margin: "auto",
-              display: 'block',
-              objectFit: 'cover',
+              display: "block",
+              objectFit: "cover",
             }}
           />
           <Typography
@@ -239,52 +242,56 @@ const UserProfile = () => {
               Edit Profile
             </Button>
           </Box> */}
-          <Box sx={{ display: "flex", justifyContent: "center", gap: 2, marginTop: 2 }}>
-  <Button
-    variant="contained"
-    onClick={handleEditProfile}
-    sx={{
-      fontFamily: "'Tahoma', sans-serif",
-      textTransform: 'none', 
-    }}
-  >
-    Edit Profile
-  </Button>
-  <Button
-    variant="contained"
-    color="error"
-    onClick={handleClickOpen}
-    sx={{
-      fontFamily: "'Tahoma', sans-serif",
-      textTransform: 'none', 
-    }}
-  >
-    Delete User
-  </Button>
-</Box>
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+              gap: 2,
+              marginTop: 2,
+            }}
+          >
+            <Button
+              variant="contained"
+              onClick={handleEditProfile}
+              sx={{
+                fontFamily: "'Tahoma', sans-serif",
+                textTransform: "none",
+              }}
+            >
+              Edit Profile
+            </Button>
+            <Button
+              variant="contained"
+              color="error"
+              onClick={handleClickOpen}
+              sx={{
+                fontFamily: "'Tahoma', sans-serif",
+                textTransform: "none",
+              }}
+            >
+              Delete User
+            </Button>
+          </Box>
 
-<Dialog
-  open={openDialog}
-  onClose={handleClose}
-  aria-labelledby="alert-dialog-title"
-  aria-describedby="alert-dialog-description"
->
-  <DialogTitle id="alert-dialog-title">
-    {"Are you sure?"}
-  </DialogTitle>
-  <DialogContent>
-    <DialogContentText id="alert-dialog-description">
-      Deleting your account is irreversible. Do you want to proceed?
-    </DialogContentText>
-  </DialogContent>
-  <DialogActions>
-    <Button onClick={handleClose}>No</Button>
-    <Button onClick={handleDeleteUser} autoFocus>
-      Yes
-    </Button>
-  </DialogActions>
-</Dialog>
-
+          <Dialog
+            open={openDialog}
+            onClose={handleClose}
+            aria-labelledby="alert-dialog-title"
+            aria-describedby="alert-dialog-description"
+          >
+            <DialogTitle id="alert-dialog-title">{"Are you sure?"}</DialogTitle>
+            <DialogContent>
+              <DialogContentText id="alert-dialog-description">
+                Deleting your account is irreversible. Do you want to proceed?
+              </DialogContentText>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={handleClose}>No</Button>
+              <Button onClick={handleDeleteUser} autoFocus>
+                Yes
+              </Button>
+            </DialogActions>
+          </Dialog>
         </Paper>
       </Container>
     </>

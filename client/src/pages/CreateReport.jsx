@@ -1,43 +1,56 @@
-import React, { useState, useEffect } from 'react';
-import { Collapse, Container, Typography, TextField, Button, FormControl, InputLabel, Select, MenuItem, Box } from '@mui/material';
-import { useFormik } from 'formik';
-import * as yup from 'yup';
-import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
-import Header from '../component/Header';
-import LoadingComponent from '../component/Loading';
+import React, { useState, useEffect } from "react";
+import {
+  Collapse,
+  Container,
+  Typography,
+  TextField,
+  Button,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  Box,
+} from "@mui/material";
+import { useFormik } from "formik";
+import * as yup from "yup";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import Header from "../component/Header";
+import LoadingComponent from "../component/Loading";
 
 const professions = ["electrician", "plumber", "Carpenter", "Technician"];
 
 const validationSchema = yup.object({
-  description: yup.string().required('Description is required'),
-  profession: yup.string().required('Profession is required'),
-  urgency: yup.number().min(1).max(5).required('Urgency is required'),
-  dateOfResolve: yup.date().required('Date of Resolve is required').nullable(),
-  range: yup.number().min(1).max(100).required('Range is required'),
+  description: yup.string().required("Description is required"),
+  profession: yup.string().required("Profession is required"),
+  urgency: yup.number().min(1).max(5).required("Urgency is required"),
+  dateOfResolve: yup.date().required("Date of Resolve is required").nullable(),
+  range: yup.number().min(1).max(100).required("Range is required"),
 });
 
 const CreateReport = () => {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
-  const [location, setLocation] = useState('');
-  const [serviceProviderError, setServiceProviderError] = useState('');
+  const [location, setLocation] = useState("");
+  const [serviceProviderError, setServiceProviderError] = useState("");
   const [selectedPhoto, setSelectedPhoto] = useState(null);
-
 
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const token = localStorage.getItem('token');
-        const response = await axios.get('http://localhost:3000/api/users/home', {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+        const token = localStorage.getItem("token");
+        const response = await axios.get(
+          "https://e2e-y8hj.onrender.com/api/users/home",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
         setUser(response.data);
-        setLocation(response.data.location.coordinates.join(','));
+        setLocation(response.data.location.coordinates.join(","));
       } catch (error) {
-        console.error('Failed to fetch user data:', error);
+        console.error("Failed to fetch user data:", error);
       }
     };
 
@@ -46,58 +59,66 @@ const CreateReport = () => {
 
   const formik = useFormik({
     initialValues: {
-      description: '',
-      profession: '',
-      urgency: '',
-      dateOfResolve: '',
-      range: '',
+      description: "",
+      profession: "",
+      urgency: "",
+      dateOfResolve: "",
+      range: "",
     },
     validationSchema,
     onSubmit: async (values) => {
       try {
         const updatedValues = {
           ...values,
-          dateOfResolve: values.dateOfResolve ? new Date(values.dateOfResolve).toISOString() : null,
+          dateOfResolve: values.dateOfResolve
+            ? new Date(values.dateOfResolve).toISOString()
+            : null,
           location: {
-            type: 'Point',
-            coordinates: location.split(',').map(coord => parseFloat(coord.trim())),
+            type: "Point",
+            coordinates: location
+              .split(",")
+              .map((coord) => parseFloat(coord.trim())),
           },
           reportByUser: user._id,
         };
 
-        const token = localStorage.getItem('token');
+        const token = localStorage.getItem("token");
 
         const formData = new FormData();
         Object.entries(updatedValues).forEach(([key, value]) => {
-          if (key === 'location') {
-            formData.append('location[type]', value.type);
-            formData.append('location[coordinates][0]', value.coordinates[0]);
-            formData.append('location[coordinates][1]', value.coordinates[1]);
+          if (key === "location") {
+            formData.append("location[type]", value.type);
+            formData.append("location[coordinates][0]", value.coordinates[0]);
+            formData.append("location[coordinates][1]", value.coordinates[1]);
           } else {
             formData.append(key, value);
           }
         });
 
         if (selectedPhoto) {
-          formData.append('photo', selectedPhoto);
+          formData.append("photo", selectedPhoto);
         }
 
-        await axios.post('http://localhost:3000/api/reports', formData, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'multipart/form-data',
-          },
-        });
-        navigate('/home');
+        await axios.post(
+          "https://e2e-y8hj.onrender.com/api/reports",
+          formData,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "multipart/form-data",
+            },
+          }
+        );
+        navigate("/home");
       } catch (error) {
         // Check if the error is from Axios and has a response with the expected data
-        if (error.response && typeof error.response.data === 'string') {
+        if (error.response && typeof error.response.data === "string") {
           setServiceProviderError(error.response.data);
         } else {
-          console.error('Error creating report:', error);
+          console.error("Error creating report:", error);
         }
       }
-    }
+    },
   });
 
   if (!user) {
@@ -107,18 +128,23 @@ const CreateReport = () => {
   return (
     <>
       <Header />
-      <Container component="main" sx={{
-        mx: 'auto',
-        p: 2,
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        minHeight: '100vh',
-        paddingTop: '64px',
-        width: { xs: '100%', sm: '600px', md: '500px' },
-      }}>
-        <Typography variant="h4" sx={{ mb: 4, fontFamily: "Georgia, serif" }}>Create Report</Typography>
+      <Container
+        component="main"
+        sx={{
+          mx: "auto",
+          p: 2,
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          minHeight: "100vh",
+          paddingTop: "64px",
+          width: { xs: "100%", sm: "600px", md: "500px" },
+        }}
+      >
+        <Typography variant="h4" sx={{ mb: 4, fontFamily: "Georgia, serif" }}>
+          Create Report
+        </Typography>
         <form onSubmit={formik.handleSubmit}>
           <TextField
             margin="normal"
@@ -130,7 +156,9 @@ const CreateReport = () => {
             autoFocus
             value={formik.values.description}
             onChange={formik.handleChange}
-            error={formik.touched.description && Boolean(formik.errors.description)}
+            error={
+              formik.touched.description && Boolean(formik.errors.description)
+            }
             helperText={formik.touched.description && formik.errors.description}
           />
           <FormControl fullWidth margin="normal">
@@ -141,10 +169,14 @@ const CreateReport = () => {
               name="profession"
               value={formik.values.profession}
               onChange={formik.handleChange}
-              error={formik.touched.profession && Boolean(formik.errors.profession)}
+              error={
+                formik.touched.profession && Boolean(formik.errors.profession)
+              }
             >
               {professions.map((profession) => (
-                <MenuItem key={profession} value={profession}>{profession}</MenuItem>
+                <MenuItem key={profession} value={profession}>
+                  {profession}
+                </MenuItem>
               ))}
             </Select>
           </FormControl>
@@ -200,8 +232,20 @@ const CreateReport = () => {
               shrink: true,
             }}
           />
-          <Box sx={{ display: 'flex', justifyContent: 'center', width: '100%', mt: 3, mb: 2 }}>
-            <Button type="submit" variant="contained" sx={{ textTransform: "none" }}>
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+              width: "100%",
+              mt: 3,
+              mb: 2,
+            }}
+          >
+            <Button
+              type="submit"
+              variant="contained"
+              sx={{ textTransform: "none" }}
+            >
               Submit Report
             </Button>
           </Box>

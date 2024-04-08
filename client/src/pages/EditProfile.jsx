@@ -1,21 +1,29 @@
-import React, { useState } from 'react';
-import { Container, Typography, TextField, Button, Box, Breadcrumbs,Link  } from '@mui/material';
-import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
-import Header from '../component/Header';
-import { Link as RouterLink } from 'react-router-dom';
+import React, { useState } from "react";
+import {
+  Container,
+  Typography,
+  TextField,
+  Button,
+  Box,
+  Breadcrumbs,
+  Link,
+} from "@mui/material";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import Header from "../component/Header";
+import { Link as RouterLink } from "react-router-dom";
 const EditProfile = () => {
-  const [oldPassword, setOldPassword] = useState('');
-  const [newPassword, setNewPassword] = useState('');
+  const [oldPassword, setOldPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem("token");
       const response = await axios.put(
-        'http://localhost:3000/api/users/updatePassword',
+        "https://e2e-y8hj.onrender.com/api/users/updatePassword",
         { oldPassword, newPassword },
         {
           headers: {
@@ -25,18 +33,18 @@ const EditProfile = () => {
       );
 
       console.log(response.data); // Password has been updated
-      navigate('/profile', { state: { passwordUpdated: true } });
+      navigate("/profile", { state: { passwordUpdated: true } });
     } catch (error) {
-      console.error('Failed to update password:', error);
+      console.error("Failed to update password:", error);
       // Handle error, display error message, etc.
     }
   };
 
   return (
     <>
-    < Header />
-    
-    <Breadcrumbs
+      <Header />
+
+      <Breadcrumbs
         aria-label="breadcrumb"
         style={{ fontFamily: '"Times New Roman", serif' }}
       >
@@ -59,41 +67,62 @@ const EditProfile = () => {
           profile
         </Link>
 
-
         <Typography
           color="text.primary"
           style={{ fontFamily: '"Times New Roman", serif' }}
           to="/profile"
         >
-         Edit profile
+          Edit profile
         </Typography>
       </Breadcrumbs>
-    <Container maxWidth="sm" sx={{ marginTop: 5 }}>
-      <Typography variant="h4" align="center" fontFamily= '"Times New Roman", serif' gutterBottom>
-        Edit Profile
-      </Typography>
-      <Box component="form" onSubmit={handleSubmit}sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}>
-        <TextField
-          type="password"
-          label="Old Password"
-          value={oldPassword}
-          onChange={(e) => setOldPassword(e.target.value)}
-          fullWidth
-          margin="normal"
-        />
-        <TextField
-          type="password"
-          label="New Password"
-          value={newPassword}
-          onChange={(e) => setNewPassword(e.target.value)}
-          fullWidth
-          margin="normal"
-        />
-        <Button type="submit" variant="contained" sx={{ marginTop: 2 ,justifyContent: "center", fontFamily: '"Times New Roman", serif'}}>
-          Update Password
-        </Button>
-      </Box>
-    </Container>
+      <Container maxWidth="sm" sx={{ marginTop: 5 }}>
+        <Typography
+          variant="h4"
+          align="center"
+          fontFamily='"Times New Roman", serif'
+          gutterBottom
+        >
+          Edit Profile
+        </Typography>
+        <Box
+          component="form"
+          onSubmit={handleSubmit}
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            width: "100%",
+          }}
+        >
+          <TextField
+            type="password"
+            label="Old Password"
+            value={oldPassword}
+            onChange={(e) => setOldPassword(e.target.value)}
+            fullWidth
+            margin="normal"
+          />
+          <TextField
+            type="password"
+            label="New Password"
+            value={newPassword}
+            onChange={(e) => setNewPassword(e.target.value)}
+            fullWidth
+            margin="normal"
+          />
+          <Button
+            type="submit"
+            variant="contained"
+            sx={{
+              marginTop: 2,
+              justifyContent: "center",
+              fontFamily: '"Times New Roman", serif',
+            }}
+          >
+            Update Password
+          </Button>
+        </Box>
+      </Container>
     </>
   );
 };

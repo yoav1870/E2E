@@ -1,25 +1,35 @@
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
-import { Container, Typography, CircularProgress, Card, CardContent, Grid } from '@mui/material';
-import Header from '../component/Header';
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import {
+  Container,
+  Typography,
+  CircularProgress,
+  Card,
+  CardContent,
+  Grid,
+} from "@mui/material";
+import Header from "../component/Header";
 
 const ReportsHistory = () => {
   const [reports, setReports] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
 
   useEffect(() => {
     const fetchReportsHistory = async () => {
       setLoading(true);
       try {
-        const token = localStorage.getItem('token');
-        const response = await axios.get('http://localhost:3000/api/reports/past', {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const token = localStorage.getItem("token");
+        const response = await axios.get(
+          "https://e2e-y8hj.onrender.com/api/reports/past",
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
         setReports(response.data);
       } catch (err) {
-        console.error('Failed to fetch reports history:', err);
-        setError('Failed to load reports history. Please try again later.');
+        console.error("Failed to fetch reports history:", err);
+        setError("Failed to load reports history. Please try again later.");
       } finally {
         setLoading(false);
       }
@@ -32,13 +42,20 @@ const ReportsHistory = () => {
     <>
       <Header />
       <Container maxWidth="lg" sx={{ mt: 4 }}>
-        <Typography variant="h4" align="center" gutterBottom fontFamily="Georgia, serif">
+        <Typography
+          variant="h4"
+          align="center"
+          gutterBottom
+          fontFamily="Georgia, serif"
+        >
           Reports History
         </Typography>
         {loading ? (
           <CircularProgress />
         ) : error ? (
-          <Typography variant="body1" color="error">{error}</Typography>
+          <Typography variant="body1" color="error">
+            {error}
+          </Typography>
         ) : (
           <Grid container spacing={3}>
             {reports.map((report) => (
@@ -46,8 +63,13 @@ const ReportsHistory = () => {
                 <Card>
                   <CardContent>
                     <Typography variant="h6">{report.description}</Typography>
-                    <Typography color="text.secondary">Resolve Date: {new Date(report.dateOfResolve).toLocaleDateString()}</Typography>
-                    <Typography color="text.secondary">Status: {report.status}</Typography>
+                    <Typography color="text.secondary">
+                      Resolve Date:{" "}
+                      {new Date(report.dateOfResolve).toLocaleDateString()}
+                    </Typography>
+                    <Typography color="text.secondary">
+                      Status: {report.status}
+                    </Typography>
                   </CardContent>
                 </Card>
               </Grid>

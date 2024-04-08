@@ -168,4 +168,8 @@ module.exports = class MongoStorage {
   findByEmail(email) {
     return this.Model.findOne({ email });
   }
+
+  getAllProfessionals() {
+    return this.Model.find({ role: "service_provider" });
+  }
 };

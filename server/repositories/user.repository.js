@@ -29,4 +29,7 @@ exports.UserRepository = {
   findByEmail(email) {
     return mongo.findByEmail(email);
   },
+  getAllProfessionals() {
+    return mongo.getAllProfessionals();
+  },
 };

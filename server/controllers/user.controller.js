@@ -9,6 +9,7 @@ const {
   FailedCRUD,
   ServerError,
   SignInError,
+  NoDataError,
 } = require("../errors/general.error");
 const { InvalidRoleError } = require("../errors/user.error");
 const {
@@ -95,6 +96,28 @@ exports.userController = {
       }
     }
   },
+
+  async getAllProfessionals(req, res) {
+    try {
+      const users = await UserRepository.getAllProfessionals();
+      if (!users || users.length === 0) {
+        throw new NoDataError("getAllProfessionals");
+      }
+      const professionTypes = users.map((user) => user.profession);
+      const uniqueProfessionTypes = Array.from(new Set(professionTypes)); // set delete duplicates
+
+      res.status(200).json(uniqueProfessionTypes);
+    } catch (error) {
+      switch (error.name) {
+        case "NoDataError":
+          break;
+        default:
+          const serverError = new ServerError();
+          res.status(serverError.status).json(serverError.message);
+      }
+    }
+  },
+
   async createUser(req, res) {
     try {
       const { email, password, username, role, location, profession } =
