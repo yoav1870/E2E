@@ -32,7 +32,7 @@ const ReportPage = () => {
         const fetchUserDetailsAndRole = async () => {
             try {
                 const token = localStorage.getItem('token');
-                const userResponse = await axios.get('http://localhost:3000/api/users/home', {
+                const userResponse = await axios.get('https://e2e-y8hj.onrender.com/api/users/home', {
                     headers: {
                         Authorization: `Bearer ${token}`,
                     },
@@ -41,7 +41,7 @@ const ReportPage = () => {
 
                 if (report) {
                     const userId = userResponse.data.role === 'service_provider' ? report.reportByUser : report.assignedUser;
-                    const userDetailsResponse = await axios.get(`http://localhost:3000/api/users/${userId}`, {
+                    const userDetailsResponse = await axios.get(`https://e2e-y8hj.onrender.com/api/users/${userId}`, {
                         headers: {
                             Authorization: `Bearer ${token}`,
                         },
@@ -60,7 +60,7 @@ const ReportPage = () => {
         const fetchReport = async () => {
             try {
                 const token = localStorage.getItem('token');
-                const response = await axios.get(`http://localhost:3000/api/reports/${id}`, {
+                const response = await axios.get(`https://e2e-y8hj.onrender.com/api/reports/${id}`, {
                     headers: {
                         Authorization: `Bearer ${token}`,
                     },
@@ -85,7 +85,7 @@ const ReportPage = () => {
         try {
             const token = localStorage.getItem('token');
             await axios.put(
-                `http://localhost:3000/api/reports/updateDate/${id}`,
+                `https://e2e-y8hj.onrender.com/api/reports/updateDate/${id}`,
                 { newDateOfResolve: newResolveDate },
                 {
                     headers: { Authorization: `Bearer ${token}` },
@@ -104,7 +104,7 @@ const ReportPage = () => {
         try {
             const token = localStorage.getItem('token');
             await axios.delete(
-                `http://localhost:3000/api/reports/`,
+                `https://e2e-y8hj.onrender.com/api/reports/`,
                 {
                     data: { id },
                     headers: { Authorization: `Bearer ${token}` },
