@@ -110,6 +110,7 @@ exports.userController = {
     } catch (error) {
       switch (error.name) {
         case "NoDataError":
+          res.status(error.status).json(error.message);
           break;
         default:
           const serverError = new ServerError();
