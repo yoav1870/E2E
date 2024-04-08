@@ -30,25 +30,6 @@ const UserProfile = () => {
   const handleClose = () => {
     setOpenDialog(false);
   };
-
-  // const handleDeleteUser = async () => {
-  //   try {
-  //     const token = localStorage.getItem("token");
-  //     const userId = user.id;
-
-  //     console.log(userId);
-  //     await axios.delete(`https://e2e-y8hj.onrender.com/api/users/deleteUser`, {
-  //       headers: {
-  //         Authorization: `Bearer ${token}`,
-  //       },
-  //     });
-  //     console.log('Navigating to sign-in page');
-  //     navigate('/sign-in');
-  //   } catch (error) {
-  //     console.error("Failed to delete user:", error);
-  //   }
-  //   setOpenDialog(false);
-  // };
   const handleDeleteUser = async () => {
     try {
       const token = localStorage.getItem("token");
@@ -91,22 +72,28 @@ const UserProfile = () => {
           }
         );
 
-        const userLocation = userResponse.data.location.coordinates;
-        const googleMapsApiUrl = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${
-          userLocation[1]
-        },${userLocation[0]}&key=${
-          import.meta.env.REACT_APP_GOOGLE_MAPS_API_KEY
-        }`;
+        const latitude = userResponse.data.location.coordinates[0];
+        const longitude = userResponse.data.location.coordinates[1];
+        const API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
+        const cityResponse = await axios.get(
+          `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=${API_KEY}&language=en`
+        );
 
-        const cityResponse = await axios.get(googleMapsApiUrl);
-        const locationDescriptor = extractLocationDescriptor(cityResponse.data);
-
-        const userDataWithLocation = {
-          ...userResponse.data,
-          location: locationDescriptor,
-        };
-
-        setUser(userDataWithLocation);
+        if (cityResponse.data.status === "OK") {
+          const locationDescriptor = extractLocationDescriptor(
+            cityResponse.data
+          );
+          const userDataWithLocation = {
+            ...userResponse.data,
+            location: locationDescriptor,
+          };
+          setUser(userDataWithLocation);
+        } else {
+          console.error(
+            "Failed to fetch city data:",
+            cityResponse.data.error_message
+          );
+        }
       } catch (error) {
         console.error("Failed to fetch user data or location:", error);
       }

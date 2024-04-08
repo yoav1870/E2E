@@ -48,7 +48,7 @@ const Information = () => {
             .slice(0, 5)
             .map((report) => `${report.profession} ${report.description}`);
         }
-        const youtubeApiKey = import.meta.env.REACT_APP_YOUTUBE_API_KEY;
+        const youtubeApiKey = import.meta.env.VITE_YOUTUBE_API_KEY;
 
         const videoPromises = searchQueries.map(async (query) => {
           const youtubeResponse = await axios.get(
