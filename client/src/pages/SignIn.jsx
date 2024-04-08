@@ -39,7 +39,7 @@ const SignIn = () => {
     }
 
     try {
-      const response = await axios.post("https://e2e-y8hj.onrender.com/api/users/sign-in", { email, password }, {
+      const response = await axios.post("http://localhost:3000/api/users/sign-in", { email, password }, {
         headers: { "Content-Type": "application/json" },
       });
       const { token } = response.data;

@@ -63,7 +63,7 @@ const Header = () => {
       try {
         const token = localStorage.getItem("token");
         const response = await axios.get(
-          "https://e2e-y8hj.onrender.com/api/users/home",
+          "http://localhost:3000/api/users/home",
           {
             headers: {
               Authorization: `Bearer ${token}`,

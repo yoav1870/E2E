@@ -67,7 +67,7 @@ describe('EditProfile', () => {
 
     await waitFor(() => {
       expect(axios.put).toHaveBeenCalledWith(
-        'https://e2e-y8hj.onrender.com/api/users/updatePassword',
+        'http://localhost:3000/api/users/updatePassword',
         { oldPassword: 'password123', newPassword: 'password123update' },
         { headers: { Authorization: `Bearer ${mockToken}` } }
       );

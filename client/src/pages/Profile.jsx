@@ -27,7 +27,7 @@ const UserProfile = () => {
   //     const userId = user.id; 
   
   //     console.log(userId); 
-  //     await axios.delete(`https://e2e-y8hj.onrender.com/api/users/deleteUser`, {
+  //     await axios.delete(`http://localhost:3000/api/users/deleteUser`, {
   //       headers: {
   //         Authorization: `Bearer ${token}`,
   //       },
@@ -46,7 +46,7 @@ const UserProfile = () => {
       console.log("User ID for deletion: ", user?.id); // Assuming 'user' state exists
     
       // Perform the deletion operation
-      await axios.delete(`https://e2e-y8hj.onrender.com/api/users/deleteUser`, {
+      await axios.delete(`http://localhost:3000/api/users/deleteUser`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -76,7 +76,7 @@ const UserProfile = () => {
       try {
         const token = localStorage.getItem("token");
         const userResponse = await axios.get(
-          "https://e2e-y8hj.onrender.com/api/users/home",
+          "http://localhost:3000/api/users/home",
           {
             headers: {
               Authorization: `Bearer ${token}`,

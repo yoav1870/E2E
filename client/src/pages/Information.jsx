@@ -10,7 +10,7 @@ const Information = () => {
     const fetchVideos = async () => {
       try {
         const token = localStorage.getItem('token');
-        const userResponse = await axios.get('https://e2e-y8hj.onrender.com/api/users/home', {
+        const userResponse = await axios.get('http://localhost:3000/api/users/home', {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -22,7 +22,7 @@ const Information = () => {
         if (user.role === 'service_provider') {
           searchQueries = [user.profession];
         } else {
-          const reportsResponse = await axios.get('https://e2e-y8hj.onrender.com/api/reports/home', {
+          const reportsResponse = await axios.get('http://localhost:3000/api/reports/home', {
             headers: {
               Authorization: `Bearer ${token}`,
             },
@@ -31,7 +31,7 @@ const Information = () => {
           searchQueries = reports.slice(0, 5).map(report => `${report.profession} ${report.description}`);
         }
 
-        const youtubeApiKey = '';
+        const youtubeApiKey = 'AIzaSyAkUl6glORD9H5Futo0QktijzL2j2mLmbE';
         const videoPromises = searchQueries.map(async (query) => {
           const youtubeResponse = await axios.get(`https://www.googleapis.com/youtube/v3/search?part=snippet&q=${query}&type=video&key=${youtubeApiKey}&maxResults=1`);
           return youtubeResponse.data.items[0];

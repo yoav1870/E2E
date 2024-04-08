@@ -22,12 +22,14 @@ const CreateReport = () => {
   const [user, setUser] = useState(null);
   const [location, setLocation] = useState('');
   const [serviceProviderError, setServiceProviderError] = useState('');
+  const [selectedPhoto, setSelectedPhoto] = useState(null);
+
 
   useEffect(() => {
     const fetchUserData = async () => {
       try {
         const token = localStorage.getItem('token');
-        const response = await axios.get('https://e2e-y8hj.onrender.com/api/users/home', {
+        const response = await axios.get('http://localhost:3000/api/users/home', {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -62,11 +64,28 @@ const CreateReport = () => {
           },
           reportByUser: user._id,
         };
-    
+
         const token = localStorage.getItem('token');
-        await axios.post('https://e2e-y8hj.onrender.com/api/reports', updatedValues, {
+
+        const formData = new FormData();
+        Object.entries(updatedValues).forEach(([key, value]) => {
+          if (key === 'location') {
+            formData.append('location[type]', value.type);
+            formData.append('location[coordinates][0]', value.coordinates[0]);
+            formData.append('location[coordinates][1]', value.coordinates[1]);
+          } else {
+            formData.append(key, value);
+          }
+        });
+
+        if (selectedPhoto) {
+          formData.append('photo', selectedPhoto);
+        }
+
+        await axios.post('http://localhost:3000/api/reports', formData, {
           headers: {
             Authorization: `Bearer ${token}`,
+            'Content-Type': 'multipart/form-data',
           },
         });
         navigate('/home');
@@ -79,7 +98,7 @@ const CreateReport = () => {
         }
       }
     }
-  });    
+  });
 
   if (!user) {
     return <LoadingComponent />;
@@ -166,6 +185,17 @@ const CreateReport = () => {
             name="dateOfResolve"
             value={formik.values.dateOfResolve}
             onChange={formik.handleChange}
+            InputLabelProps={{
+              shrink: true,
+            }}
+          />
+          <TextField
+            margin="normal"
+            fullWidth
+            id="photo"
+            type="file"
+            name="photo"
+            onChange={(event) => setSelectedPhoto(event.target.files[0])}
             InputLabelProps={{
               shrink: true,
             }}
