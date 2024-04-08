@@ -1,430 +1,207 @@
-// import React, { useEffect, useState } from "react";
-// import { useParams, Link as RouterLink, useNavigate } from "react-router-dom";
-// import {
-//   Container,
-//   Typography,
-//   Card,
-//   CardContent,
-//   CircularProgress,
-//   Box, Button, TextField,
-//   Breadcrumbs,
-//   Link,
-// } from "@mui/material";
-// import axios from "axios";
-// import Header from "../component/Header";
-// import LoadingComponent from '../component/Loading';
-
-// const ReportPage = () => {
-//   const { id } = useParams();
-//   const navigate = useNavigate();
-//   const [report, setReport] = useState(null);
-//   const [assignedUser, setAssignedUser] = useState(null);
-//   const [loading, setLoading] = useState(true);
-//   const [error, setError] = useState(null);
-//   const [newResolveDate, setNewResolveDate] = useState('');
-//   const [showUpdateField, setShowUpdateField] = useState(false); // State to control visibility
-
-//   useEffect(() => {
-//     const fetchReport = async () => {
-//       try {
-//         const token = localStorage.getItem("token");
-//         const response = await axios.get(
-//           `https://e2e-y8hj.onrender.com/api/reports/${id}`,
-//           {
-//             headers: {
-//               Authorization: `Bearer ${token}`,
-//             },
-//           }
-//         );
-//         setReport(response.data);
-//         setLoading(false);
-//       } catch (error) {
-//         console.error("Failed to fetch report:", error);
-//         setError("Failed to fetch the report. Please try again.");
-//         setLoading(false);
-//       }
-//     };
-
-//     fetchReport();
-//   }, [id]);
-
-//   useEffect(() => {
-//     const fetchAssignedUser = async () => {
-//       if (report && report.assignedUser) {
-//         try {
-//           const token = localStorage.getItem("token");
-//           const response = await axios.get(
-//             `https://e2e-y8hj.onrender.com/api/users/${report.assignedUser}`,
-//             {
-//               headers: {
-//                 Authorization: `Bearer ${token}`,
-//               },
-//             }
-//           );
-//           setAssignedUser(response.data);
-//         } catch (error) {
-//           console.error("Failed to fetch assigned user:", error);
-//         }
-//       }
-//     };
-
-//     fetchAssignedUser();
-//   }, [report]);
-
-//   const updateReportDate = async () => {
-//     if (!showUpdateField) {
-//       setShowUpdateField(true);
-//       return;
-//     }
-//     try {
-//       const token = localStorage.getItem('token');
-//       await axios.put(
-//         `https://e2e-y8hj.onrender.com/api/reports/updateDate/${id}`,
-//         { newDateOfResolve: newResolveDate },
-//         {
-//           headers: { Authorization: `Bearer ${token}` },
-//         }
-//       );
-//       alert('Report updated');
-//       setShowUpdateField(false); // Hide the input field again
-//       navigate('/home');
-//     } catch (error) {
-//       console.error('Failed to update report:', error);
-//       alert('Failed to update the report.');
-//     }
-//   };
-
-//   const deleteReport = async () => {
-//     try {
-//       const token = localStorage.getItem('token');
-//       await axios.delete(
-//         `https://e2e-y8hj.onrender.com/api/reports/`,
-//         {
-//           data: { id },
-//           headers: { Authorization: `Bearer ${token}` },
-//         }
-//       );
-//       alert('Report deleted');
-//       navigate('/home');
-//     } catch (error) {
-//       console.error('Failed to delete report:', error);
-//       alert('Failed to delete the report.');
-//     }
-//   };
-
-//   if (loading) {
-//     return (
-//       <>
-//         <Header />
-//         <Container
-//           maxWidth="lg"
-//           sx={{ mt: 4, display: "flex", justifyContent: "center" }}
-//         >
-//           <CircularProgress />
-//         </Container>
-//       </>
-//      <LoadingComponent/>
-//     );
-//   }
-
-//   if (error) {
-//     return (
-//       <>
-//         <Header />
-//         <Container maxWidth="lg" sx={{ mt: 4 }}>
-//           <Typography variant="h4" gutterBottom>Error</Typography>
-//           <Typography variant="body1">{error}</Typography>
-//         </Container>
-//       </>
-//     );
-//   }
-
-//   if (!report) {
-//     return (
-//       <>
-//         <Header />
-//         <Container maxWidth="lg" sx={{ mt: 4 }}>
-//           <Typography variant="h4" gutterBottom>Report not found</Typography>
-//           <Typography variant="body1">The requested report could not be found.</Typography>
-//         </Container>
-//       </>
-//     );
-//   }
-
-//   return (
-//     <>
-//       <Header />
-
-//       <Breadcrumbs
-//         aria-label="breadcrumb"
-//         style={{ fontFamily: '"Times New Roman", serif' }}
-//       >
-//         <Link
-//           component={RouterLink}
-//           color="inherit"
-//           to="/"
-//           style={{ fontFamily: '"Times New Roman", serif', marginLeft: "5px" }}
-//           underline="none"
-//         >
-//           Home
-//         </Link>
-//         <Typography
-//           color="text.primary"
-//           style={{ fontFamily: '"Times New Roman", serif' }}
-//         >
-//           Report Details
-//         </Typography>
-//       </Breadcrumbs>
-
-//       <Container maxWidth="lg" sx={{ mt: 4 }}>
-//         <Typography variant="h4" gutterBottom>Report Details</Typography>
-//         <Card sx={{ mb: 2 }}>
-//           <CardContent>
-//             <Typography variant="h6" gutterBottom>
-//               Description: {report.description}
-//             </Typography>
-//             <Typography variant="body1" gutterBottom>
-//               Status: {report.status}
-//             </Typography>
-//             <Typography variant="body1" gutterBottom>
-//               Urgency: {report.urgency}
-//             </Typography>
-//             <Typography variant="body1" gutterBottom>
-//               Date of Resolve:{" "}
-//               {new Date(report.dateOfResolve).toLocaleDateString()}
-//             </Typography>
-//             <Typography variant="h6" gutterBottom>Description: {report.description}</Typography>
-//             <Typography variant="body1" gutterBottom>Status: {report.status}</Typography>
-//             <Typography variant="body1" gutterBottom>Urgency: {report.urgency}</Typography>
-//             <Typography variant="body1" gutterBottom>Date of Resolve: {new Date(report.dateOfResolve).toLocaleDateString()}</Typography>
-//             {showUpdateField && (
-//               <TextField
-//                 label="New Resolve Date"
-//                 type="date"
-//                 fullWidth
-//                 value={newResolveDate}
-//                 onChange={(e) => setNewResolveDate(e.target.value)}
-//                 sx={{ mt: 2, mb: 2 }}
-//                 InputLabelProps={{
-//                   shrink: true,
-//                 }}
-//               />
-//             )}
-//             <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-//               <Button onClick={updateReportDate} variant="contained">
-//                 {showUpdateField ? 'Submit New Date' : 'Update Resolve Date'}
-//               </Button>
-//               <Button onClick={deleteReport} variant="contained" color="error">
-//                 Delete Report
-//               </Button>
-//             </Box>
-//           </CardContent>
-//         </Card>
-
-//         <Typography variant="h5" gutterBottom sx={{ mt: 4 }}>
-//           Assigned Service Provider
-//         </Typography>
-//         {assignedUser ? (
-//           <Card>
-//             <CardContent>
-//               <Typography variant="h6" gutterBottom>
-//                 Name: {assignedUser.username}
-//               </Typography>
-//               <Typography variant="body1" gutterBottom>
-//                 Email: {assignedUser.email}
-//               </Typography>
-//               <Typography variant="body1" gutterBottom>
-//                 Profession: {assignedUser.profession}
-//               </Typography>
-//               <Typography variant="body1" gutterBottom>
-//                 Availability:{" "}
-//                 {assignedUser.availability ? "Available" : "Not Available"}
-//               </Typography>
-//               <Typography variant="body1" gutterBottom>
-//                 Ranking: {assignedUser.ranking}
-//               </Typography>
-//             </CardContent>
-//           </Card>
-//         ) : (
-//           <Box sx={{ display: "flex", justifyContent: "center", mt: 2 }}>
-//             <CircularProgress />
-//           </Box>
-//         {assignedUser && (
-//           <>
-//             <Typography variant="h5" gutterBottom sx={{ mt: 4 }}>Assigned Service Provider</Typography>
-//             <Card>
-//               <CardContent>
-//                 <Typography variant="h6" gutterBottom>Name: {assignedUser.username}</Typography>
-//                 <Typography variant="body1" gutterBottom>Email: {assignedUser.email}</Typography>
-//                 <Typography variant="body1" gutterBottom>Profession: {assignedUser.profession}</Typography>
-//                 <Typography variant="body1" gutterBottom>Availability: {assignedUser.availability ? 'Available' : 'Not Available'}</Typography>
-//                 <Typography variant="body1" gutterBottom>Ranking: {assignedUser.ranking}</Typography>
-//               </CardContent>
-//             </Card>
-//           </>
-//         )}
-//       </Container>
-//     </>
-//   );
-// };
-
-// export default ReportPage;
-
 import React, { useEffect, useState } from "react";
 import { useParams, Link as RouterLink, useNavigate } from "react-router-dom";
 import {
-  Container,
-  Typography,
-  Card,
-  CardContent,
-  CircularProgress,
-  Box,
-  Button,
-  TextField,
-  Breadcrumbs,
-  Link,
-  CardMedia,
+    Container,
+    Typography,
+    Card,
+    CardContent,
+    CircularProgress,
+    Box,
+    Button,
+    TextField,
+    Breadcrumbs,
+    Link,
+    CardMedia,
+    MenuItem,
+    Collapse,
+    Alert,
 } from "@mui/material";
 import axios from "axios";
 import Header from "../component/Header";
 
 const ReportPage = () => {
-  const { id } = useParams();
-  const navigate = useNavigate();
-  const [report, setReport] = useState(null);
-  const [assignedUser, setAssignedUser] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [newResolveDate, setNewResolveDate] = useState("");
-  const [showUpdateField, setShowUpdateField] = useState(false);
+    const { id } = useParams();
+    const navigate = useNavigate();
+    const [report, setReport] = useState(null);
+    const [assignedUser, setAssignedUser] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    const [newResolveDate, setNewResolveDate] = useState("");
+    const [showUpdateField, setShowUpdateField] = useState(false);
+    const [userDetails, setUserDetails] = useState(null);
+    const [userRole, setUserRole] = useState(null);
+    const [selectedStatus, setSelectedStatus] = useState(report?.status || "");
+    const [statusUpdateMessage, setStatusUpdateMessage] = useState("");
+    const [showStatusUpdateMessage, setShowStatusUpdateMessage] = useState(false);
 
-  useEffect(() => {
-    const fetchReport = async () => {
-      setLoading(true);
-      try {
-        const token = localStorage.getItem("token");
-        const response = await axios.get(
-          `https://e2e-y8hj.onrender.com/api/reports/${id}`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-        setReport(response.data);
-      } catch (error) {
-        setError("Failed to fetch the report. Please try again.");
-      } finally {
-        setLoading(false);
-      }
+    const handleStatusChange = (event) => {
+        setSelectedStatus(event.target.value);
     };
 
-    fetchReport();
-  }, [id]);
-
-  useEffect(() => {
-    const fetchAssignedUser = async () => {
-      if (report?.assignedUser) {
+    const updateReportStatus = async () => {
         try {
-          const token = localStorage.getItem("token");
-          const response = await axios.get(
-            `https://e2e-y8hj.onrender.com/api/users/${report.assignedUser}`,
-            {
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
-            }
-          );
-          setAssignedUser(response.data);
+            const token = localStorage.getItem('token');
+            await axios.put(
+                `https://e2e-y8hj.onrender.com/api/reports/updateStatus/${id}`,
+                { newStatus: selectedStatus },
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        'Content-Type': 'application/json',
+                    },
+                }
+            );
+            setStatusUpdateMessage("Report status updated successfully.");
+            setShowStatusUpdateMessage(true);
+            setReport({ ...report, status: selectedStatus }); // Update the local report state
+            setTimeout(() => {
+                setShowStatusUpdateMessage(false);
+            }, 2000);
         } catch (error) {
-          console.error("Failed to fetch assigned user:", error);
+            console.error('Failed to update report status:', error);
+            setStatusUpdateMessage("Failed to update the report status.");
+            setShowStatusUpdateMessage(true);
+            setTimeout(() => {
+                setShowStatusUpdateMessage(false);
+            }, 2000);
         }
-      }
     };
 
-    fetchAssignedUser();
-  }, [report?.assignedUser]);
 
-  const updateReportDate = async () => {
-    if (!showUpdateField) {
-      setShowUpdateField(true);
-      return;
-    }
-    try {
-      const token = localStorage.getItem("token");
-      await axios.put(
-        `https://e2e-y8hj.onrender.com/api/reports/updateDate/${id}`,
-        { newDateOfResolve: newResolveDate },
-        {
-          headers: { Authorization: `Bearer ${token}` },
+    useEffect(() => {
+        const fetchUserDetailsAndRole = async () => {
+            try {
+                const token = localStorage.getItem('token');
+                const userResponse = await axios.get('https://e2e-y8hj.onrender.com/api/users/home', {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                });
+                setUserRole(userResponse.data.role);
+
+                if (report) {
+                    const userId = userResponse.data.role === 'service_provider' ? report.reportByUser : report.assignedUser;
+                    const userDetailsResponse = await axios.get(`https://e2e-y8hj.onrender.com/api/users/${userId}`, {
+                        headers: {
+                            Authorization: `Bearer ${token}`,
+                        },
+                    });
+                    setUserDetails(userDetailsResponse.data);
+                }
+            } catch (error) {
+                console.error('Failed to fetch user details or role:', error);
+            }
+        };
+
+        fetchUserDetailsAndRole();
+    }, [report]);
+
+    useEffect(() => {
+        const fetchReport = async () => {
+            try {
+                const token = localStorage.getItem('token');
+                const response = await axios.get(`https://e2e-y8hj.onrender.com/api/reports/${id}`, {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                });
+                setReport(response.data);
+                setLoading(false);
+            } catch (error) {
+                console.error('Failed to fetch report:', error);
+                setError('Failed to fetch the report. Please try again.');
+                setLoading(false);
+            }
+        };
+
+        fetchReport();
+    }, [id]);
+
+    const updateReportDate = async () => {
+        if (!showUpdateField) {
+            setShowUpdateField(true);
+            return;
         }
-      );
-      alert("Report updated");
-      setShowUpdateField(false);
-      navigate("/home");
-    } catch (error) {
-      alert("Failed to update the report.");
+        try {
+            const token = localStorage.getItem('token');
+            await axios.put(
+                `https://e2e-y8hj.onrender.com/api/reports/updateDate/${id}`,
+                { newDateOfResolve: newResolveDate },
+                {
+                    headers: { Authorization: `Bearer ${token}` },
+                }
+            );
+            alert('Report updated');
+            setShowUpdateField(false); // Hide the input field again
+            navigate('/home');
+        } catch (error) {
+            console.error('Failed to update report:', error);
+            alert('Failed to update the report.');
+        }
+    };
+
+    const deleteReport = async () => {
+        try {
+            const token = localStorage.getItem('token');
+            await axios.delete(
+                `https://e2e-y8hj.onrender.com/api/reports/`,
+                {
+                    data: { id },
+                    headers: { Authorization: `Bearer ${token}` },
+                }
+            );
+            alert('Report deleted');
+            navigate('/home');
+        } catch (error) {
+            console.error('Failed to delete report:', error);
+            alert('Failed to delete the report.');
+        }
+    };
+
+    if (loading) {
+        return (
+            <>
+                <Header />
+                <Container maxWidth="lg" sx={{ mt: 4, display: 'flex', justifyContent: 'center' }}>
+                    <CircularProgress />
+                </Container>
+            </>
+        );
     }
-  };
 
-  const deleteReport = async () => {
-    try {
-      const token = localStorage.getItem("token");
-      await axios.delete(`https://e2e-y8hj.onrender.com/api/reports/${id}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      alert("Report deleted");
-      navigate("/home");
-    } catch (error) {
-      alert("Failed to delete the report.");
+    if (error) {
+        return (
+            <>
+                <Header />
+                <Container maxWidth="lg" sx={{ mt: 4 }}>
+                    <Typography variant="h4" gutterBottom>Error</Typography>
+                    <Typography variant="body1">{error}</Typography>
+                </Container>
+            </>
+        );
     }
-  };
 
-  if (loading)
-    return (
-      <Header>
-        <Container
-          maxWidth="lg"
-          sx={{ mt: 4, display: "flex", justifyContent: "center" }}
-        >
-          <CircularProgress />
-        </Container>
-      </Header>
-    );
-
-  if (error)
-    return (
-      <Header>
-        <Container maxWidth="lg" sx={{ mt: 4 }}>
-          <Typography variant="h4" gutterBottom>
-            Error
-          </Typography>
-          <Typography variant="body1">{error}</Typography>
-        </Container>
-      </Header>
-    );
-
-  if (!report)
-    return (
-      <Header>
-        <Container maxWidth="lg" sx={{ mt: 4 }}>
-          <Typography variant="h4" gutterBottom>
-            Report not found
-          </Typography>
-          <Typography variant="body1">
-            The requested report could not be found.
-          </Typography>
-        </Container>
-      </Header>
-    );
+    if (!report) {
+        return (
+            <>
+                <Header />
+                <Container maxWidth="lg" sx={{ mt: 4 }}>
+                    <Typography variant="h4" gutterBottom>Report not found</Typography>
+                    <Typography variant="body1">The requested report could not be found.</Typography>
+                </Container>
+            </>
+        );
+    }
 
   return (
     <>
       <Header />
       <Breadcrumbs
         aria-label="breadcrumb"
-        style={{ fontFamily: '"Times New Roman", serif', marginLeft: "20px" }}
-      >
+        sx={{
+          fontFamily: '"Times New Roman", serif', marginLeft: '10px', 
+          display: { xs: 'none', sm: 'flex' },
+      }}      >      
         <Link component={RouterLink} color="inherit" to="/" underline="none">
           Home
         </Link>
@@ -433,111 +210,133 @@ const ReportPage = () => {
         </Typography>
       </Breadcrumbs>
 
-      <Container maxWidth="lg" sx={{ mt: 4 }}>
-        <Typography
-          variant="h4"
-          gutterBottom
-          fontFamily="Georgia, serif"
-          textAlign="center"
-        >
-          Report Details
-        </Typography>
-        <Card sx={{ mb: 2 }}>
-          <CardContent>
-            <Typography variant="h6" gutterBottom>
-              Description: {report.description}
-            </Typography>
-            <Typography variant="body1" gutterBottom>
-              Status: {report.status}
-            </Typography>
-            <Typography variant="body1" gutterBottom>
-              Urgency: {report.urgency}
-            </Typography>
-            <Typography variant="body1" gutterBottom>
-              Date of Resolve:{" "}
-              {new Date(report.dateOfResolve).toLocaleDateString()}
-            </Typography>
-            {report.photo && (
-              <CardMedia
-                component="img"
-                height="300"
-                image={report.photo}
-                alt="Report Photo"
-                sx={{ mt: 2 }}
-              />
-            )}
-            {showUpdateField && (
-              <TextField
-                label="New Resolve Date"
-                type="date"
-                fullWidth
-                value={newResolveDate}
-                onChange={(e) => setNewResolveDate(e.target.value)}
-                sx={{ mt: 2, mb: 2 }}
-                InputLabelProps={{ shrink: true }}
-              />
-            )}
-            <Box
-              sx={{ display: "flex", justifyContent: "space-between", mt: 2 }}
-            >
-              <Button
-                onClick={updateReportDate}
-                variant="contained"
-                sx={{ textTransform: "none" }}
-              >
-                {showUpdateField ? "Submit New Date" : "Update Resolve Date"}
-              </Button>{" "}
-              <Button
-                onClick={deleteReport}
-                variant="contained"
-                color="error"
-                sx={{ textTransform: "none" }}
-              >
-                Delete Report
-              </Button>{" "}
-            </Box>
-          </CardContent>
-        </Card>
+            <Container maxWidth="lg" sx={{ mt: 4 }}>
+                <Typography
+                    variant="h4"
+                    gutterBottom
+                    fontFamily="Georgia, serif"
+                    textAlign="center"
+                >
+                    Report Details
+                </Typography>
+                <Card sx={{ mb: 2 }}>
+                    <CardContent>
+                        <Typography variant="h6" gutterBottom>
+                            Description: {report.description}
+                        </Typography>
+                        <Typography variant="body1" gutterBottom>
+                            Status: {report.status}
+                        </Typography>
+                        <Typography variant="body1" gutterBottom>
+                            Urgency: {report.urgency}
+                        </Typography>
+                        <Typography variant="body1" gutterBottom>
+                            Date of Resolve:{" "}
+                            {new Date(report.dateOfResolve).toLocaleDateString()}
+                        </Typography>
+                        {report.photo && (
+                            <CardMedia
+                                component="img"
+                                height="300"
+                                image={report.photo}
+                                alt="Report Photo"
+                                sx={{ mt: 2 }}
+                            />
+                        )}
+                        {showUpdateField && (
+                            <TextField
+                                label="New Resolve Date"
+                                type="date"
+                                fullWidth
+                                value={newResolveDate}
+                                onChange={(e) => setNewResolveDate(e.target.value)}
+                                sx={{ mt: 2, mb: 2 }}
+                                InputLabelProps={{ shrink: true }}
+                            />
+                        )}
+                        {userRole === 'service_provider' && (
+                            <>
+                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mt: 2 }}>
+                                    <TextField
+                                        select
+                                        label="Update Status"
+                                        value={selectedStatus}
+                                        onChange={handleStatusChange}
+                                        fullWidth
+                                    >
+                                        <MenuItem value="pending">Pending</MenuItem>
+                                        <MenuItem value="in_progress">In Progress</MenuItem>
+                                        <MenuItem value="completed">Completed</MenuItem>
+                                    </TextField>
+                                    <Button
+                                        variant="contained"
+                                        onClick={updateReportStatus}
+                                        sx={{ textTransform: 'none' }}
+                                    >
+                                        Update
+                                    </Button>
+                                </Box>
+                            </>
+                        )}
+                        <Collapse in={showStatusUpdateMessage}>
+                            <Alert severity={statusUpdateMessage.includes("successfully") ? "success" : "error"} sx={{ mt: 2 }}>
+                                {statusUpdateMessage}
+                            </Alert>
+                        </Collapse>
+                        <Box
+                            sx={{ display: "flex", justifyContent: "space-between", mt: 2 }}
+                        >
+                            <Button
+                                onClick={updateReportDate}
+                                variant="contained"
+                                sx={{ textTransform: "none" }}
+                            >
+                                {showUpdateField ? "Submit New Date" : "Update Resolve Date"}
+                            </Button>{" "}
+                            <Button
+                                onClick={deleteReport}
+                                variant="contained"
+                                color="error"
+                                sx={{ textTransform: "none" }}
+                            >
+                                Delete Report
+                            </Button>{" "}
+                        </Box>
 
-        {assignedUser ? (
-          <>
-            <Typography
-              variant="h5"
-              gutterBottom
-              fontFamily="Georgia, serif"
-              textAlign="center"
-            >
-              Assigned Service Provider
-            </Typography>
-            <Card>
-              <CardContent>
-                <Typography variant="h6" gutterBottom>
-                  Name: {assignedUser.username}
-                </Typography>
-                <Typography variant="body1" gutterBottom>
-                  Email: {assignedUser.email}
-                </Typography>
-                <Typography variant="body1" gutterBottom>
-                  Profession: {assignedUser.profession}
-                </Typography>
-                <Typography variant="body1" gutterBottom>
-                  Availability:{" "}
-                  {assignedUser.availability ? "Available" : "Not Available"}
-                </Typography>
-                <Typography variant="body1">
-                  Ranking: {assignedUser.ranking}
-                </Typography>
-              </CardContent>
-            </Card>
-          </>
-        ) : (
-          <Box sx={{ display: "flex", justifyContent: "center", mt: 2 }}>
-            <CircularProgress />
-          </Box>
-        )}
-      </Container>
-    </>
-  );
+
+                    </CardContent>
+                </Card>
+
+                {userDetails && (
+                    <>
+                        <Typography variant="h5" gutterBottom sx={{ mt: 4 }}>
+                            {userRole === 'service_provider' ? 'Client Details' : 'Assigned Service Provider'}
+                        </Typography>
+                        <Card>
+                            <CardContent>
+                                <Typography variant="h6" gutterBottom>Name: {userDetails.username}</Typography>
+                                <Typography variant="body1" gutterBottom>Email: {userDetails.email}</Typography>
+                                {userRole === 'service_provider' && (
+                                    <Typography variant="body1" gutterBottom>
+                                        Location: {Array.isArray(userDetails.location) ? userDetails.location.join(', ') : 'Location unavailable'}
+                                    </Typography>
+                                )}
+                                {userRole !== 'service_provider' && (
+                                    <>
+                                        <Typography variant="body1" gutterBottom>Profession: {userDetails.profession}</Typography>
+                                        <Typography variant="body1" gutterBottom>Availability: {userDetails.availability ? 'Available' : 'Not Available'}</Typography>
+                                        <Typography variant="body1" gutterBottom>Ranking: {userDetails.ranking}</Typography>
+                                    </>
+                                )}
+                            </CardContent>
+                        </Card>
+                    </>
+                )}
+
+            </Container>
+        </>
+    );
 };
+
 
 export default ReportPage;

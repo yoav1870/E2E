@@ -46,13 +46,15 @@ const EditProfile = () => {
 
       <Breadcrumbs
         aria-label="breadcrumb"
-        style={{ fontFamily: '"Times New Roman", serif' }}
-      >
+        sx={{
+          fontFamily: '"Times New Roman", serif', marginLeft: '10px',
+          display: { xs: 'none', sm: 'flex' },
+      }}      >
         <Link
           component={RouterLink}
           color="inherit"
           to="/"
-          style={{ fontFamily: '"Times New Roman", serif', marginLeft: "5px" }}
+          style={{ fontFamily: '"Times New Roman", serif' }}
           underline="none"
         >
           Home

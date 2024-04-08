@@ -13,6 +13,7 @@
 //       try {
 //         const token = localStorage.getItem('token');
 //         const response = await axios.get('https://e2e-y8hj.onrender.com/api/reports/home', {
+//         const response = await axios.get('https://e2e-y8hj.onrender.com/api/reports/home', {
 //           headers: {
 //             Authorization: `Bearer ${token}`,
 //           },

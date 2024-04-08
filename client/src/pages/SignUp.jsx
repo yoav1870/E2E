@@ -39,8 +39,8 @@ const validationSchema = yup.object({
 });
 
 const SignUp = () => {
-  const [error, setError] = useState("");
-  const navigate = useNavigate();
+    const [error, setError] = useState('');
+    const navigate = useNavigate();
 
   const handleLocationFocus = () => {
     if ("geolocation" in navigator) {
@@ -243,38 +243,26 @@ const SignUp = () => {
           </>
         )}
 
-        <input
-          accept="image/*"
-          type="file"
-          id="photo"
-          name="photo"
-          onChange={handlePhotoChange}
-          style={{ marginTop: "10px" }}
-        />
-        {formik.touched.photo && formik.errors.photo && (
-          <Typography color="error" style={{ marginTop: "5px" }}>
-            {formik.errors.photo}
-          </Typography>
-        )}
+                <input
+                    accept="image/*"
+                    type="file"
+                    id="photo"
+                    name="photo"
+                    onChange={handlePhotoChange}
+                    style={{ marginTop: '10px' }}
+                />
+                {formik.touched.photo && formik.errors.photo && <Typography color="error" style={{ marginTop: '5px' }}>{formik.errors.photo}</Typography>}
 
-        <Button
-          type="submit"
-          fullWidth
-          variant="contained"
-          sx={{ mt: 3, mb: 2 }}
-        >
-          Sign Up
-        </Button>
-        {error && <Typography color="error">{error}</Typography>}
-        <Typography textAlign="center">
-          Already have an account?{" "}
-          <Link href="/sign-in" variant="body2">
-            Sign in here!
-          </Link>
-        </Typography>
-      </Box>
-    </Container>
-  );
+                <Button type="submit" fullWidth variant="contained" sx={{ mt: 3, mb: 2 }}>
+                    Sign Up
+                </Button>
+                {error && <Typography color="error">{error}</Typography>}
+                <Typography textAlign="center">
+                    Already have an account? <Link to="/sign-in" variant="body2">Sign in here!</Link>
+                </Typography>
+            </Box>
+        </Container>
+    );
 };
 
 export default SignUp;
