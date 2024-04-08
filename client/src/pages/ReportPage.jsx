@@ -15,6 +15,12 @@ import {
   MenuItem,
   Collapse,
   Alert,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  Snackbar,
 } from "@mui/material";
 import axios from "axios";
 import Header from "../component/Header";
@@ -33,6 +39,17 @@ const ReportPage = () => {
   const [selectedStatus, setSelectedStatus] = useState(report?.status || "");
   const [statusUpdateMessage, setStatusUpdateMessage] = useState("");
   const [showStatusUpdateMessage, setShowStatusUpdateMessage] = useState(false);
+  const [openDialog, setOpenDialog] = useState(false);
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
+
+  const handleDeleteConfirmation = () => {
+    setOpenDialog(true);
+  };
+
+  const handleCloseDialog = () => {
+    setOpenDialog(false);
+  };
 
   const handleStatusChange = (event) => {
     setSelectedStatus(event.target.value);
@@ -53,7 +70,7 @@ const ReportPage = () => {
       );
       setStatusUpdateMessage("Report status updated successfully.");
       setShowStatusUpdateMessage(true);
-      setReport({ ...report, status: selectedStatus }); // Update the local report state
+      setReport({ ...report, status: selectedStatus });
       setTimeout(() => {
         setShowStatusUpdateMessage(false);
       }, 2000);
@@ -129,26 +146,36 @@ const ReportPage = () => {
   }, [id]);
 
   const updateReportDate = async () => {
-    if (!showUpdateField) {
+    if (!newResolveDate) {
       setShowUpdateField(true);
       return;
     }
+
     try {
       const token = localStorage.getItem("token");
       await axios.put(
         `https://e2e-y8hj.onrender.com/api/reports/updateDate/${id}`,
         { newDateOfResolve: newResolveDate },
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
+        { headers: { Authorization: `Bearer ${token}` } }
       );
-      alert("Report updated");
-      setShowUpdateField(false); // Hide the input field again
-      navigate("/home");
+      console.log("Setting Snackbar message to success");
+      setSnackbarMessage("Report updated successfully.");
+      setSnackbarOpen(true);
+      setShowUpdateField(false);
+      setTimeout(() => navigate("/home"), 4000);
     } catch (error) {
       console.error("Failed to update report:", error);
-      alert("Failed to update the report.");
+      setSnackbarMessage("Failed to update the report.");
+      setSnackbarOpen(true);
     }
+  };
+
+  const handleSnackbarClose = (event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
+    console.log("Closing Snackbar");
+    setSnackbarOpen(false);
   };
 
   const deleteReport = async () => {
@@ -158,11 +185,12 @@ const ReportPage = () => {
         data: { id },
         headers: { Authorization: `Bearer ${token}` },
       });
-      alert("Report deleted");
       navigate("/home");
     } catch (error) {
       console.error("Failed to delete report:", error);
-      alert("Failed to delete the report.");
+      setError("Failed to delete the report.");
+    } finally {
+      setOpenDialog(false);
     }
   };
 
@@ -322,13 +350,13 @@ const ReportPage = () => {
                 {showUpdateField ? "Submit New Date" : "Update Resolve Date"}
               </Button>{" "}
               <Button
-                onClick={deleteReport}
                 variant="contained"
                 color="error"
+                onClick={handleDeleteConfirmation}
                 sx={{ textTransform: "none" }}
               >
                 Delete Report
-              </Button>{" "}
+              </Button>
             </Box>
           </CardContent>
         </Card>
@@ -375,6 +403,33 @@ const ReportPage = () => {
           </>
         )}
       </Container>
+      <Dialog
+        open={openDialog}
+        onClose={handleCloseDialog}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">{"Confirm Deletion"}</DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            Are you sure you want to delete this report? This action cannot be
+            undone.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseDialog}>Cancel</Button>
+          <Button onClick={deleteReport} color="error" autoFocus>
+            Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={5000}
+        onClose={handleSnackbarClose}
+        message={snackbarMessage}
+      />
     </>
   );
 };
