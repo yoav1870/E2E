@@ -1,17 +1,20 @@
 import React, { useEffect, useState } from "react";
 import { useParams, Link as RouterLink, useNavigate } from "react-router-dom";
 import {
-  Container,
-  Typography,
-  Card,
-  CardContent,
-  CircularProgress,
-  Box,
-  Button,
-  TextField,
-  Breadcrumbs,
-  Link,
-  CardMedia,
+    Container,
+    Typography,
+    Card,
+    CardContent,
+    CircularProgress,
+    Box,
+    Button,
+    TextField,
+    Breadcrumbs,
+    Link,
+    CardMedia,
+    MenuItem,
+    Collapse,
+    Alert,
 } from "@mui/material";
 import axios from "axios";
 import Header from "../component/Header";
@@ -27,6 +30,43 @@ const ReportPage = () => {
     const [showUpdateField, setShowUpdateField] = useState(false);
     const [userDetails, setUserDetails] = useState(null);
     const [userRole, setUserRole] = useState(null);
+    const [selectedStatus, setSelectedStatus] = useState(report?.status || "");
+    const [statusUpdateMessage, setStatusUpdateMessage] = useState("");
+    const [showStatusUpdateMessage, setShowStatusUpdateMessage] = useState(false);
+
+    const handleStatusChange = (event) => {
+        setSelectedStatus(event.target.value);
+    };
+
+    const updateReportStatus = async () => {
+        try {
+            const token = localStorage.getItem('token');
+            await axios.put(
+                `https://e2e-y8hj.onrender.com/api/reports/updateStatus/${id}`,
+                { newStatus: selectedStatus },
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        'Content-Type': 'application/json',
+                    },
+                }
+            );
+            setStatusUpdateMessage("Report status updated successfully.");
+            setShowStatusUpdateMessage(true);
+            setReport({ ...report, status: selectedStatus }); // Update the local report state
+            setTimeout(() => {
+                setShowStatusUpdateMessage(false);
+            }, 2000);
+        } catch (error) {
+            console.error('Failed to update report status:', error);
+            setStatusUpdateMessage("Failed to update the report status.");
+            setShowStatusUpdateMessage(true);
+            setTimeout(() => {
+                setShowStatusUpdateMessage(false);
+            }, 2000);
+        }
+    };
+
 
     useEffect(() => {
         const fetchUserDetailsAndRole = async () => {
@@ -170,71 +210,102 @@ const ReportPage = () => {
         </Typography>
       </Breadcrumbs>
 
-      <Container maxWidth="lg" sx={{ mt: 4 }}>
-        <Typography
-          variant="h4"
-          gutterBottom
-          fontFamily="Georgia, serif"
-          textAlign="center"
-        >
-          Report Details
-        </Typography>
-        <Card sx={{ mb: 2 }}>
-          <CardContent>
-            <Typography variant="h6" gutterBottom>
-              Description: {report.description}
-            </Typography>
-            <Typography variant="body1" gutterBottom>
-              Status: {report.status}
-            </Typography>
-            <Typography variant="body1" gutterBottom>
-              Urgency: {report.urgency}
-            </Typography>
-            <Typography variant="body1" gutterBottom>
-              Date of Resolve:{" "}
-              {new Date(report.dateOfResolve).toLocaleDateString()}
-            </Typography>
-            {report.photo && (
-              <CardMedia
-                component="img"
-                height="300"
-                image={report.photo}
-                alt="Report Photo"
-                sx={{ mt: 2 }}
-              />
-            )}
-            {showUpdateField && (
-              <TextField
-                label="New Resolve Date"
-                type="date"
-                fullWidth
-                value={newResolveDate}
-                onChange={(e) => setNewResolveDate(e.target.value)}
-                sx={{ mt: 2, mb: 2 }}
-                InputLabelProps={{ shrink: true }}
-              />
-            )}
-            <Box
-              sx={{ display: "flex", justifyContent: "space-between", mt: 2 }}
-            >
-              <Button
-                onClick={updateReportDate}
-                variant="contained"
-                sx={{ textTransform: "none" }}
-              >
-                {showUpdateField ? "Submit New Date" : "Update Resolve Date"}
-              </Button>{" "}
-              <Button
-                onClick={deleteReport}
-                variant="contained"
-                color="error"
-                sx={{ textTransform: "none" }}
-              >
-                Delete Report
-              </Button>{" "}
-            </Box>
-          </CardContent>
-        </Card>
+            <Container maxWidth="lg" sx={{ mt: 4 }}>
+                <Typography
+                    variant="h4"
+                    gutterBottom
+                    fontFamily="Georgia, serif"
+                    textAlign="center"
+                >
+                    Report Details
+                </Typography>
+                <Card sx={{ mb: 2 }}>
+                    <CardContent>
+                        <Typography variant="h6" gutterBottom>
+                            Description: {report.description}
+                        </Typography>
+                        <Typography variant="body1" gutterBottom>
+                            Status: {report.status}
+                        </Typography>
+                        <Typography variant="body1" gutterBottom>
+                            Urgency: {report.urgency}
+                        </Typography>
+                        <Typography variant="body1" gutterBottom>
+                            Date of Resolve:{" "}
+                            {new Date(report.dateOfResolve).toLocaleDateString()}
+                        </Typography>
+                        {report.photo && (
+                            <CardMedia
+                                component="img"
+                                height="300"
+                                image={report.photo}
+                                alt="Report Photo"
+                                sx={{ mt: 2 }}
+                            />
+                        )}
+                        {showUpdateField && (
+                            <TextField
+                                label="New Resolve Date"
+                                type="date"
+                                fullWidth
+                                value={newResolveDate}
+                                onChange={(e) => setNewResolveDate(e.target.value)}
+                                sx={{ mt: 2, mb: 2 }}
+                                InputLabelProps={{ shrink: true }}
+                            />
+                        )}
+                        {userRole === 'service_provider' && (
+                            <>
+                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mt: 2 }}>
+                                    <TextField
+                                        select
+                                        label="Update Status"
+                                        value={selectedStatus}
+                                        onChange={handleStatusChange}
+                                        fullWidth
+                                    >
+                                        <MenuItem value="pending">Pending</MenuItem>
+                                        <MenuItem value="in_progress">In Progress</MenuItem>
+                                        <MenuItem value="completed">Completed</MenuItem>
+                                    </TextField>
+                                    <Button
+                                        variant="contained"
+                                        onClick={updateReportStatus}
+                                        sx={{ textTransform: 'none' }}
+                                    >
+                                        Update
+                                    </Button>
+                                </Box>
+                            </>
+                        )}
+                        <Collapse in={showStatusUpdateMessage}>
+                            <Alert severity={statusUpdateMessage.includes("successfully") ? "success" : "error"} sx={{ mt: 2 }}>
+                                {statusUpdateMessage}
+                            </Alert>
+                        </Collapse>
+                        <Box
+                            sx={{ display: "flex", justifyContent: "space-between", mt: 2 }}
+                        >
+                            <Button
+                                onClick={updateReportDate}
+                                variant="contained"
+                                sx={{ textTransform: "none" }}
+                            >
+                                {showUpdateField ? "Submit New Date" : "Update Resolve Date"}
+                            </Button>{" "}
+                            <Button
+                                onClick={deleteReport}
+                                variant="contained"
+                                color="error"
+                                sx={{ textTransform: "none" }}
+                            >
+                                Delete Report
+                            </Button>{" "}
+                        </Box>
+
+
+                    </CardContent>
+                </Card>
 
                 {userDetails && (
                     <>
