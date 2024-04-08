@@ -204,7 +204,7 @@ const SignUp = () => {
                 </Button>
                 {error && <Typography color="error">{error}</Typography>}
                 <Typography textAlign="center">
-                    Already have an account? <Link href="/sign-in" variant="body2">Sign in here!</Link>
+                    Already have an account? <Link to="/sign-in" variant="body2">Sign in here!</Link>
                 </Typography>
             </Box>
         </Container>
