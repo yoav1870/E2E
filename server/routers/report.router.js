@@ -1,6 +1,7 @@
 const { Router } = require("express");
 const { reportController } = require("../controllers/report.controller");
 const authenticateToken = require("../middlewares/authenticateToken");
+const upload = require("../middlewares/fileUpload");
 const reportRouter = new Router();
 
 reportRouter.get(
@@ -16,7 +17,7 @@ reportRouter.get(
 );
 reportRouter.get("/:id", authenticateToken, reportController.getReport);
 
-reportRouter.post("/", authenticateToken, reportController.createReport);
+reportRouter.post("/", authenticateToken, upload.single('photo'), reportController.createReport);
 
 reportRouter.put(
   "/updateDate/:id",

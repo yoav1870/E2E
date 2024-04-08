@@ -98,7 +98,7 @@ exports.userController = {
   },
   async createUser(req, res) {
     try {
-      const { email, password, username, role, location, profession, photo } =
+      const { email, password, username, role, location, profession } =
         req.body;
       if (!email || !password || !username || !role || !location) {
         throw new FormError("Please provide all required fields at createUser");
@@ -106,80 +106,52 @@ exports.userController = {
       if (role !== "service_provider" && role !== "service_request") {
         throw new InvalidRoleError(role);
       }
-      if (role === "service_provider") {
-        if (!profession) {
-          throw new FormError("Please provide profession field at createUser");
-        }
-
-        const existingUser = await UserRepository.findByEmail(email);
-        if (existingUser) {
-          throw new DataAlreadyExistsError(
-            "User with this email already exists."
-          );
-        }
-
-        const hashedPassword = await bcrypt.hash(password, 10);
-
-        const newUser = {
-          email,
-          password: hashedPassword,
-          username,
-          role,
-          location,
-          profession,
-          photo,
-        };
-        const result = {
-          status: 201,
-          data: await UserRepository.create(newUser),
-        };
-        if (result.data === null) {
-          throw new FailedCRUD("Failed to create a user");
-        }
-        if (process.env.NODE_ENV !== "test") {
-          const emailResult = await sendReportNotificationForCreateNewUser(
-            result.data.email
-          );
-          if (emailResult === null) {
-            console.error("Failed to send email");
-          }
-        }
-        res.status(result.status).json(result.data);
-      } else {
-        const existingUser = await UserRepository.findByEmail(email);
-        if (existingUser) {
-          throw new DataAlreadyExistsError(
-            "User with this email already exists."
-          );
-        }
-
-        const hashedPassword = await bcrypt.hash(password, 10);
-
-        const newUser = {
-          email,
-          password: hashedPassword,
-          username,
-          role,
-          location,
-          photo,
-        };
-        const result = {
-          status: 201,
-          data: await UserRepository.create(newUser),
-        };
-
-        if (result.data === null) {
-          throw new FailedCRUD("Failed to create a user");
-        }
-        const emailResult = await sendReportNotificationForCreateNewUser(
-          result.data.email
-        );
-        if (emailResult === null) {
-          console.error("Failed to send email");
-        }
-        res.status(result.status).json(result.data);
+      if (role === "service_provider" && !profession) {
+        throw new FormError("Please provide profession field at createUser");
       }
+
+      const existingUser = await UserRepository.findByEmail(email);
+      if (existingUser) {
+        throw new DataAlreadyExistsError(
+          "User with this email already exists."
+        );
+      }
+
+      const hashedPassword = await bcrypt.hash(password, 10);
+      let photoUrl = req.file ? req.file.location : null; // Use S3 URL from the uploaded file
+
+      const newUser = {
+        email,
+        password: hashedPassword,
+        username,
+        role,
+        location: { type: "Point", coordinates: location.coordinates },
+        profession: role === "service_provider" ? profession : undefined,
+        photo: photoUrl,
+      };
+
+      // Logging the newUser object before attempting to create it in the database
+      console.log("Creating user with:", newUser);
+
+      const createdUser = await UserRepository.create(newUser).catch((err) => {
+        console.error("Error creating user:", err.message);
+        // Depending on your error handling strategy, you might want to send an error response here
+        res
+          .status(500)
+          .json({ error: "Failed to create user due to an error." });
+        return null; // Prevent further execution in case of error
+      });
+
+      if (!createdUser) {
+        // This could be due to the catch block or other reasons like validation failure
+        throw new FailedCRUD("Failed to create a user");
+      }
+
+      // Proceed with your success response...
+      res.status(201).json(createdUser);
     } catch (error) {
+      // Your existing error handling logic
+
       switch (error.name) {
         case "DataAlreadyExistsError":
         case "FormError":

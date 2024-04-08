@@ -162,7 +162,7 @@ exports.reportController = {
         const newReport = {
           location,
           description,
-          photo: req.body.photo,
+          photo: req.file ? req.file.location : null,
           urgency,
           reportByUser: userId,
           dateOfResolve,
