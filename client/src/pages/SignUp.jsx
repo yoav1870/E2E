@@ -42,44 +42,6 @@ const SignUp = () => {
     const [error, setError] = useState('');
     const navigate = useNavigate();
 
-    const formik = useFormik({
-        initialValues: {
-            username: '',
-            email: '',
-            password: '',
-            role: '',
-            location: '',
-            profession: '',
-            description: '',
-            photo: '',
-        },
-        validationSchema: validationSchema,
-        onSubmit: async (values, { setSubmitting }) => {      
-            const dataToSend = {
-                ...values,
-                location: {
-                    type: "Point",
-                    coordinates: values.location.split(',').map(coord => parseFloat(coord.trim()))
-                },
-            };
-
-            try {
-                await axios.post('https://e2e-y8hj.onrender.com/api/users/sign-up', dataToSend, {
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                });
-                navigate('/sign-in');
-            } catch (error) {
-                console.error('Sign up failed', error);
-                const message = error.response && error.response.data ? error.response.data : 'Sign up failed. Please try again.';
-                setError(message);
-            }
-
-            setSubmitting(false);
-        },
-    });
-
   const handleLocationFocus = () => {
     if ("geolocation" in navigator) {
       navigator.geolocation.getCurrentPosition(
