@@ -283,6 +283,7 @@ import {
   TextField,
   Breadcrumbs,
   Link,
+  CardMedia,
 } from "@mui/material";
 import axios from "axios";
 import Header from "../component/Header";
@@ -458,6 +459,15 @@ const ReportPage = () => {
               Date of Resolve:{" "}
               {new Date(report.dateOfResolve).toLocaleDateString()}
             </Typography>
+            {report.photo && (
+              <CardMedia
+                component="img"
+                height="300"
+                image={report.photo}
+                alt="Report Photo"
+                sx={{ mt: 2 }}
+              />
+            )}
             {showUpdateField && (
               <TextField
                 label="New Resolve Date"
@@ -493,7 +503,12 @@ const ReportPage = () => {
 
         {assignedUser ? (
           <>
-            <Typography variant="h5" gutterBottom fontFamily="Georgia, serif" textAlign="center">
+            <Typography
+              variant="h5"
+              gutterBottom
+              fontFamily="Georgia, serif"
+              textAlign="center"
+            >
               Assigned Service Provider
             </Typography>
             <Card>

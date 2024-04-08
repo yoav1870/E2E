@@ -106,13 +106,21 @@
 //   );
 // };
 // HomePage.js
-import React, { useEffect, useState } from 'react';
-import { Container, Typography, Grid, Card, CardContent, CardMedia, CircularProgress } from '@mui/material';
-import { Link } from 'react-router-dom';
-import axios from 'axios';
-import Header from '../component/Header';
-import SearchBar from '../component/SearchBar';
-import DateFilter from '../component/Filter';
+import React, { useEffect, useState } from "react";
+import {
+  Container,
+  Typography,
+  Grid,
+  Card,
+  CardContent,
+  CardMedia,
+  CircularProgress,
+} from "@mui/material";
+import { Link } from "react-router-dom";
+import axios from "axios";
+import Header from "../component/Header";
+import SearchBar from "../component/SearchBar";
+import DateFilter from "../component/Filter";
 
 const HomePage = () => {
   const [reports, setReports] = useState([]);
@@ -123,33 +131,38 @@ const HomePage = () => {
   useEffect(() => {
     const fetchReports = async () => {
       try {
-        const token = localStorage.getItem('token');
-        const response = await axios.get('https://e2e-y8hj.onrender.com/api/reports/home', {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+        const token = localStorage.getItem("token");
+        const response = await axios.get(
+          "https://e2e-y8hj.onrender.com/api/reports/home",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
         setReports(response.data);
         setFilteredReports(response.data);
         setLoading(false);
       } catch (error) {
-        console.error('Failed to fetch reports:', error);
+        console.error("Failed to fetch reports:", error);
         setLoading(false);
 
         // Check if the error response status code is 404
         if (error.response && error.response.status === 404) {
           setError("Sorry, you haven't been placed yet");
         } else if (error.response) {
-          console.error('Response data:', error.response.data);
-          console.error('Response status:', error.response.status);
-          console.error('Response headers:', error.response.headers);
-          setError(`Failed to fetch reports. Server responded with status code ${error.response.status}`);
+          console.error("Response data:", error.response.data);
+          console.error("Response status:", error.response.status);
+          console.error("Response headers:", error.response.headers);
+          setError(
+            `Failed to fetch reports. Server responded with status code ${error.response.status}`
+          );
         } else if (error.request) {
-          console.error('No response received:', error.request);
-          setError('Failed to fetch reports. No response from the server.');
+          console.error("No response received:", error.request);
+          setError("Failed to fetch reports. No response from the server.");
         } else {
-          console.error('Error:', error.message);
-          setError('Failed to fetch reports. An error occurred.');
+          console.error("Error:", error.message);
+          setError("Failed to fetch reports. An error occurred.");
         }
       }
     };
@@ -169,7 +182,12 @@ const HomePage = () => {
     <>
       <Header />
       <Container maxWidth="lg" sx={{ mt: 4 }}>
-        <Typography variant="h4" align="center" gutterBottom  fontFamily="Georgia, serif">
+        <Typography
+          variant="h4"
+          align="center"
+          gutterBottom
+          fontFamily="Georgia, serif"
+        >
           Welcome to the Homepage
         </Typography>
         <SearchBar reports={reports} onSearch={handleSearch} />
@@ -192,7 +210,7 @@ const HomePage = () => {
               <Grid item xs={12} sm={6} md={4} key={report._id}>
                 <Link
                   to={`/reports/${report._id}`}
-                  style={{ textDecoration: 'none' }}
+                  style={{ textDecoration: "none" }}
                 >
                   <Card>
                     {report.photo && (
@@ -214,7 +232,8 @@ const HomePage = () => {
                         Urgency: {report.urgency}
                       </Typography>
                       <Typography variant="body2" color="text.secondary">
-                        Date of Resolve: {new Date(report.dateOfResolve).toLocaleDateString()}
+                        Date of Resolve:{" "}
+                        {new Date(report.dateOfResolve).toLocaleDateString()}
                       </Typography>
                     </CardContent>
                   </Card>

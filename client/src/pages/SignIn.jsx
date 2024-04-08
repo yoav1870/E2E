@@ -1,16 +1,22 @@
 import React, { useState, useEffect } from "react";
-import { Container, Typography, TextField, Button, Link, Collapse } from "@mui/material";
+import {
+  Container,
+  Typography,
+  TextField,
+  Button,
+  Link,
+  Collapse,
+} from "@mui/material";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import logo from "../assets/icon_logo.png";
 
 const SignIn = () => {
   const navigate = useNavigate();
-  const [errorMessage, setErrorMessage] = useState('');
+  const [errorMessage, setErrorMessage] = useState("");
   const [showErrorMessage, setShowErrorMessage] = useState(false);
   const [emailError, setEmailError] = useState(false);
   const [passwordError, setPasswordError] = useState(false);
-  
 
   useEffect(() => {
     if (errorMessage) {
@@ -19,7 +25,7 @@ const SignIn = () => {
         setShowErrorMessage(false);
         // Clear the error message after the collapse animation completes
         // to remove the space it occupied.
-        setTimeout(() => setErrorMessage(''), 300); // Adjust time as needed based on animation duration
+        setTimeout(() => setErrorMessage(""), 300); // Adjust time as needed based on animation duration
       }, 2000); // Wait for 2 seconds before hiding the message
     }
   }, [errorMessage]);
@@ -39,9 +45,13 @@ const SignIn = () => {
     }
 
     try {
-      const response = await axios.post("https://e2e-y8hj.onrender.com/api/users/sign-in", { email, password }, {
-        headers: { "Content-Type": "application/json" },
-      });
+      const response = await axios.post(
+        "https://e2e-y8hj.onrender.com/api/users/sign-in",
+        { email, password },
+        {
+          headers: { "Content-Type": "application/json" },
+        }
+      );
       const { token } = response.data;
       localStorage.setItem("token", token);
       navigate("/home");
@@ -56,8 +66,18 @@ const SignIn = () => {
   };
   return (
     <Container component="main" maxWidth="xs">
-      <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
-        <img src={logo} alt="Logo" style={{ height: "50px", marginTop: "20px" }} />
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+        }}
+      >
+        <img
+          src={logo}
+          alt="Logo"
+          style={{ height: "50px", marginTop: "20px" }}
+        />
         <Typography component="h1" variant="h5" style={{ margin: "20px" }}>
           Sign In
         </Typography>
@@ -99,7 +119,11 @@ const SignIn = () => {
           Sign In
         </Button>
         <Collapse in={showErrorMessage}>
-          <Typography color="error" align="center" style={{ marginBottom: "12px" }}>
+          <Typography
+            color="error"
+            align="center"
+            style={{ marginBottom: "12px" }}
+          >
             {errorMessage}
           </Typography>
         </Collapse>

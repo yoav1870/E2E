@@ -1,5 +1,5 @@
 class InvalidRoleError extends Error {
-  constructor(role, msg) {
+  constructor(role) {
     super("Invalid role: " + role);
     this.name = "InvalidRoleError";
     this.status = 400;
