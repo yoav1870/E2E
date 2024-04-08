@@ -162,10 +162,8 @@ const UserProfile = () => {
         <Typography
           component="h1"
           variant="h4"
-          // fontWeight="bold"
           marginBottom={3}
           fontFamily="Georgia, serif"
-          // color={"#535252"}
         >
           User Profile
         </Typography>

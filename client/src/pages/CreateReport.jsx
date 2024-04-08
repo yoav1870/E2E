@@ -18,7 +18,7 @@ import { useNavigate } from "react-router-dom";
 import Header from "../component/Header";
 import LoadingComponent from "../component/Loading";
 
-const professions = ["electrician", "plumber", "Carpenter", "Technician"];
+// const professions = ["electrician", "plumber", "Carpenter", "Technician"];
 
 const validationSchema = yup.object({
   description: yup.string().required("Description is required"),
@@ -34,8 +34,27 @@ const CreateReport = () => {
   const [location, setLocation] = useState("");
   const [serviceProviderError, setServiceProviderError] = useState("");
   const [selectedPhoto, setSelectedPhoto] = useState(null);
+  const [professions, setProfessions] = useState([]);
 
   useEffect(() => {
+    const fetchProfessions = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const response = await axios.get(
+          "https://e2e-y8hj.onrender.com/api/users/allProfessionals",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        console.log("Professions fetched:", response.data);
+        setProfessions(response.data || []);
+      } catch (error) {
+        console.error("Failed to fetch professions:", error);
+      }
+    };
+
     const fetchUserData = async () => {
       try {
         const token = localStorage.getItem("token");
@@ -53,7 +72,7 @@ const CreateReport = () => {
         console.error("Failed to fetch user data:", error);
       }
     };
-
+    fetchProfessions();
     fetchUserData();
   }, []);
 
@@ -111,7 +130,6 @@ const CreateReport = () => {
         );
         navigate("/home");
       } catch (error) {
-        // Check if the error is from Axios and has a response with the expected data
         if (error.response && typeof error.response.data === "string") {
           setServiceProviderError(error.response.data);
         } else {
@@ -161,7 +179,11 @@ const CreateReport = () => {
             }
             helperText={formik.touched.description && formik.errors.description}
           />
-          <FormControl fullWidth margin="normal">
+          <FormControl
+            fullWidth
+            margin="normal"
+            key={`profession-${professions.length}`}
+          >
             <InputLabel id="profession-label">Profession</InputLabel>
             <Select
               labelId="profession-label"
@@ -173,13 +195,14 @@ const CreateReport = () => {
                 formik.touched.profession && Boolean(formik.errors.profession)
               }
             >
-              {professions.map((profession) => (
-                <MenuItem key={profession} value={profession}>
+              {professions.map((profession, index) => (
+                <MenuItem key={index} value={profession}>
                   {profession}
                 </MenuItem>
               ))}
             </Select>
           </FormControl>
+
           <TextField
             margin="normal"
             required
