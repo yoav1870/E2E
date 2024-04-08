@@ -2,10 +2,10 @@ const jwt = require("jsonwebtoken");
 const { NotAuthorizedError } = require("../errors/general.error");
 const authenticateToken = (req, res, next) => {
   const authHeader = req.headers["authorization"];
-  const token = authHeader && authHeader.split(" ")[1]; // Bearer TOKEN
+  const token = authHeader && authHeader.split(" ")[1];
   if (!token) {
     const error = new NotAuthorizedError();
-    res.status(error.status).send(error.message);
+    return res.status(error.status).send(error.message);
   }
   try {
     const verified = jwt.verify(token, process.env.JWT_SECRET);

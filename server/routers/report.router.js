@@ -2,6 +2,7 @@ const { Router } = require("express");
 const { reportController } = require("../controllers/report.controller");
 const authenticateToken = require("../middlewares/authenticateToken");
 const upload = require("../middlewares/fileUpload");
+const { NotFoundCRUD } = require("../errors/general.error");
 const reportRouter = new Router();
 
 reportRouter.get(

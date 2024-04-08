@@ -1,6 +1,6 @@
 const { Router } = require("express");
 const { userController } = require("../controllers/user.controller");
-const { NotFoundCRUD, RequiredIdError } = require("../errors/general.error");
+const { NotFoundCRUD } = require("../errors/general.error");
 const authenticateToken = require("../middlewares/authenticateToken");
 const upload = require("../middlewares/fileUpload");
 const UserRouter = new Router();

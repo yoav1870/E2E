@@ -1,6 +1,5 @@
 const app = require("../server");
 const request = require("supertest");
-const jwt = require("jsonwebtoken");
 const authenticateToken = require("../middlewares/authenticateToken");
 const { UserRepository } = require("../repositories/user.repository");
 const { reportRepository } = require("../repositories/report.repository");
@@ -547,6 +546,7 @@ describe("PUT /api/reports/updateStatus/:id", () => {
     expect(response.body).toEqual("Report status updated");
   });
 });
+
 describe("DELETE /api/reports", () => {
   beforeEach(() => {
     authenticateToken.mockImplementation((req, res, next) => {
@@ -594,6 +594,29 @@ describe("DELETE /api/reports", () => {
       "Access Denied you forbidden for this content."
     );
   });
-});
+  it("should return 400 when failed crud", async () => {
+    reportRepository.retrieve.mockImplementation(() => {
+      return { reportId: "1", reportByUser: "123" };
+    });
 
-// enum: ["pending", "in_progress", "completed"],
+    reportRepository.delete.mockImplementation(() => {
+      return null;
+    });
+
+    const response = await request(app).delete(`/api/reports`).send({ id: 1 });
+
+    expect(response.status).toBe(400);
+    expect(response.body).toEqual("failed to delete the report");
+  });
+  it("should return 200 when the report is deleted", async () => {
+    reportRepository.retrieve.mockResolvedValue({
+      reportId: "1",
+      reportByUser: "123",
+    });
+    reportRepository.delete.mockResolvedValue(true);
+    const response = await request(app).delete(`/api/reports`).send({ id: 1 });
+
+    expect(response.status).toBe(200);
+    expect(response.body).toEqual("Report has been deleted");
+  });
+});
