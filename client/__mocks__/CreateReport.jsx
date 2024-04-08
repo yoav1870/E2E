@@ -1,12 +1,12 @@
-import React, { useState } from 'react';
+import { useState } from "react";
 
 const MockCreateReport = ({ isLoading }) => {
   const [formData, setFormData] = useState({
-    description: '',
-    profession: '',
-    urgency: '',
-    dateOfResolve: '',
-    range: '',
+    description: "",
+    profession: "",
+    urgency: "",
+    dateOfResolve: "",
+    range: "",
   });
 
   const handleChange = (e) => {
@@ -18,7 +18,7 @@ const MockCreateReport = ({ isLoading }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log('Form data:', formData);
+    console.log("Form data:", formData);
     // Add logic to handle form submission
   };
 
