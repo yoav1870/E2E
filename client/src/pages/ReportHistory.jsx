@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 import {
   Container,
@@ -7,8 +7,11 @@ import {
   Card,
   CardContent,
   Grid,
+  Breadcrumbs,
+  Link,
 } from "@mui/material";
 import Header from "../component/Header";
+import { Link as RouterLink } from "react-router-dom";
 
 const ReportsHistory = () => {
   const [reports, setReports] = useState([]);
@@ -41,6 +44,33 @@ const ReportsHistory = () => {
   return (
     <>
       <Header />
+      <Breadcrumbs
+        aria-label="breadcrumb"
+        sx={{
+          fontFamily: '"Times New Roman", serif',
+          marginLeft: "10px",
+          display: { xs: "none", sm: "flex" },
+        }}
+      >
+        <Link
+          component={RouterLink}
+          color="inherit"
+          to="/"
+          style={{ fontFamily: '"Times New Roman", serif' }}
+          underline="none"
+        >
+          Home
+        </Link>
+        <Link
+          component={RouterLink}
+          color="inherit"
+          to="/report-history"
+          style={{ fontFamily: '"Times New Roman", serif', marginLeft: "5px" }}
+          underline="none"
+        >
+          report history
+        </Link>
+      </Breadcrumbs>
       <Container maxWidth="lg" sx={{ mt: 4 }}>
         <Typography
           variant="h4"

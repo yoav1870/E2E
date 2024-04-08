@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Container,
   Typography,
@@ -6,9 +6,12 @@ import {
   List,
   ListItem,
   ListItemText,
+  Breadcrumbs,
+  Link,
 } from "@mui/material";
 import axios from "axios";
 import Header from "../component/Header";
+import { Link as RouterLink } from "react-router-dom";
 
 const Information = () => {
   const [videos, setVideos] = useState([]);
@@ -67,6 +70,33 @@ const Information = () => {
   return (
     <>
       <Header />
+      <Breadcrumbs
+        aria-label="breadcrumb"
+        sx={{
+          fontFamily: '"Times New Roman", serif',
+          marginLeft: "10px",
+          display: { xs: "none", sm: "flex" },
+        }}
+      >
+        <Link
+          component={RouterLink}
+          color="inherit"
+          to="/"
+          style={{ fontFamily: '"Times New Roman", serif' }}
+          underline="none"
+        >
+          Home
+        </Link>
+        <Link
+          component={RouterLink}
+          color="inherit"
+          to="/information"
+          style={{ fontFamily: '"Times New Roman", serif', marginLeft: "5px" }}
+          underline="none"
+        >
+          Inforamation
+        </Link>
+      </Breadcrumbs>
       <Container maxWidth="lg" sx={{ mt: 4 }}>
         <Typography
           variant="h4"

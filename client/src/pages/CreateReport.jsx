@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import {
   Collapse,
   Container,
@@ -10,6 +10,8 @@ import {
   Select,
   MenuItem,
   Box,
+  Breadcrumbs,
+  Link,
 } from "@mui/material";
 import { useFormik } from "formik";
 import * as yup from "yup";
@@ -17,6 +19,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import Header from "../component/Header";
 import LoadingComponent from "../component/Loading";
+import { Link as RouterLink } from "react-router-dom";
 
 // const professions = ["electrician", "plumber", "Carpenter", "Technician"];
 
@@ -146,6 +149,33 @@ const CreateReport = () => {
   return (
     <>
       <Header />
+      <Breadcrumbs
+        aria-label="breadcrumb"
+        sx={{
+          fontFamily: '"Times New Roman", serif',
+          marginLeft: "10px",
+          display: { xs: "none", sm: "flex" },
+        }}
+      >
+        <Link
+          component={RouterLink}
+          color="inherit"
+          to="/"
+          style={{ fontFamily: '"Times New Roman", serif' }}
+          underline="none"
+        >
+          Home
+        </Link>
+        <Link
+          component={RouterLink}
+          color="inherit"
+          to="/create-report"
+          style={{ fontFamily: '"Times New Roman", serif', marginLeft: "5px" }}
+          underline="none"
+        >
+          Create Report
+        </Link>
+      </Breadcrumbs>
       <Container
         component="main"
         sx={{

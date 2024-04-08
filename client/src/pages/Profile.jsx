@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Container, Typography, Box, Paper, Button } from "@mui/material";
 import { useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
@@ -11,7 +11,10 @@ import {
   DialogContentText,
   DialogTitle,
   Avatar,
+  Breadcrumbs,
+  Link,
 } from "@mui/material";
+import { Link as RouterLink } from "react-router-dom";
 
 const UserProfile = () => {
   const [user, setUser] = useState(null);
@@ -149,6 +152,33 @@ const UserProfile = () => {
   return (
     <>
       <Header />
+      <Breadcrumbs
+        aria-label="breadcrumb"
+        sx={{
+          fontFamily: '"Times New Roman", serif',
+          marginLeft: "10px",
+          display: { xs: "none", sm: "flex" },
+        }}
+      >
+        <Link
+          component={RouterLink}
+          color="inherit"
+          to="/"
+          style={{ fontFamily: '"Times New Roman", serif' }}
+          underline="none"
+        >
+          Home
+        </Link>
+        <Link
+          component={RouterLink}
+          color="inherit"
+          to="/profile"
+          style={{ fontFamily: '"Times New Roman", serif', marginLeft: "5px" }}
+          underline="none"
+        >
+          profile
+        </Link>
+      </Breadcrumbs>
       <Container
         component="main"
         maxWidth="sm"

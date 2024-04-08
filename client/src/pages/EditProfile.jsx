@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import {
   Container,
   Typography,
@@ -47,9 +47,11 @@ const EditProfile = () => {
       <Breadcrumbs
         aria-label="breadcrumb"
         sx={{
-          fontFamily: '"Times New Roman", serif', marginLeft: '10px',
-          display: { xs: 'none', sm: 'flex' },
-      }}      >
+          fontFamily: '"Times New Roman", serif',
+          marginLeft: "10px",
+          display: { xs: "none", sm: "flex" },
+        }}
+      >
         <Link
           component={RouterLink}
           color="inherit"
@@ -69,13 +71,15 @@ const EditProfile = () => {
           profile
         </Link>
 
-        <Typography
-          color="text.primary"
-          style={{ fontFamily: '"Times New Roman", serif' }}
-          to="/profile"
+        <Link
+          component={RouterLink}
+          color="inherit"
+          to="/edit-profile"
+          style={{ fontFamily: '"Times New Roman", serif', marginLeft: "5px" }}
+          underline="none"
         >
           Edit profile
-        </Typography>
+        </Link>
       </Breadcrumbs>
       <Container maxWidth="sm" sx={{ marginTop: 5 }}>
         <Typography

@@ -269,12 +269,19 @@ const Header = () => {
                 label="Reports History"
                 component={RouterLink}
                 to="/report-history"
+                sx={{ "&:hover": { color: "primary.dark" } }}
               />
-              <Tab label="My Profile" component={RouterLink} to="/profile" />
+              <Tab
+                label="My Profile"
+                component={RouterLink}
+                to="/profile"
+                sx={{ "&:hover": { color: "primary.dark" } }}
+              />
               <Tab
                 label="Information"
                 component={RouterLink}
                 to="/information"
+                sx={{ "&:hover": { color: "primary.dark" } }}
               />
               {userRole !== "service_provider" && (
                 <Tab
@@ -282,10 +289,8 @@ const Header = () => {
                   component={RouterLink}
                   to="/create-report"
                   sx={{
-                    // backgroundColor: 'rgba(100, 100, 100, 0.2)',
-                    // color: "white",
                     "&:hover": {
-                      backgroundColor: "primary.dark",
+                      color: "primary.dark",
                     },
                     marginLeft: "auto",
                   }}
