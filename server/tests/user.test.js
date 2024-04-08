@@ -300,6 +300,41 @@ describe("GET /api/users/:id", () => {
   });
 });
 
+describe("GET /api/users/allProfessionals", () => {
+  it("should return 500 for server errors", async () => {
+    UserRepository.getAllProfessionals.mockImplementation(() => {
+      const error = new Error("Unexpected error");
+      error.name = "UnknownError";
+      throw error;
+    });
+
+    const response = await request(app).get(`/api/users/allProfessionals`);
+
+    expect(response.status).toBe(500);
+    expect(response.body).toEqual(
+      "server encountered an unexpected condition that prevented it from fulfilling the request."
+    );
+  });
+  it("should return 404 if professionals not found", async () => {
+    UserRepository.getAllProfessionals.mockResolvedValue(null);
+    const response = await request(app).get(`/api/users/allProfessionals`);
+
+    expect(response.status).toBe(404);
+    expect(response.body).toEqual("No data found at getAllProfessionals.");
+  });
+  it("should return 200 and professionals data if professionals found", async () => {
+    const mockData = [
+      { userId: "123", name: "John Doe", profession: "doctor" },
+    ];
+    UserRepository.getAllProfessionals.mockResolvedValue(mockData);
+
+    const response = await request(app).get(`/api/users/allProfessionals`);
+
+    expect(response.status).toBe(200);
+    expect(response.body).toEqual(["doctor"]);
+  });
+});
+
 describe("PUT /api/users/updatePassword", () => {
   beforeEach(() => {
     authenticateToken.mockImplementation((req, res, next) => {

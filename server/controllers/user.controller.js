@@ -152,28 +152,29 @@ exports.userController = {
         photo: photoUrl,
       };
 
-      // Logging the newUser object before attempting to create it in the database
-      console.log("Creating user with:", newUser);
-
       const createdUser = await UserRepository.create(newUser).catch((err) => {
         console.error("Error creating user:", err.message);
-        // Depending on your error handling strategy, you might want to send an error response here
         res
           .status(500)
           .json({ error: "Failed to create user due to an error." });
-        return null; // Prevent further execution in case of error
+        return null;
       });
 
       if (!createdUser) {
-        // This could be due to the catch block or other reasons like validation failure
         throw new FailedCRUD("Failed to create a user");
       }
 
-      // Proceed with your success response...
+      if (process.env.NODE_ENV !== "test") {
+        const emailResult = await sendReportNotificationForCreateNewUser(
+          createdUser.email,
+          createdUser.username
+        );
+        if (emailResult === false) {
+          console.error("Failed to send email");
+        }
+      }
       res.status(201).json(createdUser);
     } catch (error) {
-      // Your existing error handling logic
-
       switch (error.name) {
         case "DataAlreadyExistsError":
         case "FormError":
@@ -187,6 +188,7 @@ exports.userController = {
       }
     }
   },
+
   async updateUserPassword(req, res) {
     try {
       const userId = req.user.userId;
@@ -251,6 +253,7 @@ exports.userController = {
       }
     }
   },
+
   async deleteUser(req, res) {
     try {
       const result = await deleteUserById(req.user.userId);

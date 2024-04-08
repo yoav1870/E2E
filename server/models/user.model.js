@@ -64,13 +64,6 @@ userSchema.path("profession").required(function () {
   return this.role === "service_provider";
 });
 
-userSchema.pre("save", function (next) {
-  if (this.profession) {
-    this.profession = this.profession.toLowerCase();
-  }
-  next();
-});
-
 userSchema.index({ location: "2dsphere" });
 
 const User = model("user", userSchema);
