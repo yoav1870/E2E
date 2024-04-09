@@ -55,7 +55,7 @@ const SignIn = () => {
       const { token } = response.data;
       localStorage.setItem("token", token);
       navigate("/home");
-      window.location.reload();
+      // window.location.reload();
     } catch (error) {
       if (error.response) {
         setErrorMessage("Invalid email or password");

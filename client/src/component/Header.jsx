@@ -1,6 +1,8 @@
 // Header.jsx
 import { useState, useEffect } from "react";
 import { Link as RouterLink, useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+
 import {
   AppBar,
   Toolbar,
@@ -48,6 +50,7 @@ const Header = () => {
   const [userRole, setUserRole] = useState("");
   const [user, setUser] = useState(null);
   const location = useLocation();
+  const navigate = useNavigate();
 
   useEffect(() => {
     // Decode the JWT token and set the user role
@@ -104,7 +107,8 @@ const Header = () => {
     localStorage.removeItem("role");
 
     // Redirect to the sign-in page using window.location.href
-    window.location.href = "/sign-in";
+    // window.location.href = "/sign-in";
+    navigate("/sign-in");
   };
 
   const getTabValue = () => {
