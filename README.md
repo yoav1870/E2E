@@ -58,12 +58,93 @@ Create a `.env` file in the root directory and set the following variables:
 - `GMAIL_USER`, `GMAIL_APP_PASSWORD`: Gmail credentials for nodemailer.
 - `DB_USER`, `DB_PASS`, `DB_HOST`: MongoDB credentials.
 - `YOUTUBE_API_KEY`: API key for YouTube integration.
+- `GOOGLE_MAPS_API_KEY` : API key for google maps city
 
 ## Getting Started
 
-To begin, follow these steps:
+To begin setting up the Damages Assessment and Resolution Platform on your local environment, follow these steps to get both the client and server sides up and running.
+
+### 1. Clone the Repository
+Start by cloning the project repository to your local machine. Open your terminal and execute:
+ `https://github.com/yoav1870/E2E` 
+
+### 2. Set Up the Server
+**Navigate to the Server Directory**
+```bash
+cd server
+```
+
+**Install Dependencies**
+
+Install the necessary dependencies for the server side by running:
+
+```bash
+npm install
+```
+
+**Configure Environment Variables**
+
+Create a `.env` file in the root of your server directory. Add the necessary environment variables as outlined in the project's documentation.
+
+Example:
+
+```bash
+JWT_SECRET=your_jwt_secret_here
+AWS_ACCESS_KEY_ID=your_access_key
+AWS_SECRET_ACCESS_KEY=your_secret_access_key
+DB_HOST=your_database_host
+DB_USER=your_database_username
+DB_PASS=your_database_password
+GMAIL_USER=your_gmail_username
+GMAIL_APP_PASSWORD=your_gmail_app_password
+```
+**Start the Server**
+
+With the environment configured and dependencies installed, start the server:
+```bash
+npm start
+```
 
 
+
+### 3. Set Up the Client
+**Navigate to the Client Directory**
+
+Open a new terminal window and navigate to the client directory within your cloned repository:
+```bash
+cd client
+```
+
+**Install Dependencies**
+
+Install the necessary dependencies for the client side:
+
+```bash
+npm install
+```
+
+**Configure Environment Variables**
+
+Create a `.env` file in the root of your client directory. Include any required environment variables specific to the client side.
+
+Example:
+```bash
+VITE_YOUTUBE_API_KEY=""
+VITE_GOOGLE_MAPS_API_KEY=""
+```
+
+**Start the Client Development Server**
+
+Finally, start the client development server:
+
+```bash
+npm start
+```
+
+The client application should now be accessible in your browser, typically at `http://localhost:3000`.
+
+### 4. Explore the Application
+With both the server and client running, you're now ready to explore the functionalities of the Damages Assessment and Resolution Platform. Begin by registering as a new user, browsing through the service offerings, or reporting a new issue.
 
 
 ## Server-Side Testing
@@ -76,11 +157,6 @@ Testing is a critical part of the development process. Our server-side code incl
 - **Mocking**: To isolate the testing environment from the production server, we use Jest mocks for external dependencies such as databases and middleware.
 - **Test Coverage**: Our tests cover successful operations and various error scenarios to ensure robust error handling.
 
-### Key Endpoint Tests
-
-- **User Authentication**: Tests for sign-in include checking for successful token generation with valid credentials, and handling of missing fields or incorrect password.
-- **User Registration**: Tests validate that only users with unique emails can register, required fields are checked, and the correct role and profession are stored.
-- **Report Management**: We verify that reports can be created, updated, and deleted correctly, ensuring that users can only manipulate reports they have submitted or been assigned to.
 
 ### How to Run Tests
 
@@ -94,7 +170,26 @@ npm test -- tests/report.test.js
 npm test -- tests/user.test.js
 ```
 
+## Client-Side Testing
+Testing is equally important on the client side to ensure our user interface works as expected. We have implemented tests for our React components to verify both their functionality and their interaction with external services and APIs.
+### Test Suite Features
+- **Automated Testing** with React Testing Library: Utilizes React Testing Library and Jest to simulate user interactions and test component state.
+- **Mocking API Calls** Uses Jest to mock axios calls, allowing us to test the behavior of our components in response to successful and failed API requests.
+- **Route Testing** Incorporates testing for React Router to ensure navigation occurs correctly when users interact with the application.
+- **Mocking Modules** Implements module mocks for files and styles (e.g., images, CSS modules), which are not directly testable or relevant to the logic being tested.
 
+### How to Run Tests
+To run the client-side tests, navigate to the client directory in your terminal. Then, execute the following command to run all tests:
+```bash
+npm test -- tests/SignIn.test.jsx
+```
+
+```bash
+npm test -- tests/EditProfile.test.jsx
+```
+## API Reference
+
+POSTMAN = https://documenter.getpostman.com/view/32136851/2sA35G21W9
 ## Feedback
 
 If you have any feedback, please reach out to us at https://github.com/yoav1870/E2E
