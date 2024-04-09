@@ -9,6 +9,7 @@ import {
   Grid,
   Breadcrumbs,
   Link,
+  CardMedia,
 } from "@mui/material";
 import Header from "../component/Header";
 import { Link as RouterLink } from "react-router-dom";
@@ -92,6 +93,25 @@ const ReportsHistory = () => {
               <Grid item xs={12} sm={6} md={4} key={report._id}>
                 <Card>
                   <CardContent>
+                    <Typography variant="h5">
+                      {report.photo ? (
+                        <CardMedia
+                          component="img"
+                          height="300"
+                          image={report.photo}
+                          alt="Report Photo"
+                          sx={{ mt: 2 }}
+                        />
+                      ) : (
+                        <CardMedia
+                          component="img"
+                          height="300"
+                          image="https://s3.eu-central-1.amazonaws.com/report.photo.bucket/defult_report.png"
+                          alt="Defult Photo"
+                          sx={{ mt: 2 }}
+                        />
+                      )}
+                    </Typography>
                     <Typography variant="h6">{report.description}</Typography>
                     <Typography color="text.secondary">
                       Resolve Date:{" "}
