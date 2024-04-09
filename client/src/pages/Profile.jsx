@@ -34,16 +34,12 @@ const UserProfile = () => {
     try {
       const token = localStorage.getItem("token");
 
-      console.log("User ID for deletion: ", user?.id); // Assuming 'user' state exists
-
       // Perform the deletion operation
       await axios.delete(`https://e2e-y8hj.onrender.com/api/users/deleteUser`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
-
-      console.log("User deleted successfully. Navigating to sign-in page.");
 
       // Clear local storage or any state management tokens/user info here
       localStorage.removeItem("token");

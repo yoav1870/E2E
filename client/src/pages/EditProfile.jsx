@@ -32,7 +32,6 @@ const EditProfile = () => {
         }
       );
 
-      console.log(response.data); // Password has been updated
       navigate("/profile", { state: { passwordUpdated: true } });
     } catch (error) {
       console.error("Failed to update password:", error);
@@ -122,7 +121,8 @@ const EditProfile = () => {
             sx={{
               marginTop: 2,
               justifyContent: "center",
-              fontFamily: '"Times New Roman", serif',
+              fontFamily: "'Tahoma', sans-serif",
+              textTransform: "none",
             }}
           >
             Update Password

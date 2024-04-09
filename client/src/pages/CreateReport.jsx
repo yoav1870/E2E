@@ -49,7 +49,6 @@ const CreateReport = () => {
             },
           }
         );
-        console.log("Professions fetched:", response.data);
         setProfessions(response.data || []);
       } catch (error) {
         console.error("Failed to fetch professions:", error);

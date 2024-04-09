@@ -158,7 +158,6 @@ const ReportPage = () => {
         { newDateOfResolve: newResolveDate },
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      console.log("Setting Snackbar message to success");
       setSnackbarMessage("Report updated successfully.");
       setSnackbarOpen(true);
       setShowUpdateField(false);
@@ -174,7 +173,6 @@ const ReportPage = () => {
     if (reason === "clickaway") {
       return;
     }
-    console.log("Closing Snackbar");
     setSnackbarOpen(false);
   };
 
@@ -266,7 +264,7 @@ const ReportPage = () => {
         >
           Report Details
         </Typography>
-        <Card sx={{ mb: 2 ,maxWidth: 600, mx: 'auto'}}>
+        <Card sx={{ mb: 2, maxWidth: 600, mx: "auto" }}>
           <CardContent>
             <Typography variant="h6" gutterBottom>
               Description: {report.description}
@@ -340,16 +338,16 @@ const ReportPage = () => {
               </Alert>
             </Collapse>
             <Box
-                 sx={{ display: "flex", justifyContent: "space-between", mt: 2 }}
-                 >
-                   {userRole !== "service_provider" && (
-                     <Button
-                       onClick={updateReportDate}
-                       variant="contained"
-                       sx={{ textTransform: "none" }}
-                     >
-                       {showUpdateField ? "Submit New Date" : "Update Resolve Date"}
-                     </Button>
+              sx={{ display: "flex", justifyContent: "space-between", mt: 2 }}
+            >
+              {userRole !== "service_provider" && (
+                <Button
+                  onClick={updateReportDate}
+                  variant="contained"
+                  sx={{ textTransform: "none" }}
+                >
+                  {showUpdateField ? "Submit New Date" : "Update Resolve Date"}
+                </Button>
               )}
               <Button
                 variant="contained"
@@ -365,13 +363,18 @@ const ReportPage = () => {
 
         {userDetails && (
           <>
-            <Typography variant="h5" gutterBottom  fontFamily="Georgia, serif"
-          textAlign="center" sx={{ mt: 4 }}>
+            <Typography
+              variant="h5"
+              gutterBottom
+              fontFamily="Georgia, serif"
+              textAlign="center"
+              sx={{ mt: 4 }}
+            >
               {userRole === "service_provider"
                 ? "Client Details"
                 : "Assigned Service Provider"}
             </Typography>
-            <Card sx={{ mb: 2 ,maxWidth: 600, mx: 'auto'}}>
+            <Card sx={{ mb: 2, maxWidth: 600, mx: "auto" }}>
               <CardContent>
                 <Typography variant="h6" gutterBottom>
                   Name: {userDetails.username}
