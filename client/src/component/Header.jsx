@@ -108,7 +108,9 @@ const Header = () => {
 
     // Redirect to the sign-in page using window.location.href
     // window.location.href = "/sign-in";
-    navigate("/sign-in");
+    navigate("/sign-in", { replace: true });
+    window.location.reload();
+    //  navigate("/edit-profile");
   };
 
   const getTabValue = () => {
