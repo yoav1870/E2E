@@ -106,12 +106,21 @@ const HomePage = () => {
                   style={{ textDecoration: "none" }}
                 >
                   <Card>
-                    {report.photo && (
+                    {report.photo ? (
                       <CardMedia
                         component="img"
-                        height="200"
+                        height="300"
                         image={report.photo}
-                        alt={report.description}
+                        alt="Report Photo"
+                        sx={{ mt: 2 }}
+                      />
+                    ) : (
+                      <CardMedia
+                        component="img"
+                        height="300"
+                        image="https://s3.eu-central-1.amazonaws.com/report.photo.bucket/defult_report.png"
+                        alt="Defult Photo"
+                        sx={{ mt: 2 }}
                       />
                     )}
                     <CardContent>

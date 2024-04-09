@@ -21,6 +21,7 @@ import {
   DialogContentText,
   DialogTitle,
   Snackbar,
+  Avatar,
 } from "@mui/material";
 import axios from "axios";
 import Header from "../component/Header";
@@ -279,12 +280,20 @@ const ReportPage = () => {
               Date of Resolve:{" "}
               {new Date(report.dateOfResolve).toLocaleDateString()}
             </Typography>
-            {report.photo && (
+            {report.photo ? (
               <CardMedia
                 component="img"
                 height="300"
                 image={report.photo}
                 alt="Report Photo"
+                sx={{ mt: 2 }}
+              />
+            ) : (
+              <CardMedia
+                component="img"
+                height="300"
+                image="https://s3.eu-central-1.amazonaws.com/report.photo.bucket/defult_report.png"
+                alt="Defult Photo"
                 sx={{ mt: 2 }}
               />
             )}
@@ -382,14 +391,20 @@ const ReportPage = () => {
                 <Typography variant="body1" gutterBottom>
                   Email: {userDetails.email}
                 </Typography>
-                {userRole === "service_provider" && (
-                  <Typography variant="body1" gutterBottom>
-                    Location:{" "}
-                    {Array.isArray(userDetails.location)
-                      ? userDetails.location.join(", ")
-                      : "Location unavailable"}
-                  </Typography>
-                )}
+                <Typography variant="body1" gutterBottom>
+                  photo:{" "}
+                  {userDetails.photo ? (
+                    <CardMedia
+                      component="img"
+                      height="100"
+                      image={userDetails.photo}
+                      alt="Report Photo"
+                      sx={{ mt: 2 }}
+                    />
+                  ) : (
+                    <Avatar />
+                  )}
+                </Typography>
                 {userRole !== "service_provider" && (
                   <>
                     <Typography variant="body1" gutterBottom>
