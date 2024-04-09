@@ -1,25 +1,9 @@
-import React, { useState, useEffect } from "react";
-import {
-  TextField,
-  Grid,
-  styled,
-  IconButton,
-  Collapse,
-  Button,
-  Divider,
-} from "@mui/material";
+import { useState, useEffect } from "react";
+import PropTypes from "prop-types";
+import { Grid, IconButton, Collapse, Button, Divider } from "@mui/material";
 import { LocalizationProvider, DatePicker } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import FilterListIcon from "@mui/icons-material/FilterList";
-
-const StyledTextField = styled(TextField)({
-  "& .MuiOutlinedInput-root": {
-    borderRadius: "24px",
-    "&:hover": {
-      boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
-    },
-  },
-});
 
 const DateFilter = ({ reports, onFilter }) => {
   const [startDate, setStartDate] = useState(null);
@@ -108,9 +92,12 @@ const DateFilter = ({ reports, onFilter }) => {
         </Grid>
       </Grid>
     </LocalizationProvider>
-    
-
   );
+};
+
+DateFilter.propTypes = {
+  reports: PropTypes.array.isRequired,
+  onFilter: PropTypes.func.isRequired,
 };
 
 export default DateFilter;

@@ -1,7 +1,5 @@
-import React from "react";
 import { Box, Container, Typography, Link } from "@mui/material";
 import { FaGithub } from "react-icons/fa";
-
 
 const Footer = () => {
   return (
@@ -12,9 +10,6 @@ const Footer = () => {
         color: "white",
         py: 2,
         mt: "auto",
-        // position: "relative",
-        // bottom: 0,
-        // left: 0,
       }}
     >
       <Container

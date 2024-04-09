@@ -10,7 +10,7 @@ import Information from "./pages/Information.jsx";
 import Footer from "./component/Footer";
 import ReportHistory from "./pages/ReportHistory";
 import { Box } from "@mui/system";
-import './app.css';
+import "./app.css";
 
 const App = () => {
   const isAuthenticated = () => {
@@ -27,58 +27,82 @@ const App = () => {
           minHeight: "100vh",
         }}
       >
-          <Box
+        <Box
           className="content"
           sx={{
             flex: 1,
-            
           }}
         >
-        <Routes>
-          <Route
-            path="/sign-in"
-            element={isAuthenticated() ? <Navigate to="/home" /> : <SignIn />}
-          />
-          <Route
-            path="/sign-up"
-            element={isAuthenticated() ? <Navigate to="/home" /> : <SignUp />}
-          />
-          <Route
-            path="/"
-            element={
-              isAuthenticated() ? (
-                <Navigate to="/home" />
-              ) : (
-                <Navigate to="/sign-in" />
-              )
-            }
-          />
-          <Route
-            path="/home"
-            element={
-              isAuthenticated() ? <HomePage /> : <Navigate to="/sign-in" />
-            }
-          />
-          <Route
-            path="/profile"
-            element={
-              isAuthenticated() ? <Profile /> : <Navigate to="/sign-in" />
-            }
-          />
-          <Route
-            path="/create-report"
-            element={
-              isAuthenticated() ? <CreateReport /> : <Navigate to="/sign-in" />
-            }
-          />
-          <Route path="/reports/:id" element={<ReportPage />} />
-          <Route path="/edit-profile" element={<EditProfile />} />
-          <Route path="/information" element={<Information />} />
-          <Route
-            path="/report-history"
-            element={isAuthenticated() ? <ReportHistory /> : <Navigate to="/sign-in" />}
-          />
-      </Routes>
+          <Routes>
+            <Route
+              path="/sign-in"
+              element={isAuthenticated() ? <Navigate to="/home" /> : <SignIn />}
+            />
+            <Route
+              path="/sign-up"
+              element={isAuthenticated() ? <Navigate to="/home" /> : <SignUp />}
+            />
+            <Route
+              path="/"
+              element={
+                isAuthenticated() ? (
+                  <Navigate to="/home" />
+                ) : (
+                  <Navigate to="/sign-in" />
+                )
+              }
+            />
+            <Route
+              path="/home"
+              element={
+                isAuthenticated() ? <HomePage /> : <Navigate to="/sign-in" />
+              }
+            />
+            <Route
+              path="/profile"
+              element={
+                isAuthenticated() ? <Profile /> : <Navigate to="/sign-in" />
+              }
+            />
+            <Route
+              path="/create-report"
+              element={
+                isAuthenticated() ? (
+                  <CreateReport />
+                ) : (
+                  <Navigate to="/sign-in" />
+                )
+              }
+            />
+            <Route
+              path="/reports/:id"
+              element={
+                isAuthenticated() ? <ReportPage /> : <Navigate to="/sign-in" />
+              }
+            />
+            <Route
+              path="/edit-profile"
+              element={
+                isAuthenticated() ? <EditProfile /> : <Navigate to="/sign-in" />
+              }
+            />
+            <Route
+              path="/information"
+              element={
+                isAuthenticated() ? <Information /> : <Navigate to="/sign-in" />
+              }
+            />
+            <Route
+              path="/report-history"
+              element={
+                isAuthenticated() ? (
+                  <ReportHistory />
+                ) : (
+                  <Navigate to="/sign-in" />
+                )
+              }
+            />
+          </Routes>
         </Box>
         <Footer />
       </Box>

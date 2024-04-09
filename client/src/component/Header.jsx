@@ -1,5 +1,5 @@
 // Header.jsx
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Link as RouterLink, useLocation } from "react-router-dom";
 import {
   AppBar,
@@ -129,7 +129,6 @@ const Header = () => {
       open={Boolean(mobileMenuAnchorEl)}
       onClose={handleMobileMenuClose}
     >
-      {/* Apply the sx prop with fontFamily to each MenuItem */}
       <MenuItem
         component={RouterLink}
         to="/report-history"

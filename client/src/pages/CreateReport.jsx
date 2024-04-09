@@ -21,8 +21,6 @@ import Header from "../component/Header";
 import LoadingComponent from "../component/Loading";
 import { Link as RouterLink } from "react-router-dom";
 
-// const professions = ["electrician", "plumber", "Carpenter", "Technician"];
-
 const validationSchema = yup.object({
   description: yup.string().required("Description is required"),
   profession: yup.string().required("Profession is required"),

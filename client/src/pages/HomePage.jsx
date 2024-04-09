@@ -1,5 +1,5 @@
 // HomePage.js
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Container,
   Typography,
@@ -136,7 +136,6 @@ const HomePage = () => {
           </Grid>
         )}
       </Container>
-      {/* <Footer /> */}
     </>
   );
 };

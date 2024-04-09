@@ -256,20 +256,6 @@ const UserProfile = () => {
           >
             Member since: {new Date(user.createdAt).toLocaleDateString()}
           </Typography>
-          {/* <Box
-            sx={{ display: "flex", justifyContent: "center", marginTop: 2 }}
-          >
-            <Button
-              variant="contained"
-              onClick={handleEditProfile}
-              sx={{
-                fontFamily: "'Tahoma', sans-serif",
-                textTransform: 'none', 
-              }}
-            >
-              Edit Profile
-            </Button>
-          </Box> */}
           <Box
             sx={{
               display: "flex",

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import PropTypes from "prop-types";
 
 const MockCreateReport = ({ isLoading }) => {
   const [formData, setFormData] = useState({
@@ -86,6 +87,10 @@ const MockCreateReport = ({ isLoading }) => {
       </form>
     </div>
   );
+};
+
+MockCreateReport.propTypes = {
+  isLoading: PropTypes.bool,
 };
 
 export default MockCreateReport;
